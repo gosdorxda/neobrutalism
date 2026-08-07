@@ -326,7 +326,7 @@ export function TokenInfo() {
   ];
 
   return (
-    <section id="token" className="w-full bg-gradient-to-b from-secondary-background via-background to-secondary-background py-8 sm:py-10">
+    <section id="token" className="w-full bg-gradient-to-b from-secondary-background to-background py-8 sm:py-10">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="text-center mb-6">

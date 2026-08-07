@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       updates.foundationWallet = body.foundationWallet.trim();
     }
 
-    const socialFields = ["telegram", "twitter", "instagram", "tiktok"] as const;
+    const socialFields = ["telegram", "twitter", "instagram", "tiktok", "partnerApplyLink"] as const;
     socialFields.forEach((field) => {
       if (body[field] !== undefined) {
         if (typeof body[field] !== "string") {
@@ -69,6 +69,7 @@ export async function POST(request: NextRequest) {
         icon: ["Cat", "Home", "PawPrint", "Shield", "Heart"].includes(String((p as Partner).icon))
           ? (String((p as Partner).icon) as Partner["icon"])
           : "Cat",
+        logo: String((p as Partner).logo || ""),
         socials: {
           instagram: String(((p as Partner).socials as Partner["socials"])?.instagram || ""),
           facebook: String(((p as Partner).socials as Partner["socials"])?.facebook || ""),

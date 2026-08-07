@@ -63,9 +63,10 @@ const socialLinks = [
 export function Partners() {
   const { settings } = useSettings();
   const partners = settings?.partners || [];
+  const applyLink = settings?.partnerApplyLink?.trim();
 
   return (
-    <section id="partners" className="w-full bg-background py-10">
+    <section id="partners" className="w-full bg-gradient-to-b from-background to-secondary-background border-y-2 border-border py-10">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-heading text-foreground mb-3">
@@ -76,9 +77,9 @@ export function Partners() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="flex flex-wrap justify-center gap-4">
           {partners.length === 0 && (
-            <p className="col-span-full text-center text-sm font-base text-foreground/50">
+            <p className="w-full text-center text-sm font-base text-foreground/50">
               No rescue partners added yet.
             </p>
           )}
@@ -88,16 +89,19 @@ export function Partners() {
             return (
               <div
                 key={partner.name}
-                className="group flex flex-col items-center text-center gap-3 bg-secondary-background border-2 border-border rounded-base p-4 shadow-shadow hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none transition-all"
+                className="w-40 flex flex-col items-center text-center gap-3 bg-secondary-background border-2 border-border rounded-base p-4 shadow-shadow"
               >
-                <a
-                  href={partner.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex flex-col items-center text-center gap-3"
-                >
-                  <div className="w-12 h-12 rounded-full bg-main/10 border-2 border-border flex items-center justify-center group-hover:bg-main/20 transition-colors">
-                    <Icon className="w-6 h-6 text-main" />
+                <div className="flex flex-col items-center text-center gap-3">
+                  <div className="w-20 h-20 rounded-full bg-main/10 border-2 border-border flex items-center justify-center overflow-hidden">
+                    {partner.logo ? (
+                      <img
+                        src={partner.logo}
+                        alt={`${partner.name} logo`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <Icon className="w-10 h-10 text-main" />
+                    )}
                   </div>
                   <div>
                     <h3 className="text-sm font-heading text-foreground leading-tight">
@@ -107,7 +111,7 @@ export function Partners() {
                       {partner.description}
                     </p>
                   </div>
-                </a>
+                </div>
                 <div className="flex items-center gap-1.5">
                   {socialLinks.map(({ key, label, Icon, buttonClass }) => {
                     const url = partner.socials[key]?.trim();
@@ -136,6 +140,22 @@ export function Partners() {
             );
           })}
         </div>
+
+        {applyLink && (
+          <div className="mt-8 text-center">
+            <p className="text-sm font-base text-foreground/70">
+              Want to become a rescue partner?{" "}
+              <a
+                href={applyLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-heading text-main underline hover:text-foreground transition-colors"
+              >
+                Apply here
+              </a>
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );

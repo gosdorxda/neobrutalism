@@ -37,17 +37,20 @@ export function Navbar() {
               <a href="#gallery" className="font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
                 Gallery
               </a>
+              <a href="#how-it-works" className="font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
+                How It Works
+              </a>
               <a href="#token" className="font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
                 Token
               </a>
-              <a href="#about" className="font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
-                About
+              <a href="#partners" className="font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
+                Partners
+              </a>
+              <a href="#top-donors" className="font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
+                Donors
               </a>
               <a href="#faq" className="font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
                 FAQ
-              </a>
-              <a href="#partners" className="font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
-                Partners
               </a>
             </div>
 
@@ -118,17 +121,20 @@ export function Navbar() {
               <a href="#gallery" onClick={closeMenu} className="block py-2 font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
                 Gallery
               </a>
+              <a href="#how-it-works" onClick={closeMenu} className="block py-2 font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
+                How It Works
+              </a>
               <a href="#token" onClick={closeMenu} className="block py-2 font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
                 Token
               </a>
-              <a href="#about" onClick={closeMenu} className="block py-2 font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
-                About
+              <a href="#partners" onClick={closeMenu} className="block py-2 font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
+                Partners
+              </a>
+              <a href="#top-donors" onClick={closeMenu} className="block py-2 font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
+                Donors
               </a>
               <a href="#faq" onClick={closeMenu} className="block py-2 font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
                 FAQ
-              </a>
-              <a href="#partners" onClick={closeMenu} className="block py-2 font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
-                Partners
               </a>
               <div className="flex gap-2 mt-2">
                 {telegram && (

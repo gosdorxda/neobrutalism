@@ -77,7 +77,7 @@ export function TopDonors() {
   }, []);
 
   return (
-    <section className="w-full bg-secondary-background py-8 sm:py-10">
+    <section id="top-donors" className="w-full bg-gradient-to-b from-background to-secondary-background py-8 sm:py-10">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="text-center mb-6">

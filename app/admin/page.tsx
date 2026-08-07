@@ -144,6 +144,7 @@ export default function AdminPage() {
   const [twitter, setTwitter] = useState("");
   const [instagram, setInstagram] = useState("");
   const [tiktok, setTiktok] = useState("");
+  const [partnerApplyLink, setPartnerApplyLink] = useState("");
   const [partners, setPartners] = useState<Partner[]>([]);
 
   useEffect(() => {
@@ -177,6 +178,7 @@ export default function AdminPage() {
       setTwitter(data.twitter || "");
       setInstagram(data.instagram || "");
       setTiktok(data.tiktok || "");
+      setPartnerApplyLink(data.partnerApplyLink || "");
       setPartners(Array.isArray(data.partners) ? data.partners : []);
     } catch {
       setMessage("Failed to load settings");
@@ -202,6 +204,7 @@ export default function AdminPage() {
           twitter,
           instagram,
           tiktok,
+          partnerApplyLink,
           partners,
         }),
       });
@@ -225,6 +228,7 @@ export default function AdminPage() {
         description: "",
         href: "",
         icon: "Cat",
+        logo: "",
         socials: { instagram: "", facebook: "", tiktok: "" },
       },
     ]);
@@ -250,6 +254,18 @@ export default function AdminPage() {
         i === index ? { ...p, socials: { ...p.socials, [field]: value } } : p
       )
     );
+  }
+
+  async function uploadPartnerLogo(index: number, file: File) {
+    const path = await uploadSingleFile(file, "partners", "photo");
+    if (path) {
+      setPartners((prev) =>
+        prev.map((p, i) => (i === index ? { ...p, logo: path } : p))
+      );
+      setMessage("Partner logo uploaded");
+    } else {
+      setMessage("Partner logo upload failed");
+    }
   }
 
   async function fetchBatches() {
@@ -870,6 +886,19 @@ export default function AdminPage() {
                     </Button>
                   </div>
 
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-base text-foreground/60 block">Partner Application Link</label>
+                    <Input
+                      value={partnerApplyLink}
+                      onChange={(e) => setPartnerApplyLink(e.target.value)}
+                      placeholder="https://forms.google.com/... or mailto:partner@example.com"
+                      className="w-full"
+                    />
+                    <p className="text-[10px] font-base text-foreground/50">
+                      Link untuk tombol &quot;Become a Partner&quot; di landing page.
+                    </p>
+                  </div>
+
                   {partners.length === 0 && (
                     <p className="text-xs font-base text-foreground/50">No partners added yet.</p>
                   )}
@@ -908,6 +937,38 @@ export default function AdminPage() {
                           placeholder="Short description"
                           className="text-sm"
                         />
+                        <div className="space-y-2">
+                          <label className="text-xs font-base text-foreground/50 block">Logo</label>
+                          <div className="flex flex-wrap items-center gap-3">
+                            {partner.logo && (
+                              <div className="relative w-12 h-12 border-2 border-border rounded-base overflow-hidden bg-secondary-background">
+                                <Image
+                                  src={partner.logo}
+                                  alt={`${partner.name || "Partner"} logo`}
+                                  fill
+                                  sizes="48px"
+                                  className="object-cover"
+                                  unoptimized
+                                />
+                              </div>
+                            )}
+                            <Input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) uploadPartnerLogo(index, file);
+                              }}
+                              className="text-sm w-auto flex-1 min-w-[200px]"
+                            />
+                            <Input
+                              value={partner.logo}
+                              onChange={(e) => updatePartner(index, "logo", e.target.value)}
+                              placeholder="Or paste logo URL"
+                              className="text-sm flex-[2] min-w-[200px]"
+                            />
+                          </div>
+                        </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                           <select
                             value={partner.icon}

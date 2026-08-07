@@ -57,7 +57,21 @@ export function getStats() {
   };
 }
 
-export function getAllPhotos(): string[] {
+export type PhotoWithBatch = {
+  url: string;
+  batchId: number;
+  batchName: string;
+  batchDate: string;
+};
+
+export function getAllPhotos(): PhotoWithBatch[] {
   const batches = getBatches();
-  return batches.flatMap((b) => b.photos);
+  return batches.flatMap((b) =>
+    b.photos.map((photo) => ({
+      url: photo,
+      batchId: b.id,
+      batchName: b.name,
+      batchDate: b.targetDate,
+    }))
+  );
 }

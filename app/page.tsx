@@ -19,10 +19,10 @@ export default function Home() {
       <BatchHistory />
       <Gallery photos={photos} />
       <HowItWorks />
+      <Partners />
       <TokenInfo />
       <TopDonors />
       <FAQ />
-      <Partners />
     </div>
   );
 }

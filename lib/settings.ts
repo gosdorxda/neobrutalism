@@ -8,6 +8,7 @@ export type Partner = {
   description: string;
   href: string;
   icon: "Cat" | "Home" | "PawPrint" | "Shield" | "Heart";
+  logo: string;
   socials: {
     instagram: string;
     facebook: string;
@@ -24,6 +25,7 @@ export type Settings = {
   twitter: string;
   instagram: string;
   tiktok: string;
+  partnerApplyLink: string;
   partners: Partner[];
 };
 
@@ -36,6 +38,7 @@ const defaultSettings: Settings = {
   twitter: "",
   instagram: "",
   tiktok: "",
+  partnerApplyLink: "",
   partners: [],
 };
 

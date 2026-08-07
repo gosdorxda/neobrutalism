@@ -2,5 +2,36 @@
   "tokenCa": "9Pfync3ejPC9eHqVzq3nYQJAhyhjqpnB9UsaSfLxpump",
   "projectName": "SwapCat",
   "creatorWallet": "jtsmEHJjk8oGTmN2oX8pwnMseojMvxKQS5NHwC2VBF2",
-  "foundationWallet": "jtsmEHJjk8oGTmN2oX8pwnMseojMvxKQS5NHwC2VBF2"
+  "foundationWallet": "jtsmEHJjk8oGTmN2oX8pwnMseojMvxKQS5NHwC2VBF2",
+  "telegram": "",
+  "twitter": "",
+  "instagram": "",
+  "tiktok": "",
+  "partnerApplyLink": "https://docs.google.com/forms/u/0/",
+  "partners": [
+    {
+      "name": "keluarga kucing Lampung",
+      "description": "📍B.Lampung, Lampung",
+      "href": "",
+      "icon": "Cat",
+      "logo": "/uploads/partners/1786087625524-e897a2dae2a5c093b14746fa6329a882_tplv-tiktokx-cropcenter_1080_1080.jpg",
+      "socials": {
+        "instagram": "https://www.tiktok.com/@susan_k3l?lang=ar",
+        "facebook": "",
+        "tiktok": "https://www.tiktok.com/@susan_k3l?lang=ar"
+      }
+    },
+    {
+      "name": "Kucing Rumah Ronal Cat Rescue",
+      "description": "📍Kuningan, Jawa Barat",
+      "href": "",
+      "icon": "Cat",
+      "logo": "/uploads/partners/1786088162362-713824365_122160500096965059_4383802158820255594_n.jpg",
+      "socials": {
+        "instagram": "",
+        "facebook": "https://www.facebook.com/profile.php?id=61578951778752&locale=nl_NL#",
+        "tiktok": ""
+      }
+    }
+  ]
 }
