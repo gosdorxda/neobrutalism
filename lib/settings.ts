@@ -1,0 +1,56 @@
+import fs from "fs";
+import path from "path";
+
+const settingsFilePath = path.join(process.cwd(), "data", "settings.json");
+
+export type Partner = {
+  name: string;
+  description: string;
+  href: string;
+  icon: "Cat" | "Home" | "PawPrint" | "Shield" | "Heart";
+  socials: {
+    instagram: string;
+    facebook: string;
+    tiktok: string;
+  };
+};
+
+export type Settings = {
+  tokenCa: string;
+  projectName: string;
+  creatorWallet: string;
+  foundationWallet: string;
+  telegram: string;
+  twitter: string;
+  instagram: string;
+  tiktok: string;
+  partners: Partner[];
+};
+
+const defaultSettings: Settings = {
+  tokenCa: "CATFUNDeio111111111111111111111111111111111",
+  projectName: "CATFUND",
+  creatorWallet: "",
+  foundationWallet: "",
+  telegram: "",
+  twitter: "",
+  instagram: "",
+  tiktok: "",
+  partners: [],
+};
+
+export function getSettings(): Settings {
+  try {
+    const data = fs.readFileSync(settingsFilePath, "utf8");
+    return { ...defaultSettings, ...JSON.parse(data) };
+  } catch {
+    return defaultSettings;
+  }
+}
+
+export function saveSettings(settings: Partial<Settings>): Settings {
+  const current = getSettings();
+  const updated = { ...current, ...settings };
+  fs.writeFileSync(settingsFilePath, JSON.stringify(updated, null, 2), "utf8");
+  return updated;
+}

@@ -1,0 +1,85 @@
+import { getSettings, saveSettings, type Settings, type Partner } from "@/lib/settings";
+import { NextRequest, NextResponse } from "next/server";
+
+function checkAuth(request: NextRequest) {
+  const authHeader = request.headers.get("authorization");
+  const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+  return authHeader === `Bearer ${adminPassword}`;
+}
+
+export async function GET() {
+  return NextResponse.json(getSettings());
+}
+
+export async function POST(request: NextRequest) {
+  if (!checkAuth(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const body = await request.json();
+    const updates: Partial<Settings> = {};
+
+    if (body.tokenCa !== undefined) {
+      if (typeof body.tokenCa !== "string" || !body.tokenCa.trim()) {
+        return NextResponse.json({ error: "Invalid contract address" }, { status: 400 });
+      }
+      updates.tokenCa = body.tokenCa.trim();
+    }
+
+    if (body.projectName !== undefined) {
+      if (typeof body.projectName !== "string" || !body.projectName.trim()) {
+        return NextResponse.json({ error: "Invalid project name" }, { status: 400 });
+      }
+      updates.projectName = body.projectName.trim();
+    }
+
+    if (body.creatorWallet !== undefined) {
+      if (typeof body.creatorWallet !== "string") {
+        return NextResponse.json({ error: "Invalid creator wallet" }, { status: 400 });
+      }
+      updates.creatorWallet = body.creatorWallet.trim();
+    }
+
+    if (body.foundationWallet !== undefined) {
+      if (typeof body.foundationWallet !== "string") {
+        return NextResponse.json({ error: "Invalid foundation wallet" }, { status: 400 });
+      }
+      updates.foundationWallet = body.foundationWallet.trim();
+    }
+
+    const socialFields = ["telegram", "twitter", "instagram", "tiktok"] as const;
+    socialFields.forEach((field) => {
+      if (body[field] !== undefined) {
+        if (typeof body[field] !== "string") {
+          return;
+        }
+        (updates as Record<string, string>)[field] = body[field].trim();
+      }
+    });
+
+    if (body.partners !== undefined) {
+      if (!Array.isArray(body.partners)) {
+        return NextResponse.json({ error: "Invalid partners" }, { status: 400 });
+      }
+      updates.partners = body.partners.map((p: unknown) => ({
+        name: String((p as Partner).name || ""),
+        description: String((p as Partner).description || ""),
+        href: String((p as Partner).href || ""),
+        icon: ["Cat", "Home", "PawPrint", "Shield", "Heart"].includes(String((p as Partner).icon))
+          ? (String((p as Partner).icon) as Partner["icon"])
+          : "Cat",
+        socials: {
+          instagram: String(((p as Partner).socials as Partner["socials"])?.instagram || ""),
+          facebook: String(((p as Partner).socials as Partner["socials"])?.facebook || ""),
+          tiktok: String(((p as Partner).socials as Partner["socials"])?.tiktok || ""),
+        },
+      }));
+    }
+
+    const updated = saveSettings(updates);
+    return NextResponse.json(updated);
+  } catch {
+    return NextResponse.json({ error: "Failed to save settings" }, { status: 500 });
+  }
+}

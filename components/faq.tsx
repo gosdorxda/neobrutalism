@@ -1,0 +1,92 @@
+"use client";
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { useProjectName } from "@/components/project-name-provider";
+
+export function FAQ() {
+  const { projectName, tokenSymbol } = useProjectName();
+
+  const faqs = [
+    {
+      question: `What is ${projectName}?`,
+      answer:
+        `${projectName} is a meme token on pump.fun with one mission: turning creator rewards into meals for street cats. Every trade generates rewards, and 100% of them are used to buy cat food.`,
+    },
+    {
+      question: "How do creator rewards become cat food?",
+      answer:
+        `Every time ${tokenSymbol} is traded on pump.fun, creator rewards are generated. We collect these rewards throughout each weekly batch. On feeding day, we cash them out and buy cat food.`,
+    },
+    {
+      question: "Is this really 100% transparent?",
+      answer:
+        "Yes. We publish the wallet address so anyone can verify the rewards collected on-chain. We also upload purchase receipts and photos of every feeding session.",
+    },
+    {
+      question: "How often do you feed the cats?",
+      answer:
+        "Once a week. Each batch lasts 7 days, then we withdraw the rewards, buy food, and feed the cats.",
+    },
+    {
+      question: "How many cats have been fed so far?",
+      answer:
+        "You can check our live stats and batch history. Every completed batch shows exactly how much was collected, how many cats were fed, and how much food was purchased.",
+    },
+    {
+      question: `Who is behind ${projectName}?`,
+      answer:
+        "We are a small team of cat lovers. No big investors, no fancy offices — just people using crypto to help street cats in a transparent way.",
+    },
+    {
+      question: `How can I support ${projectName}?`,
+      answer:
+        `The easiest way is to buy ${tokenSymbol} on pump.fun. Every trade contributes to the creator rewards. You can also follow us on social media and share our mission.`,
+    },
+    {
+      question: `Where can I buy ${tokenSymbol}?`,
+      answer:
+        `You can buy ${tokenSymbol} directly on pump.fun. The link is available in the navbar and hero section.`,
+    },
+  ];
+
+  return (
+    <section id="faq" className="w-full bg-gradient-to-b from-secondary-background to-background py-8">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        
+        {/* Heading */}
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-heading text-foreground mb-3">
+            Frequently Asked Questions
+          </h2>
+          <p className="text-base font-base text-foreground/60">
+            Everything you need to know about {projectName}
+          </p>
+        </div>
+
+        {/* Accordion */}
+        <Accordion type="single" collapsible className="w-full space-y-3">
+          {faqs.map((faq, index) => (
+            <AccordionItem
+              key={index}
+              value={`item-${index}`}
+              className="border-2 border-border bg-white rounded-base px-5"
+            >
+              <AccordionTrigger className="text-left text-base font-heading text-foreground hover:no-underline py-4">
+                {faq.question}
+              </AccordionTrigger>
+              <AccordionContent className="text-sm font-base text-foreground/70 leading-relaxed pb-4">
+                {faq.answer}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+
+      </div>
+    </section>
+  );
+}
