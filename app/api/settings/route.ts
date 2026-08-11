@@ -1,6 +1,8 @@
 import { getSettings, saveSettings, type Settings, type Partner } from "@/lib/settings";
 import { NextRequest, NextResponse } from "next/server";
 
+const validThemes = ["original", "mint", "lavender", "lemon"] as const;
+
 function checkAuth(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
   const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
@@ -57,6 +59,20 @@ export async function POST(request: NextRequest) {
         (updates as Record<string, string>)[field] = body[field].trim();
       }
     });
+
+    if (body.theme !== undefined) {
+      if (!validThemes.includes(body.theme)) {
+        return NextResponse.json({ error: "Invalid theme" }, { status: 400 });
+      }
+      updates.theme = body.theme;
+    }
+
+    if (body.notificationText !== undefined) {
+      if (typeof body.notificationText !== "string") {
+        return NextResponse.json({ error: "Invalid notification text" }, { status: 400 });
+      }
+      updates.notificationText = body.notificationText.trim();
+    }
 
     if (body.partners !== undefined) {
       if (!Array.isArray(body.partners)) {

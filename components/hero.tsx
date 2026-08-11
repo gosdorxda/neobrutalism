@@ -2,7 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 import {
   Tooltip,
   TooltipContent,
@@ -42,7 +43,7 @@ function formatDisplayDate(dateStr: string): string {
   });
 }
 
-export function Hero() {
+export function Hero({ initialStats }: { initialStats?: { totalCats: number; totalFees: number; totalFeesSol: number; totalFeesCumulative: number; totalFood: number; feedingRounds: number; estimatedBowls: number } }) {
   const { projectName, tokenSymbol } = useProjectName();
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
@@ -52,16 +53,19 @@ export function Hero() {
   });
   const [progress, setProgress] = useState(0);
   const [stats, setStats] = useState({
-    totalCats: 0,
-    totalFees: 0,
-    totalFeesSol: 0,
-    totalFood: 0,
+    totalCats: initialStats?.totalCats ?? 0,
+    totalFees: initialStats?.totalFees ?? 0,
+    totalFeesSol: initialStats?.totalFeesSol ?? 0,
+    totalFeesCumulative: initialStats?.totalFeesCumulative ?? 0,
+    totalFood: initialStats?.totalFood ?? 0,
+    estimatedBowls: initialStats?.estimatedBowls ?? 0,
   });
   const [showSol, setShowSol] = useState(false);
   const [activeBatch, setActiveBatch] = useState<ApiBatch | null>(null);
   const [isFinished, setIsFinished] = useState(false);
   const [buyUrl, setBuyUrl] = useState("https://pump.fun");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(initialStats === undefined);
+  const [batchLoading, setBatchLoading] = useState(true);
 
   const animatedTotalFees = useCountUpNumber(stats.totalFees);
   const animatedTotalFeesSol = useCountUpNumber(stats.totalFeesSol);
@@ -91,6 +95,7 @@ export function Hero() {
         // keep defaults on any error
       } finally {
         setIsLoading(false);
+        setBatchLoading(false);
       }
     }
 
@@ -150,7 +155,7 @@ export function Hero() {
   }, [activeBatch]);
 
   return (
-    <section className="relative min-h-[calc(85vh-5rem)] overflow-hidden bg-background px-4 pt-20 pb-10 sm:px-6 lg:px-8">
+    <section className="relative min-h-[calc(85vh-5rem)] overflow-hidden bg-background px-4 pt-12 pb-10 sm:px-6 lg:px-8">
       {/* Animated paw print background decorations */}
       <div className="absolute inset-0 pointer-events-none select-none">
         <img
@@ -237,10 +242,10 @@ export function Hero() {
         <div className="flex flex-col items-center text-center space-y-4">
           
           {/* Stats Badge */}
-          <p className="text-sm font-base text-foreground/80 px-2 py-0.5 rounded-base">
-            {activeBatch
-              ? `${Number(activeBatch.cats.replace(/[^0-9.]/g, "")) || 0} cats estimated to be fed next`
-              : "Waiting for the next batch"}
+          <p className="text-sm font-base text-foreground/80 px-2 py-0.5 rounded-base -mb-1 pb-1">
+            {stats.totalFeesCumulative > 0
+              ? `${Math.round(stats.totalFeesCumulative)} bowls filled so far`
+              : "Next feeding batch coming soon"}
           </p>
 
           {/* Headline */}
@@ -285,8 +290,8 @@ export function Hero() {
                     {/* Batch Label - Same size as countdown */}
                     <div className="flex items-center gap-2">
                       <Package className="w-4 h-4 text-foreground" />
-                      {isLoading ? (
-                        <Skeleton className="h-6 w-32" />
+                      {batchLoading ? (
+                        <Skeleton width={128} height={24} borderRadius={4} />
                       ) : (
                         <span className="text-xl font-heading text-foreground">
                           {activeBatch ? activeBatch.name : "No Active Batch"}
@@ -295,8 +300,8 @@ export function Hero() {
                     </div>
 
                     {/* Countdown */}
-                    {isLoading ? (
-                      <Skeleton className="h-6 w-28" />
+                    {batchLoading ? (
+                        <Skeleton width={112} height={24} borderRadius={4} />
                     ) : activeBatch ? (
                       isFinished ? (
                         <span className="text-base font-heading text-main animate-pulse">
@@ -333,10 +338,10 @@ export function Hero() {
                   {/* Progress Bar - Bigger with Shimmer */}
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-xs font-base text-foreground/60">
-                      {isLoading ? (
+                      {batchLoading ? (
                         <>
-                          <Skeleton className="h-4 w-28" />
-                          <Skeleton className="h-4 w-24" />
+                          <Skeleton width={112} height={16} borderRadius={4} />
+                          <Skeleton width={96} height={16} borderRadius={4} />
                         </>
                       ) : (
                         <>
@@ -352,8 +357,8 @@ export function Hero() {
                       )}
                     </div>
                     <div className="h-4 bg-secondary-background border-2 border-border rounded-base overflow-hidden relative">
-                      {isLoading ? (
-                        <Skeleton className="h-full w-full rounded-none border-0" />
+                      {batchLoading ? (
+                        <Skeleton height="100%" width="100%" borderRadius={0} />
                       ) : (
                         <div 
                           className="h-full bg-main transition-all duration-1000 ease-linear relative overflow-hidden"
@@ -435,11 +440,15 @@ export function Hero() {
                     {/* Stats */}
                     <div className="flex gap-2 sm:gap-6 min-w-0">
                       <div className="text-center">
-                        <div className="text-lg sm:text-2xl font-heading text-foreground mb-0.5 transition-all duration-300">
-                          {showSol
-                            ? `${animatedTotalFeesSol.toFixed(4)} SOL`
-                            : formatUsd(animatedTotalFees)}
-                        </div>
+                        {isLoading ? (
+                          <Skeleton className="w-24 h-7 sm:w-32 sm:h-8 mb-0.5 mx-auto" borderRadius={4} />
+                        ) : (
+                          <div className="text-lg sm:text-2xl font-heading text-foreground mb-0.5 transition-all duration-300">
+                            {showSol
+                              ? `${animatedTotalFeesSol.toFixed(4)} SOL`
+                              : formatUsd(animatedTotalFees)}
+                          </div>
+                        )}
                         <div className="text-[10px] sm:text-xs font-base text-foreground/60 flex items-center justify-center gap-1 whitespace-nowrap h-5 sm:h-6">
                           <Wallet className="w-3 h-3" />
                           <span>Rewards</span>
@@ -462,9 +471,13 @@ export function Hero() {
                       </div>
                       <div className="h-auto w-px bg-border"></div>
                       <div className="text-center">
-                        <div className="text-lg sm:text-2xl font-heading text-foreground mb-0.5 transition-all duration-300">
-                          {Math.round(animatedTotalCats)}
-                        </div>
+                        {isLoading ? (
+                          <Skeleton className="w-16 h-7 sm:w-20 sm:h-8 mb-0.5 mx-auto" borderRadius={4} />
+                        ) : (
+                          <div className="text-lg sm:text-2xl font-heading text-foreground mb-0.5 transition-all duration-300">
+                            {Math.round(stats.estimatedBowls || animatedTotalCats)}
+                          </div>
+                        )}
                         <div className="text-[10px] sm:text-xs font-base text-foreground/60 flex items-center justify-center gap-1 whitespace-nowrap h-5 sm:h-6">
                           <Soup className="w-3 h-3" />
                           <span>Bowls</span>

@@ -1,8 +1,8 @@
 {
-  "tokenCa": "9Pfync3ejPC9eHqVzq3nYQJAhyhjqpnB9UsaSfLxpump",
-  "projectName": "SwapCat",
-  "creatorWallet": "jtsmEHJjk8oGTmN2oX8pwnMseojMvxKQS5NHwC2VBF2",
-  "foundationWallet": "jtsmEHJjk8oGTmN2oX8pwnMseojMvxKQS5NHwC2VBF2",
+  "tokenCa": "HpZSFUgEbzXe9AP2xdCik3pYBTifTr5tPTMrq65bpump",
+  "projectName": "CatBowl",
+  "creatorWallet": "5JncgzPZ23QsqQBbunxzosb8HSwzzjCHGVc28XLEixnx",
+  "foundationWallet": "5JncgzPZ23QsqQBbunxzosb8HSwzzjCHGVc28XLEixnx",
   "telegram": "",
   "twitter": "",
   "instagram": "",
@@ -33,5 +33,7 @@
         "tiktok": ""
       }
     }
-  ]
+  ],
+  "theme": "original",
+  "notificationText": "cek"
 }

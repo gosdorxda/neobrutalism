@@ -56,7 +56,7 @@ export function FAQ() {
 
   return (
     <section id="faq" className="w-full bg-gradient-to-b from-secondary-background to-background py-8">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         
         {/* Heading */}
         <div className="text-center mb-12">
@@ -74,7 +74,7 @@ export function FAQ() {
             <AccordionItem
               key={index}
               value={`item-${index}`}
-              className="border-2 border-border bg-white rounded-base px-5"
+              className="border-2 border-border bg-white rounded-base shadow-none"
             >
               <AccordionTrigger className="text-left text-base font-heading text-foreground hover:no-underline py-4">
                 {faq.question}

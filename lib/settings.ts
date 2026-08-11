@@ -16,6 +16,8 @@ export type Partner = {
   };
 };
 
+export type Theme = "original" | "mint" | "lavender" | "lemon";
+
 export type Settings = {
   tokenCa: string;
   projectName: string;
@@ -27,6 +29,8 @@ export type Settings = {
   tiktok: string;
   partnerApplyLink: string;
   partners: Partner[];
+  theme: Theme;
+  notificationText: string;
 };
 
 const defaultSettings: Settings = {
@@ -40,6 +44,8 @@ const defaultSettings: Settings = {
   tiktok: "",
   partnerApplyLink: "",
   partners: [],
+  theme: "original",
+  notificationText: "",
 };
 
 export function getSettings(): Settings {

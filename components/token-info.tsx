@@ -7,6 +7,8 @@ import { Check, Copy, ExternalLink, ShieldCheck, TrendingUp, ArrowRightLeft, Swo
 import { useEffect, useRef, useState } from "react";
 import { useProjectName } from "@/components/project-name-provider";
 import { NetworkSolana, WalletPhantom } from "@web3icons/react";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const TOKEN_CA = process.env.NEXT_PUBLIC_TOKEN_CA || "CATFUNDeio111111111111111111111111111111111";
 
@@ -33,14 +35,6 @@ function CopyButton({ text }: { text: string }) {
       {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
       <span className="ml-1">{copied ? "Copied" : "Copy"}</span>
     </Button>
-  );
-}
-
-function Skeleton({ className }: { className?: string }) {
-  return (
-    <span
-      className={`block animate-pulse rounded-base bg-secondary-background ${className || ""}`}
-    />
   );
 }
 
@@ -255,26 +249,26 @@ function FoundationWalletCard() {
   );
 }
 
-export function TokenInfo() {
+export function TokenInfo({ initialToken }: { initialToken?: {
+  ca: string;
+  name: string;
+  symbol: string;
+  price: string | null;
+  marketCap: string | null;
+  volume: string | null;
+  holders: string | null;
+  totalTx: string | null;
+  buyTx: string | null;
+  sellTx: string | null;
+  snipers: string | null;
+  athMarketCap: string | null;
+  devHolding: string;
+  imageUrl: string | null;
+  buyUrl: string;
+} }) {
   const { projectName, tokenSymbol } = useProjectName();
-  const [token, setToken] = useState<{
-    ca: string;
-    name: string;
-    symbol: string;
-    price: string | null;
-    marketCap: string | null;
-    volume: string | null;
-    holders: string | null;
-    totalTx: string | null;
-    buyTx: string | null;
-    sellTx: string | null;
-    snipers: string | null;
-    athMarketCap: string | null;
-    devHolding: string | null;
-    imageUrl: string | null;
-    buyUrl: string;
-  } | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(initialToken ?? null);
+  const [loading, setLoading] = useState(initialToken === undefined);
 
   useEffect(() => {
     async function loadToken() {
@@ -296,7 +290,7 @@ export function TokenInfo() {
           sellTx: null,
           snipers: null,
           athMarketCap: null,
-          devHolding: null,
+          devHolding: "0%",
           imageUrl: null,
           buyUrl: "https://pump.fun",
         });
@@ -355,7 +349,7 @@ export function TokenInfo() {
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="text-xl font-heading text-foreground">
-                      {loading ? <Skeleton className="h-6 w-24" /> : token?.name}
+                      {loading ? <Skeleton width={96} height={24} borderRadius={4} /> : token?.name}
                     </h3>
                     <Badge variant="neutral" className="text-xs font-base">
                       {loading ? "..." : token?.symbol}
@@ -393,7 +387,7 @@ export function TokenInfo() {
                   className="flex-1 h-10 bg-secondary-background border-2 border-border rounded-base px-3 flex items-center min-w-0 hover:border-main transition-colors"
                 >
                   {loading ? (
-                    <Skeleton className="h-5 w-full" />
+                    <Skeleton height={20} width="100%" borderRadius={4} />
                   ) : (
                     <code className="text-sm font-mono text-foreground truncate" title={token?.ca}>
                       {displayCa}
@@ -438,7 +432,7 @@ export function TokenInfo() {
                     {metric.label}
                   </p>
                   {loading || !metric.value ? (
-                    <Skeleton className="h-5 w-16 mt-1" />
+                    <Skeleton width={64} height={20} borderRadius={4} className="mt-1" />
                   ) : (
                     <p className="text-base font-heading text-foreground mt-0.5">
                       <AnimatedValue value={metric.value} />
@@ -462,7 +456,7 @@ export function TokenInfo() {
                       <Icon className="w-3.5 h-3.5 mr-1.5 shrink-0 text-foreground/70" />
                       <span className="text-foreground/60 mr-1">{badge.label}:</span>
                       {loading || !badge.value ? (
-                        <Skeleton className="h-3.5 w-10" />
+                        <Skeleton width={40} height={14} borderRadius={4} />
                       ) : (
                         <AnimatedValue value={badge.value} />
                       )}
@@ -483,6 +477,15 @@ export function TokenInfo() {
 
         {/* Foundation Wallet */}
         <FoundationWalletCard />
+
+        {/* Foundation Wallet Note */}
+        <div className="mt-4 bg-white border-2 border-border rounded-base p-4 shadow-shadow">
+          <p className="text-xs font-base text-foreground/70 leading-relaxed">
+            This foundation wallet accepts donations in any form. Funds are reserved for future needs,
+            such as covering medical care for sick or injured street cats, emergency rescues, and other
+            welfare expenses that go beyond our regular weekly feeding batches.
+          </p>
+        </div>
       </div>
     </section>
   );

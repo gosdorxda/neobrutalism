@@ -1,38 +1,42 @@
 # VPS Deployment Guide
 
-This document explains how to deploy the Neobrutalism project to a self-managed VPS (Virtual Private Server).
+Panduan lengkap deploy project ini ke VPS pribadi (Ubuntu).
 
-> **Note:** The project currently uses JSON files in the `data/` folder for persistence. This guide assumes you will continue using that approach on the VPS.
+> **Note:** Project ini menyimpan data di file JSON (`data/`) dan menggunakan **Upstash Redis** untuk caching data realtime.
 
 ---
 
 ## 1. Server Requirements
 
-- **OS:** Ubuntu 22.04 LTS or 24.04 LTS (recommended)
-- **Node.js:** 18.x or newer
-- **RAM:** Minimum 1 GB (2 GB recommended for `npm run build`)
-- **Storage:** Depends on uploaded photos/media
-- **Network:** IPv4 outbound is required for the `gmgn-cli` integration. IPv6-only outbound may cause `401`/`403` errors from GMGN.
+- **OS:** Ubuntu 22.04 LTS atau 24.04 LTS (recommended)
+- **Node.js:** 20.x LTS atau lebih baru (Next.js 16 + React 19)
+- **RAM:** Minimal 1 GB (2 GB recommended untuk `npm run build`)
+- **Storage:** Tergantung jumlah foto/media yang di-upload
+- **Network:** IPv4 outbound diperlukan untuk API eksternal (CoinGecko, Solana RPC, PumpFun, pumpdev.io, GMGN)
+- **Upstash Redis:** Akun gratis di [upstash.com](https://upstash.com) untuk caching data
 
 ---
 
 ## 2. Install System Dependencies
 
 ```bash
+# Update system
 sudo apt update && sudo apt upgrade -y
+
+# Install essentials
 sudo apt install -y curl git nginx
 
 # Install Node.js 20 LTS
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs
 
-# Install PM2 globally
+# Install PM2 (process manager)
 sudo npm install -g pm2
 
 # Verify
-node -v
-npm -v
-pm2 -v
+node -v    # harus v20.x.x atau lebih baru
+npm -v     # harus 10.x.x atau lebih baru
+pm2 -v     # harus 5.x.x atau lebih baru
 ```
 
 ---
@@ -40,70 +44,132 @@ pm2 -v
 ## 3. Clone & Build
 
 ```bash
+# Clone project
 cd ~
 git clone <your-repo-url> neobrutalism
 cd neobrutalism
 
+# Install dependencies
 npm install
+
+# Build production
 npm run build
 ```
+
+Kalau build gagal karena memory, tambah swap dulu:
+```bash
+sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+```
+
+Atau build di lokal, lalu copy folder `.next/` ke VPS dan jalankan `npm start` saja.
 
 ---
 
 ## 4. Environment Variables
 
-Create `.env.local` in the project root with real production values:
+Buat file `.env.local` di root project:
 
 ```env
-ADMIN_PASSWORD=your-strong-admin-password
-GMGN_API_KEY=your-gmgn-production-api-key
-CRON_SECRET=your-random-cron-secret
+# --- WAJIB ---
+ADMIN_PASSWORD=your-strong-admin-password-here
+
+# --- SOCIAL MEDIA (opsional, tapi direkomendasikan) ---
+# Isi dari admin panel Settings > Social Links
+
+# --- GMGN (untuk fitur Top Donors) ---
+# Dapatkan API key dari https://gmgn.ai/ai
+GMGN_API_KEY=your-gmgn-api-key
+
+# --- CRON (untuk update top donors otomatis) ---
+CRON_SECRET=your-random-cron-secret-string
+
+# --- SOLANA RPC (opsional, untuk wallet balance & stats realtime) ---
+# Default: https://api.mainnet-beta.solana.com
+# Untuk production, pakai RPC provider seperti Helius, QuickNode, atau Triton
+SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+
+# --- UPSTASH REDIS (WAJIB untuk caching) ---
+# 1. Daftar di https://console.upstash.com/redis
+# 2. Buat database Redis baru (region terdekat)
+# 3. Copy REST URL dan REST Token
+UPSTASH_REDIS_REST_URL=https://your-db.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your-redis-token
+
+# --- TOKEN CA (opsional, bisa diisi dari admin panel) ---
+# NEXT_PUBLIC_TOKEN_CA=CATFUNDeio111111111111111111111111111111111
 ```
 
-### Important notes
-
-- Do **not** commit `.env.local` to Git. It is already ignored via `.gitignore`.
-- Do **not** use the public demo key `gmgn_solbscbaseethmonadtron` in production. Get your own key at https://gmgn.ai/ai.
-- `CRON_SECRET` is used to authorize cron requests to `/api/admin/update-top-donors`.
+> **Jangan commit `.env.local` ke Git!** Sudah di-ignore via `.gitignore`.
 
 ---
 
-## 5. Data Persistence
+## 5. Upstash Redis Setup (WAJIB)
 
-The project stores data in the `data/` directory:
+Project ini menggunakan Redis untuk caching data realtime global. Tanpa Redis, data tetap jalan tapi bisa lambat dan kena rate limit API.
 
-- `data/batches.json`
-- `data/settings.json`
-- `data/top-donors.json`
+### Cara setup:
 
-Make sure the directory exists and is writable by the user running the Node process:
+1. Daftar di [https://console.upstash.com/redis](https://console.upstash.com/redis)
+2. Klik **Create Database**
+3. Pilih region terdekat dengan VPS-mu
+4. Pilih tipe **Global** atau **Regional**
+5. Klik **Create**
+6. Setelah jadi, buka tab **REST API**
+7. Copy **UPSTASH_REDIS_REST_URL** dan **UPSTASH_REDIS_REST_TOKEN**
+8. Paste ke `.env.local`
+
+### Data yang di-cache di Redis:
+
+| Key | Isi | TTL |
+|-----|-----|-----|
+| `sol:price` | Harga SOL dalam USD | 60 detik |
+| `stats:summary` | Statistik kumulatif (total fees, cats, bowls) | 60 detik |
+| `token:info` | Data token dari PumpFun | 30 detik |
+| `wallets:summary` | Balance Foundation & Creator wallet | 60 detik |
+
+---
+
+## 6. Data Persistence
+
+Project menyimpan data di folder `data/`:
+
+| File | Fungsi |
+|------|--------|
+| `data/batches.json` | Data batch, receipt, foto |
+| `data/settings.json` | Konfigurasi proyek, tema, partner, notification |
+| `data/top-donors.json` | Data top donors |
+| `data/stats-cache.json` | Cache stats (fallback kalau Redis mati) |
+
+Pastikan folder ada dan writable:
 
 ```bash
 mkdir -p data
 chmod 755 data
+sudo chown -R $USER:$USER data
 ```
 
-If running as a non-root user (recommended), ensure that user owns the `data/` folder:
+### Backup data JSON
 
 ```bash
-sudo chown -R $USER:$USER data
+# Backup semua data
+cp -r data/ data-backup-$(date +%Y%m%d)/
+
+# Atau pakai cron untuk backup otomatis
+# crontab -e
+# 0 3 * * * cp -r /home/<user>/neobrutalism/data/ /home/<user>/backups/data-$(date +\%Y\%m\%d)/
 ```
 
 ---
 
-## 6. Run with PM2
+## 7. Run with PM2
 
-### Quick start
+### Pakai ecosystem file (recommended)
 
-```bash
-pm2 start npm --name "neobrutalism" -- start
-pm2 save
-pm2 startup
-```
-
-### Using an ecosystem file (recommended)
-
-Create `ecosystem.config.js` in the project root:
+Buat `ecosystem.config.js` di root project:
 
 ```js
 module.exports = {
@@ -112,7 +178,7 @@ module.exports = {
       name: "neobrutalism",
       script: "npm",
       args: "start",
-      cwd: "/home/<your-user>/neobrutalism",
+      cwd: "/home/<user>/neobrutalism",
       env: {
         NODE_ENV: "production",
       },
@@ -129,7 +195,9 @@ module.exports = {
 };
 ```
 
-Then run:
+Ganti `<user>` dengan username VPS-mu.
+
+Kemudian:
 
 ```bash
 mkdir -p logs
@@ -138,16 +206,27 @@ pm2 save
 pm2 startup
 ```
 
+### Quick start (tanpa ecosystem file)
+
+```bash
+pm2 start npm --name "neobrutalism" -- start
+pm2 save
+pm2 startup
+```
+
 ---
 
-## 7. Nginx Reverse Proxy
+## 8. Nginx Reverse Proxy
 
-Create `/etc/nginx/sites-available/neobrutalism`:
+Buat file `/etc/nginx/sites-available/neobrutalism`:
 
 ```nginx
 server {
     listen 80;
     server_name your-domain.com;
+
+    # Upload limit untuk foto (maks 10MB)
+    client_max_body_size 10M;
 
     location / {
         proxy_pass http://localhost:3000;
@@ -159,11 +238,13 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_cache_bypass $http_upgrade;
+        proxy_read_timeout 300s;
+        proxy_connect_timeout 300s;
     }
 }
 ```
 
-Enable the site:
+Enable site:
 
 ```bash
 sudo ln -s /etc/nginx/sites-available/neobrutalism /etc/nginx/sites-enabled/
@@ -173,79 +254,83 @@ sudo systemctl restart nginx
 
 ---
 
-## 8. SSL with Certbot
+## 9. SSL with Certbot
 
 ```bash
 sudo apt install -y certbot python3-certbot-nginx
 sudo certbot --nginx -d your-domain.com
 ```
 
-Follow the prompts. Certbot will automatically configure HTTPS and redirect HTTP to HTTPS.
+Ikuti prompt. Certbot akan otomatis konfigurasi HTTPS dan redirect HTTP ke HTTPS.
 
 ---
 
-## 9. Cron Jobs
+## 10. Cron Jobs
 
-The `vercel.json` cron configuration is **not used on a VPS**. You must set up cron jobs manually.
+Cron jobs untuk update data otomatis.
 
-### Option A: System cron (recommended)
+### Top Donors (setiap 6 jam)
 
 ```bash
 crontab -e
 ```
 
-Add this line to refresh top donors every 6 hours:
+Tambah baris:
 
 ```cron
-0 */6 * * * curl -fsS -H "Authorization: Bearer YOUR_CRON_SECRET" https://your-domain.com/api/admin/update-top-donors >> /home/<your-user>/neobrutalism/logs/cron.log 2>&1
+0 */6 * * * curl -fsS -H "Authorization: Bearer YOUR_CRON_SECRET" https://your-domain.com/api/admin/update-top-donors >> /home/<user>/neobrutalism/logs/cron.log 2>&1
 ```
 
-### Option B: Node scheduler
+### Refresh Redis Cache (setiap 2 menit, opsional)
 
-Alternatively, install `node-cron` and schedule the update inside the app. This is more complex and not covered here.
+Untuk memastikan data Redis selalu fresh, bisa tambah cron:
 
----
+```cron
+*/2 * * * * curl -fsS https://your-domain.com/api/sol-price > /dev/null 2>&1
+*/2 * * * * curl -fsS https://your-domain.com/api/stats > /dev/null 2>&1
+*/2 * * * * curl -fsS https://your-domain.com/api/token > /dev/null 2>&1
+*/2 * * * * curl -fsS https://your-domain.com/api/wallets > /dev/null 2>&1
+```
 
-## 10. GMGN CLI Notes
-
-- `gmgn-cli` is installed as a project dependency in `node_modules/`. The update route executes it directly.
-- If you get `401`/`403` errors from GMGN on the VPS, check for IPv6 outbound traffic:
-
-  ```bash
-  curl -s https://ipv6.icanhazip.com
-  ```
-
-  If an IPv6 address is returned, disable IPv6 or force IPv4 for outbound traffic.
+Ini akan memicu refresh Redis cache setiap 2 menit, jadi data selalu fresh untuk semua user.
 
 ---
 
 ## 11. Post-Deploy Checklist
 
-1. Open `https://your-domain.com` — the homepage should load.
-2. Open `https://your-domain.com/admin` and log in.
-3. Go to the **Top Donors** tab and click **Refresh Top Donors**.
-4. Verify the response is successful:
+1. ✅ Buka `https://your-domain.com` — homepage harus load
+2. ✅ Buka `https://your-domain.com/admin` — login dengan password dari `ADMIN_PASSWORD`
+3. ✅ Buka tab **Settings** → **Notification Banner** — isi teks, simpan, cek muncul di homepage
+4. ✅ Buka tab **Settings** → **Theme** — ganti tema, simpan, refresh homepage
+5. ✅ Buka `https://your-domain.com/dashboard` — data wallet dan transaksi harus muncul
+6. ✅ Cek SOL price di navbar — harus muncul setelah beberapa detik
+7. ✅ Cek Token Info — data harus muncul
+8. ✅ Cek Redis: login ke console Upstash, cek ada data di key `sol:price`, `stats:summary`, dll
+9. ✅ Test Top Donors:
 
-   ```bash
-   curl -H "Authorization: Bearer YOUR_CRON_SECRET" https://your-domain.com/api/admin/update-top-donors
-   ```
+```bash
+curl -H "Authorization: Bearer YOUR_CRON_SECRET" https://your-domain.com/api/admin/update-top-donors
+```
 
-5. Verify cron logs after the first scheduled run:
+10. ✅ Cek log cron setelah scheduled run pertama:
 
-   ```bash
-   tail -f /home/<your-user>/neobrutalism/logs/cron.log
-   ```
+```bash
+tail -f /home/<user>/neobrutalism/logs/cron.log
+```
 
 ---
 
 ## 12. Useful Commands
 
 ```bash
-# Restart the app
+# Restart app
 pm2 restart neobrutalism
 
 # View logs
 pm2 logs neobrutalism
+
+# View realtime logs
+pm2 logs neobrutalism --lines 100
 
 # Reload Nginx
 sudo systemctl reload nginx
@@ -253,42 +338,96 @@ sudo systemctl reload nginx
 # Check disk space
 df -h
 
-# Check app is listening on port 3000
+# Check app is running on port 3000
 ss -tlnp | grep 3000
+
+# Check Redis connection (dari VPS)
+curl -s https://YOUR_UPSTASH_URL/ping -H "Authorization: Bearer YOUR_UPSTASH_TOKEN"
+
+# Deploy ulang setelah update kode
+cd ~/neobrutalism
+git pull
+npm install
+npm run build
+pm2 restart neobrutalism
 ```
 
 ---
 
-## 13. Files That May Need Attention on VPS
+## 13. Files That Need Attention on VPS
 
 | File / Directory | Notes |
 |---|---|
-| `.env.local` | Must be created manually with production secrets. |
-| `data/` | Must be writable by the Node process. |
-| `logs/` | Optional; used by the PM2 ecosystem example above. |
-| `vercel.json` | Safe to keep, but ignored on VPS. |
+| `.env.local` | Harus dibuat manual dengan production secrets |
+| `data/` | Harus writable oleh Node process |
+| `logs/` | Optional; dipakai PM2 ecosystem |
+| `public/` | Static files (foto, logo, dll) |
+| `vercel.json` | Aman di-keep, tapi di-ignore di VPS |
 
 ---
 
-## 14. Troubleshooting
+## 14. Dependencies Overview
 
-### `Updated 0 top donors` or GMGN errors
+| Package | Fungsi |
+|---------|--------|
+| `next` | Framework (v16.3) |
+| `react` / `react-dom` | UI library (v19) |
+| `framer-motion` | Animasi (flywheel, notif banner) |
+| `@upstash/redis` | Caching Redis |
+| `react-loading-skeleton` | Loading skeleton |
+| `@web3icons/react` | Icon crypto (Solana, Phantom) |
+| `lucide-react` | Icon UI |
+| `@radix-ui/*` | Aksesibel UI primitives |
+| `sharp` | Image optimization |
+| `gmgn-cli` | GMGN top donors |
+| `tw-animate-css` | Tailwind CSS animations |
 
-- Check `GMGN_API_KEY` is set correctly in `.env.local`.
-- Ensure the VPS uses IPv4 outbound for GMGN requests.
-- Check PM2 logs for detailed error messages.
+---
 
-### Admin login fails
+## 15. Troubleshooting
 
-- Verify `ADMIN_PASSWORD` in `.env.local` matches what you are entering.
-- Remember that the password is case-sensitive.
+### Halaman lambat / data nggak muncul
 
-### Uploaded images not showing
+- Cek Redis: `curl -s https://YOUR_UPSTASH_URL/get/sol:price -H "Authorization: Bearer YOUR_UPSTASH_TOKEN"`
+- Cek env vars: `cat .env.local` (pastikan UPSTASH_REDIS_* sudah benar)
+- Cek PM2 logs: `pm2 logs neobrutalism`
 
-- Check the upload destination folder exists and is writable.
-- Check Nginx allows serving static files from that folder.
+### SOL Price di navbar tidak muncul
 
-### Next.js build fails due to memory
+- Pastikan VPS bisa akses `api.coingecko.com` dan `api.binance.com`
+- Cek: `curl -s https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd`
 
-- Increase swap or use a VPS with more RAM.
-- Alternatively, build locally and copy the `.next/` folder to the VPS.
+### Token Info kosong / error
+
+- Pastikan Token CA di admin panel Settings benar
+- Cek: `curl -s https://advanced-api-v2.pump.fun/coins/metadata/TOKEN_CA`
+
+### GMGN errors / 401 Unauthorized
+
+- Check `GMGN_API_KEY` di `.env.local`
+- Pastikan VPS pakai IPv4 outbound: `curl -s https://ipv4.icanhazip.com`
+- Jika IPv6 muncul, force IPv4: `sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1`
+
+### Build gagal karena memory
+
+```bash
+# Tambah swap
+sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+
+# Atau build di lokal, copy .next/ ke VPS
+```
+
+### Upload foto gagal
+
+- Check folder uploads writable
+- Check Nginx `client_max_body_size` (minimum 10M)
+- Check disk space: `df -h`
+
+### Admin login gagal
+
+- Cek `ADMIN_PASSWORD` di `.env.local`
+- Password case-sensitive
+- Restart app setelah ubah `.env.local`: `pm2 restart neobrutalism`

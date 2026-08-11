@@ -1,8 +1,12 @@
 import { getStats } from "@/lib/data";
+import { getSettings } from "@/lib/settings";
 import { formatUsd } from "@/lib/utils";
+import { PartnerMarquee } from "@/components/partner-marquee";
 
 export function StatsBar() {
   const stats = getStats();
+  const settings = getSettings();
+  const partners = settings.partners || [];
 
   return (
     <section className="relative w-full bg-gradient-to-b from-background to-secondary-background border-y-2 border-border py-8 mt-14">
@@ -65,6 +69,13 @@ export function StatsBar() {
             </div>
           </div>
         </div>
+
+        {/* Partner Marquee */}
+        {partners.length > 0 && (
+          <div className="mt-10 sm:mt-12">
+            <PartnerMarquee partners={partners} />
+          </div>
+        )}
       </div>
     </section>
   );

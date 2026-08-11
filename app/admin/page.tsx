@@ -10,6 +10,7 @@ import Image from "next/image";
 import { getThumbPath } from "@/lib/utils";
 import { ChevronDown, Cat, Home, PawPrint, Shield, Heart, Plus, Trash2 } from "lucide-react";
 import { type Partner } from "@/lib/settings";
+import { themes, type Theme } from "@/components/theme-provider";
 
 type Batch = {
   id: number;
@@ -146,6 +147,8 @@ export default function AdminPage() {
   const [tiktok, setTiktok] = useState("");
   const [partnerApplyLink, setPartnerApplyLink] = useState("");
   const [partners, setPartners] = useState<Partner[]>([]);
+  const [theme, setTheme] = useState<Theme>("original");
+  const [notificationText, setNotificationText] = useState("");
 
   useEffect(() => {
     const storedPassword = sessionStorage.getItem("adminPassword");
@@ -180,6 +183,8 @@ export default function AdminPage() {
       setTiktok(data.tiktok || "");
       setPartnerApplyLink(data.partnerApplyLink || "");
       setPartners(Array.isArray(data.partners) ? data.partners : []);
+      setTheme(data.theme && ["original", "mint", "lavender", "lemon"].includes(data.theme) ? data.theme : "original");
+      setNotificationText(data.notificationText || "");
     } catch {
       setMessage("Failed to load settings");
     }
@@ -206,6 +211,8 @@ export default function AdminPage() {
           tiktok,
           partnerApplyLink,
           partners,
+          theme,
+          notificationText,
         }),
       });
       if (res.ok) {
@@ -830,6 +837,50 @@ export default function AdminPage() {
                         className="w-full"
                       />
                     </div>
+                  </div>
+                </div>
+
+                {/* Theme */}
+                <div className="space-y-4 pt-4 border-t-2 border-border">
+                  <h3 className="text-sm font-heading text-foreground">Theme</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {themes.map(({ id, label, bg, main }) => (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => setTheme(id)}
+                        className={`flex flex-col items-center gap-2 p-3 rounded-base border-2 transition-all ${
+                          theme === id
+                            ? "border-foreground bg-secondary-background"
+                            : "border-border bg-white hover:border-foreground/50"
+                        }`}
+                      >
+                        <span
+                          className="w-8 h-8 rounded-base border-2 border-border shadow-shadow"
+                          style={{ background: `linear-gradient(135deg, ${bg} 50%, ${main} 50%)` }}
+                        />
+                        <span className="text-xs font-heading text-foreground">{label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Notification Banner */}
+                <div className="space-y-4 pt-4 border-t-2 border-border">
+                  <h3 className="text-sm font-heading text-foreground">Notification Banner</h3>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-base text-foreground/60 block">
+                      Announcement Text
+                    </label>
+                    <Input
+                      value={notificationText}
+                      onChange={(e) => setNotificationText(e.target.value)}
+                      placeholder="e.g. We just donated 100 bowls of cat food! 🐱"
+                      className="w-full"
+                    />
+                    <p className="text-[10px] font-base text-foreground/50">
+                      Shows at the top of every page. Leave empty to hide.
+                    </p>
                   </div>
                 </div>
 

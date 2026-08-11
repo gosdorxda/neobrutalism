@@ -1,10 +1,10 @@
 {
-  "timestamp": 1786099554917,
+  "timestamp": 1786358944229,
   "stats": {
-    "totalCats": 12,
-    "totalFees": 12.14083932792,
+    "totalCats": 50,
+    "totalFees": 50.10512812173,
     "totalFood": 19,
-    "feedingRounds": 12,
-    "totalFeesSol": 0.165248936
+    "feedingRounds": 50,
+    "totalFeesSol": 0.653175963
   }
 }

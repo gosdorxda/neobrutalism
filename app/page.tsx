@@ -8,19 +8,21 @@ import { HowItWorks } from "@/components/how-it-works";
 import { FAQ } from "@/components/faq";
 import { Partners } from "@/components/partners";
 import { getAllPhotos } from "@/lib/data";
+import { getStats, getTokenInfo } from "@/lib/cache";
 
-export default function Home() {
+export default async function Home() {
   const photos = getAllPhotos();
+  const [stats, token] = await Promise.all([getStats(), getTokenInfo()]);
 
   return (
     <div className="min-h-screen bg-background">
-      <Hero />
+      <Hero initialStats={stats} />
       <StatsBar />
       <BatchHistory />
       <Gallery photos={photos} />
       <HowItWorks />
       <Partners />
-      <TokenInfo />
+      <TokenInfo initialToken={token} />
       <TopDonors />
       <FAQ />
     </div>
