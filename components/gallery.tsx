@@ -139,18 +139,18 @@ export function Gallery({ photos }: { photos: GalleryPhoto[] }) {
               : "Photo preview"}
           </DialogTitle>
           {selectedPhoto && (
-            <div className="relative flex flex-col">
-              <div className="relative w-full aspect-square sm:aspect-[4/3] bg-secondary-background">
-                <Image
-                  src={selectedPhoto.url}
-                  alt={`Feeding photo from ${selectedPhoto.batchName}`}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 80vw"
-                  className="object-contain"
-                  unoptimized
-                  priority
-                />
-              </div>
+              <div className="relative flex flex-col">
+                <div className="relative w-full aspect-[3/4] bg-secondary-background">
+                  <Image
+                    src={selectedPhoto.url}
+                    alt={`Feeding photo from ${selectedPhoto.batchName}`}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 80vw"
+                    className="object-cover"
+                    unoptimized
+                    priority
+                  />
+                </div>
               <div className="px-4 py-3 bg-white border-t-2 border-border">
                 <p className="text-sm font-heading text-foreground">
                   {selectedPhoto.batchName}

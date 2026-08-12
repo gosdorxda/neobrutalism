@@ -19,7 +19,7 @@ export function Navbar({ initialSolPrice }: { initialSolPrice?: number | null })
   const twitter = settings?.twitter?.trim();
 
   return (
-    <div className="w-full bg-background pt-2 px-4 sm:px-6 lg:px-8">
+    <div className="w-full bg-background pt-4 px-4 sm:px-6 lg:px-8">
       <nav className="mx-auto max-w-6xl border-2 border-border bg-white rounded-base overflow-hidden">
         <div className="px-3 sm:px-4 lg:px-6">
           <div className="flex h-14 items-center justify-between">

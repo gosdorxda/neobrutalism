@@ -95,7 +95,7 @@ function ReceiptDialog({ batch }: { batch: Batch }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="reverse" size="sm" className="text-xs h-8 px-2.5">
+        <Button variant="noShadow" size="sm" className="text-xs h-8 px-2.5 bg-zinc-100 text-foreground hover:bg-zinc-200 border">
           <Receipt className="w-3.5 h-3.5" />
           Receipt
         </Button>
@@ -283,7 +283,7 @@ function PhotosDialog({ batch }: { batch: Batch }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="reverse" size="sm" className="text-xs h-8 px-2.5">
+        <Button variant="noShadow" size="sm" className="text-xs h-8 px-2.5 bg-zinc-100 text-foreground hover:bg-zinc-200 border">
           <Camera className="w-3.5 h-3.5" />
           Photos
         </Button>
@@ -362,6 +362,7 @@ function PhotosDialog({ batch }: { batch: Batch }) {
                 <Button
                   variant="neutral"
                   size="sm"
+                  className="bg-zinc-100 text-foreground hover:bg-zinc-200 border"
                   onClick={() => setVisibleCount((prev) => prev + 12)}
                 >
                   Load {Math.min(batch.photos.length - visibleCount, 12)} More
@@ -541,7 +542,7 @@ export function BatchHistory() {
               List
             </span>
             <div className={`relative w-7 h-4 rounded-full border border-border transition-colors ${viewMode === "list" ? "bg-main" : "bg-foreground/10"}`}>
-              <div className={`absolute top-[2px] w-3 h-3 rounded-full bg-foreground transition-all ${viewMode === "list" ? "left-[calc(100%-14px)]" : "left-[2px]"}`} />
+              <div className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-foreground transition-all ${viewMode === "list" ? "left-[calc(100%-14px)]" : "left-[2px]"}`} />
             </div>
             <span className={viewMode === "table" ? "text-foreground font-heading" : ""}>
               Table
@@ -596,17 +597,9 @@ export function BatchHistory() {
                     className="border-2 border-border rounded-base bg-white overflow-hidden"
                   >
                     {/* Top row: name + status + actions */}
-                    <div className="flex items-center gap-3 px-4 py-3">
-                      {/* Status dot */}
-                      <div className="flex items-center gap-2 shrink-0">
-                        {isActive ? (
-                          <div className="w-2.5 h-2.5 rounded-full bg-main animate-pulse" />
-                        ) : isFeeding ? (
-                          <Soup className="w-4 h-4 text-chart-3" />
-                        ) : (
-                          <CircleCheck className="w-4 h-4 text-chart-4" />
-                        )}
-                      </div>
+                    <div className="flex items-center gap-2 px-4 py-3">
+                      {/* Batch icon */}
+                      <Package className="w-5 h-5 sm:w-6 sm:h-6 shrink-0 text-foreground" />
 
                       {/* Name + status */}
                       <div className="flex-1 min-w-0">
@@ -614,17 +607,17 @@ export function BatchHistory() {
                           <h3 className="text-base sm:text-lg font-heading text-foreground">
                             {batch.name}
                           </h3>
-                          <span className={"text-xs font-heading px-1 " + (isActive ? "text-main" : isFeeding ? "text-chart-3" : "text-chart-4")}>
+                          <span className={"text-xs font-heading px-1 inline-flex items-center gap-1 " + (isActive ? "text-main" : isFeeding ? "text-chart-3" : "text-chart-4")}>
                             {isActive ? (
-                              <span className="inline-flex items-center gap-1">
-                                <span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                                In Progress
-                              </span>
+                              <span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                            ) : isFeeding ? (
+                              <Soup className="w-3.5 h-3.5" />
                             ) : (
-                              batch.status
+                              <CircleCheck className="w-3.5 h-3.5" />
                             )}
+                            {isActive ? "In Progress" : batch.status}
                           </span>
-</div>
+                        </div>
                       </div>
 
                       {/* Actions */}

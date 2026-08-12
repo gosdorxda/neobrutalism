@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Wallet, DollarSign, ShoppingCart, Camera } from "lucide-react";
 import { useProjectName } from "@/components/project-name-provider";
 const STEP_DURATION = 5000;
 
@@ -16,24 +17,28 @@ export function HowItWorks() {
       title: `Buy ${tokenSymbol}`,
       description: `Purchase ${tokenSymbol} on pump.fun. Every swap adds to the creator rewards pool, fueling the next batch.`,
       color: "bg-chart-1",
+      icon: Wallet,
     },
     {
       number: "2",
       title: "Creator Rewards",
       description: "All creator rewards from pump.fun are accumulated during each weekly batch period, ready to be converted into meals.",
       color: "bg-chart-4",
+      icon: DollarSign,
     },
     {
       number: "3",
       title: "Buy Cat Food",
       description: "100% of the collected rewards are used to purchase cat food from local stores. No fees, no middlemen.",
       color: "bg-chart-2",
+      icon: ShoppingCart,
     },
     {
       number: "4",
       title: "Photo Proof",
       description: "Every street cat that gets fed is photographed and shared. Proof of impact, one cat at a time.",
       color: "bg-chart-3",
+      icon: Camera,
     },
   ];
 
@@ -127,13 +132,18 @@ export function HowItWorks() {
             className="rounded-base border-2 border-border bg-white p-5 sm:p-6"
           >
             <div className="flex items-start gap-4">
-              <div
-                className={`shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-border flex items-center justify-center font-heading text-lg sm:text-xl ${
-                  steps[activeStep].color
-                }`}
-              >
-                {steps[activeStep].number}
-              </div>
+              {(() => {
+                const ActiveIcon = steps[activeStep].icon;
+                return (
+                  <div
+                    className={`shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-border flex items-center justify-center ${
+                      steps[activeStep].color
+                    }`}
+                  >
+                    <ActiveIcon className="w-5 h-5 sm:w-6 sm:h-6 text-foreground" />
+                  </div>
+                );
+              })()}
               <div>
                 <h3 className="text-lg sm:text-xl font-heading text-foreground mb-2">
                   {steps[activeStep].title}

@@ -11,7 +11,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Heart, ShieldCheck, Camera, Receipt, Package, Wallet, Soup, Activity, Cat, Info, Calendar } from "lucide-react";
-import { CatPeep } from "@/components/cat-peep";
+
 import { useProjectName } from "@/components/project-name-provider";
 import { formatUsd } from "@/lib/utils";
 import { useCountUpNumber } from "@/hooks/use-count-up";
@@ -493,12 +493,8 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
                     </div>
 
                     {/* CTA Button */}
-                    <div className="relative group shrink-0">
-                      {/* Peeking cat rises up from behind button */}
-                      <div className="absolute -top-28 left-1/2 -translate-x-1/2 w-24 h-28 pointer-events-none transition-all duration-500 ease-out translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 z-0">
-                        <CatPeep className="w-full h-full" />
-                      </div>
-                      <Button variant="noShadow" size="default" asChild className="relative z-10 px-2.5 sm:px-4 text-xs sm:text-sm">
+                    <div className="shrink-0">
+                      <Button variant="noShadow" size="default" asChild className="px-2.5 sm:px-4 text-xs sm:text-sm">
                         <a href={buyUrl} target="_blank" rel="noopener noreferrer">
                           <span className="hidden sm:inline">Feed a Cat</span>
                           <span className="sm:hidden">Feed</span>

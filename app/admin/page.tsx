@@ -680,6 +680,7 @@ export default function AdminPage() {
                     <Button
                       variant="noShadow"
                       size="sm"
+                      className="bg-zinc-100 text-foreground hover:bg-zinc-200 border"
                       onClick={() => saveBatch(batch)}
                       disabled={loading}
                     >
@@ -721,6 +722,7 @@ export default function AdminPage() {
                           <Button
                             variant="noShadow"
                             size="sm"
+                            className="bg-zinc-100 text-foreground hover:bg-zinc-200 border"
                             onClick={() => {
                               setExpandedPhotos((prev) => {
                                 const next = new Set(prev);
