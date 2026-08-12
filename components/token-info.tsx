@@ -273,7 +273,7 @@ export function TokenInfo({ initialToken }: { initialToken?: {
   useEffect(() => {
     async function loadToken() {
       try {
-        const res = await fetch("/api/token", { cache: "no-store" });
+        const res = await fetch("/api/token?_t=" + Date.now(), { cache: "no-store" });
         const data = await res.json();
         setToken(data);
       } catch {
