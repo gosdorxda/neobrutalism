@@ -148,7 +148,7 @@ function FoundationWalletCard() {
   if (!wallet) return null;
 
   return (
-    <div className="mt-6 bg-secondary-background border-2 border-border rounded-base p-5 sm:p-6 shadow-shadow">
+    <div className="mt-6 bg-secondary-background border-2 border-border rounded-base p-5 sm:p-6">
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-5">
         <div className="flex items-center gap-3">
@@ -479,7 +479,7 @@ export function TokenInfo({ initialToken }: { initialToken?: {
         <FoundationWalletCard />
 
         {/* Foundation Wallet Note */}
-        <div className="mt-4 bg-white border-2 border-border rounded-base p-4 shadow-shadow">
+        <div className="mt-4 bg-white border-2 border-border rounded-base p-4">
           <p className="text-xs font-base text-foreground/70 leading-relaxed">
             This foundation wallet accepts donations in any form. Funds are reserved for future needs,
             such as covering medical care for sick or injured street cats, emergency rescues, and other

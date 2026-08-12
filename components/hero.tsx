@@ -69,7 +69,6 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
 
   const animatedTotalFees = useCountUpNumber(stats.totalFees);
   const animatedTotalFeesSol = useCountUpNumber(stats.totalFeesSol);
-  const animatedTotalCats = useCountUpNumber(stats.totalCats);
 
   useEffect(() => {
     async function loadHeroData() {
@@ -475,7 +474,7 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
                           <Skeleton className="w-16 h-7 sm:w-20 sm:h-8 mb-0.5 mx-auto" borderRadius={4} />
                         ) : (
                           <div className="text-lg sm:text-2xl font-heading text-foreground mb-0.5 transition-all duration-300">
-                            {Math.round(stats.estimatedBowls || animatedTotalCats)}
+                            {Math.round(stats.estimatedBowls)}
                           </div>
                         )}
                         <div className="text-[10px] sm:text-xs font-base text-foreground/60 flex items-center justify-center gap-1 whitespace-nowrap h-5 sm:h-6">

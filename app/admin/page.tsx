@@ -794,6 +794,36 @@ export default function AdminPage() {
 
           <Card className="border-2 border-border shadow-shadow bg-white">
             <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-heading text-foreground">Redis Cache</h3>
+                <Button
+                  type="button"
+                  variant="neutral"
+                  size="sm"
+                  onClick={async () => {
+                    try {
+                      const res = await fetch("/api/admin/clear-cache", {
+                        method: "POST",
+                        headers: { authorization: `Bearer ${password}` },
+                      });
+                      const data = await res.json();
+                      setMessage(data.message || data.error || "Done");
+                    } catch {
+                      setMessage("Failed to clear cache");
+                    }
+                  }}
+                >
+                  Clear Cache
+                </Button>
+              </div>
+              <p className="text-[10px] font-base text-foreground/50">
+                Clears all cached data (SOL price, stats, token info, wallets). Data will refresh on next page load.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-2 border-border shadow-shadow bg-white">
+            <CardContent className="p-4">
               <form onSubmit={saveSettings} className="space-y-6">
                 {/* Core settings */}
                 <div className="space-y-4">

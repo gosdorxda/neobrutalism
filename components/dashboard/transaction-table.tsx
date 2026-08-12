@@ -17,6 +17,7 @@ import {
 const typeConfig = {
   "sol-transfer": { label: "SOL Transfer", icon: ArrowRightLeft, color: "bg-chart-2 text-white" },
   "token-transfer": { label: "Token Transfer", icon: Coins, color: "bg-chart-1 text-white" },
+  "fee-collection": { label: "Creator Fee", icon: Coins, color: "bg-chart-4 text-black" },
   swap: { label: "Swap", icon: Repeat, color: "bg-chart-3 text-black" },
   contract: { label: "Contract", icon: FileCode, color: "bg-chart-5 text-white" },
   unknown: { label: "Unknown", icon: HelpCircle, color: "bg-secondary-background text-foreground" },
@@ -105,7 +106,7 @@ const columns: ColumnDef<DashboardTx>[] = [
         href={row.original.solscanUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center justify-center w-8 h-8 rounded-base border-2 border-border bg-secondary-background hover:bg-main hover:text-main-foreground transition-colors"
+        className="inline-flex items-center justify-center w-8 h-8 rounded-base hover:bg-secondary-background transition-colors"
         aria-label="View on Solscan"
       >
         <ExternalLink className="w-3.5 h-3.5" />
@@ -116,7 +117,7 @@ const columns: ColumnDef<DashboardTx>[] = [
 
 function SkeletonTable() {
   return (
-    <div className="bg-white overflow-hidden border-2 border-border rounded-base">
+    <div className="bg-white overflow-hidden border border-border">
       <div className="grid grid-cols-8 gap-2 p-3 bg-foreground/5 border-b-2 border-border">
         {Array.from({ length: 8 }).map((_, i) => (
           <Skeleton key={i} className="h-4 w-full" />
@@ -149,7 +150,7 @@ export function TransactionTable({
     );
   }
   return (
-    <div className="border-2 border-border rounded-base overflow-hidden">
+    <div className="overflow-hidden">
       <DataTable columns={columns} data={transactions} />
     </div>
   );

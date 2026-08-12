@@ -1,5 +1,23 @@
 [
   {
+    "fees": "$0",
+    "cats": "0",
+    "food": "0kg",
+    "txHash": "-",
+    "isActive": true,
+    "receiptImage": "",
+    "receiptStore": "",
+    "receiptItem": "",
+    "receiptTotal": "$0",
+    "notes": "",
+    "photos": [],
+    "id": 1,
+    "name": "Batch #1",
+    "status": "In Progress",
+    "startDate": "2026-08-11",
+    "targetDate": "2026-08-18"
+  },
+  {
     "fees": "$15",
     "cats": "15",
     "food": "4kg",

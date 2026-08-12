@@ -101,7 +101,7 @@ const [data, setData] = useState<DashboardData | null>(null);
         )}
 
         {/* SOL Price pill */}
-        <div className="mb-6 inline-flex items-center gap-2.5 bg-secondary-background border-2 border-border rounded-base pl-2 pr-3 py-1.5 shadow-shadow">
+        <div className="mb-6 inline-flex items-center gap-2.5 bg-secondary-background border-2 border-border rounded-base pl-2 pr-3 py-1.5">
           <div className="w-7 h-7 rounded-full bg-[#9945FF]/10 flex items-center justify-center">
             <NetworkSolana variant="branded" className="w-5 h-5" />
           </div>
@@ -143,22 +143,28 @@ const [data, setData] = useState<DashboardData | null>(null);
               </TabsTrigger>
             </TabsList>
             <TabsContent value="foundation" className="mt-3">
-              <TransactionTable
-                transactions={data?.wallets.foundation.recentTx || []}
-                loading={loading}
-              />
+              <div className="border border-border overflow-hidden rounded-base">
+                <TransactionTable
+                  transactions={data?.wallets.foundation.recentTx || []}
+                  loading={loading}
+                />
+              </div>
             </TabsContent>
             <TabsContent value="creator" className="mt-3">
-              <TransactionTable
-                transactions={data?.wallets.creator.recentTx || []}
-                loading={loading}
-              />
+              <div className="border border-border overflow-hidden rounded-base">
+                <TransactionTable
+                  transactions={data?.wallets.creator.recentTx || []}
+                  loading={loading}
+                />
+              </div>
             </TabsContent>
             <TabsContent value="token" className="mt-3">
-              <TransactionTable
-                transactions={data?.tokenRecentTx || []}
-                loading={loading}
-              />
+              <div className="border border-border overflow-hidden rounded-base">
+                <TransactionTable
+                  transactions={data?.tokenRecentTx || []}
+                  loading={loading}
+                />
+              </div>
             </TabsContent>
           </Tabs>
         </section>

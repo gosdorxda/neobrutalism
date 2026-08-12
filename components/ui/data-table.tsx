@@ -4,6 +4,7 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
+  getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table"
 
@@ -15,6 +16,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -29,6 +32,12 @@ export function DataTable<TData, TValue>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      },
+    },
   })
 
   return (
@@ -38,7 +47,7 @@ export function DataTable<TData, TValue>({
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow
               key={headerGroup.id}
-              className="bg-foreground/5 hover:bg-foreground/5 border-b-2 border-border"
+              className="bg-foreground/5 hover:bg-foreground/5 border-b border-border"
             >
               {headerGroup.headers.map((header) => {
                 return (
@@ -78,6 +87,34 @@ export function DataTable<TData, TValue>({
           )}
         </TableBody>
       </Table>
+      {/* Pagination */}
+      {table.getPageCount() > 1 && (
+        <div className="flex items-center justify-between px-4 py-3 border-t border-border">
+          <span className="text-xs font-base text-foreground/60">
+            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+          </span>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="neutral"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="neutral"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -40,7 +40,7 @@ function WalletCard({
   const address = wallet?.address || "";
 
   return (
-    <Card className="border-2 border-border shadow-shadow">
+    <Card className="border-2 border-border">
       <CardContent className="p-5 sm:p-6">
         <div className="flex items-start justify-between gap-4 mb-4">
           <div className="flex items-center gap-3">

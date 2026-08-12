@@ -248,11 +248,13 @@ async function fetchFreshTokenInfo(): Promise<CachedTokenInfo | null> {
 }
 
 export async function getTokenInfo(): Promise<CachedTokenInfo> {
-  const cached = await getFromCache<CachedTokenInfo>(TOKEN_KEY);
-  if (cached !== null) return cached;
-
   const settings = getSettings();
   const tokenCa = settings.tokenCa || process.env.NEXT_PUBLIC_TOKEN_CA || "CATFUNDeio111111111111111111111111111111111";
+  const cacheKey = `${TOKEN_KEY}:${tokenCa}`;
+  
+  const cached = await getFromCache<CachedTokenInfo>(cacheKey);
+  if (cached !== null) return cached;
+
   const projectName = settings.projectName || "CATFUND";
 
   const fresh = await fetchFreshTokenInfo();
@@ -275,7 +277,7 @@ export async function getTokenInfo(): Promise<CachedTokenInfo> {
       buyUrl: `https://pump.fun/coin/${tokenCa}`,
     };
 
-  await setCache(TOKEN_KEY, result, TOKEN_TTL);
+  await setCache(cacheKey, result, TOKEN_TTL);
   return result;
 }
 
