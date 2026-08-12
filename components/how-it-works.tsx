@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useProjectName } from "@/components/project-name-provider";
-const STEP_DURATION = 4000;
+const STEP_DURATION = 5000;
 
 export function HowItWorks() {
   const { projectName, tokenSymbol } = useProjectName();
@@ -12,24 +12,28 @@ export function HowItWorks() {
 
   const steps = [
     {
-      number: "01",
+      number: "1",
       title: `Buy ${tokenSymbol}`,
       description: `Purchase ${tokenSymbol} on pump.fun. Every swap adds to the creator rewards pool, fueling the next batch.`,
+      color: "bg-chart-1",
     },
     {
-      number: "02",
+      number: "2",
       title: "Creator Rewards",
       description: "All creator rewards from pump.fun are accumulated during each weekly batch period, ready to be converted into meals.",
+      color: "bg-chart-4",
     },
     {
-      number: "03",
+      number: "3",
       title: "Buy Cat Food",
       description: "100% of the collected rewards are used to purchase cat food from local stores. No fees, no middlemen.",
+      color: "bg-chart-2",
     },
     {
-      number: "04",
+      number: "4",
       title: "Photo Proof",
       description: "Every street cat that gets fed is photographed and shared. Proof of impact, one cat at a time.",
+      color: "bg-chart-3",
     },
   ];
 
@@ -52,12 +56,12 @@ export function HowItWorks() {
     >
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
-        <div className="text-center mb-10 sm:mb-14">
+        <div className="text-center mb-10 sm:mb-12">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-3xl sm:text-4xl font-heading text-foreground mb-3"
+            className="text-3xl font-heading text-foreground mb-3"
           >
             How {projectName} Works
           </motion.h2>
@@ -66,75 +70,75 @@ export function HowItWorks() {
           </p>
         </div>
 
-        {/* Horizontal stepper */}
-        <div className="relative mb-10 sm:mb-12">
-          {/* Track line */}
-          <div className="absolute top-[19px] sm:top-[23px] left-0 right-0 h-0.5 bg-border/30" />
+        {/* Step cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+          {steps.map((step, index) => {
+            const isActive = index === activeStep;
+            const isCompleted = index < activeStep;
 
-          {/* Progress line */}
-          <motion.div
-            className="absolute top-[19px] sm:top-[23px] left-0 h-0.5 bg-main"
-            animate={{ width: `${(activeStep / (steps.length - 1)) * 100}%` }}
-            transition={{ duration: 0.4, ease: "easeInOut" }}
-          />
-
-          {/* Steps */}
-          <div className="relative flex justify-between">
-            {steps.map((step, index) => {
-              const isActive = index === activeStep;
-              const isCompleted = index < activeStep;
-
-              return (
-                <button
-                  key={step.title}
-                  onClick={() => setActiveStep(index)}
-                  className="group flex flex-col items-center gap-2 focus:outline-none"
+            return (
+              <motion.button
+                key={step.title}
+                onClick={() => setActiveStep(index)}
+                className={`relative flex flex-col items-center gap-2 p-3 sm:p-4 rounded-base border-2 transition-all duration-300 focus:outline-none ${
+                  isActive
+                    ? "bg-white border-foreground"
+                    : isCompleted
+                    ? "bg-white/40 border-border/40"
+                    : "bg-white/80 border-border hover:border-foreground/50"
+                }`}
+                animate={{
+                  scale: isActive ? 1.05 : 1,
+                  y: isActive ? -2 : 0,
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              >
+                <div
+                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 flex items-center justify-center font-heading text-base sm:text-lg transition-all duration-300 ${
+                    isActive
+                      ? `${step.color} border-foreground text-foreground`
+                      : isCompleted
+                      ? "bg-white border-border/40 text-foreground/40"
+                      : "bg-white border-border text-foreground/60"
+                  }`}
                 >
-                  <motion.div
-                    className={`relative w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 flex items-center justify-center font-heading text-sm sm:text-base transition-colors duration-300 ${
-                      isActive
-                        ? "bg-main border-foreground text-main-foreground"
-                        : isCompleted
-                        ? "bg-foreground border-foreground text-background"
-                        : "bg-white border-border text-foreground"
-                    }`}
-                    animate={{ scale: isActive ? 1.1 : 1 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                  >
-                    {step.number}
-                  </motion.div>
-                  <span
-                    className={`text-xs sm:text-sm font-heading text-center transition-colors duration-300 ${
-                      isActive ? "text-foreground" : "text-foreground/40"
-                    }`}
-                  >
-                    {step.title}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                  {step.number}
+                </div>
+                <span
+                  className={`text-xs sm:text-sm font-heading text-center transition-colors duration-300 leading-tight ${
+                    isActive ? "text-foreground" : "text-foreground/50"
+                  }`}
+                >
+                  {step.title}
+                </span>
+              </motion.button>
+            );
+          })}
         </div>
 
         {/* Content card */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeStep}
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
+            exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.3 }}
-            className="rounded-base border-2 border-border bg-white p-6 sm:p-8"
+            className="rounded-base border-2 border-border bg-white p-5 sm:p-6"
           >
-            <div className="flex items-start gap-4 sm:gap-5">
-              <span className="shrink-0 text-3xl sm:text-4xl font-heading text-foreground/20 leading-none">
+            <div className="flex items-start gap-4">
+              <div
+                className={`shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-border flex items-center justify-center font-heading text-lg sm:text-xl ${
+                  steps[activeStep].color
+                }`}
+              >
                 {steps[activeStep].number}
-              </span>
+              </div>
               <div>
-                <h3 className="text-xl sm:text-2xl font-heading text-foreground mb-2">
+                <h3 className="text-lg sm:text-xl font-heading text-foreground mb-2">
                   {steps[activeStep].title}
                 </h3>
-                <p className="text-base font-base text-foreground/70 leading-relaxed">
+                <p className="text-sm sm:text-base font-base text-foreground/70 leading-relaxed">
                   {steps[activeStep].description}
                 </p>
               </div>
@@ -143,7 +147,7 @@ export function HowItWorks() {
         </AnimatePresence>
 
         {/* Dots */}
-        <div className="flex justify-center gap-2 mt-6">
+        <div className="flex justify-center gap-2 mt-5">
           {steps.map((_, index) => (
             <button
               key={index}

@@ -49,9 +49,6 @@ export function Navbar({ initialSolPrice }: { initialSolPrice?: number | null })
               <a href="#partners" className="flex items-center h-full font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
                 Partners
               </a>
-              <a href="#top-donors" className="flex items-center h-full font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
-                Donors
-              </a>
               <a href="#faq" className="flex items-center h-full font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
                 FAQ
               </a>
@@ -134,9 +131,6 @@ export function Navbar({ initialSolPrice }: { initialSolPrice?: number | null })
             </a>
             <a href="#partners" onClick={closeMenu} className="block py-2 font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
               Partners
-            </a>
-            <a href="#top-donors" onClick={closeMenu} className="block py-2 font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
-              Donors
             </a>
             <a href="#faq" onClick={closeMenu} className="block py-2 font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
               FAQ

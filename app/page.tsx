@@ -1,7 +1,6 @@
 import { Hero } from "@/components/hero";
 import { StatsBar } from "@/components/stats-bar";
 import { TokenInfo } from "@/components/token-info";
-import { TopDonors } from "@/components/top-donors";
 import { BatchHistory } from "@/components/batch-history";
 import { Gallery } from "@/components/gallery";
 import { HowItWorks } from "@/components/how-it-works";
@@ -23,7 +22,6 @@ export default async function Home() {
       <HowItWorks />
       <Partners />
       <TokenInfo initialToken={token} />
-      <TopDonors />
       <FAQ />
     </div>
   );

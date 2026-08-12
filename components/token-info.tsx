@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Copy, ExternalLink, ShieldCheck, TrendingUp, ArrowRightLeft, Swords, Trophy, UserCheck } from "lucide-react";
+import { Check, Copy, ExternalLink, ShieldCheck, RefreshCw, TrendingUp, ArrowRightLeft, Swords, Trophy, UserCheck } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useProjectName } from "@/components/project-name-provider";
 import { NetworkSolana, WalletPhantom } from "@web3icons/react";
@@ -269,39 +269,40 @@ export function TokenInfo({ initialToken }: { initialToken?: {
   const { projectName, tokenSymbol } = useProjectName();
   const [token, setToken] = useState(initialToken ?? null);
   const [loading, setLoading] = useState(initialToken === undefined);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
+    if (initialToken) return; // already have data from SSR
+    
     async function loadToken() {
       try {
         const res = await fetch("/api/token?_t=" + Date.now(), { cache: "no-store" });
         const data = await res.json();
-        setToken(data);
+        if (data && data.ca) {
+          setToken(data);
+        }
       } catch {
-        setToken({
-          ca: TOKEN_CA,
-          name: projectName,
-          symbol: tokenSymbol,
-          price: null,
-          marketCap: null,
-          volume: null,
-          holders: null,
-          totalTx: null,
-          buyTx: null,
-          sellTx: null,
-          snipers: null,
-          athMarketCap: null,
-          devHolding: "0%",
-          imageUrl: null,
-          buyUrl: "https://pump.fun",
-        });
+        // keep current state
       }
       setLoading(false);
     }
 
     loadToken();
-    const interval = setInterval(loadToken, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  }, [initialToken]);
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    try {
+      const res = await fetch("/api/token?_t=" + Date.now(), { cache: "no-store" });
+      const data = await res.json();
+      if (data && data.ca) {
+        setToken(data);
+      }
+    } catch {
+      // keep current
+    }
+    setRefreshing(false);
+  }
 
   const displayCa = token?.ca ? formatCa(token.ca) : "";
 
@@ -324,7 +325,17 @@ export function TokenInfo({ initialToken }: { initialToken?: {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="text-center mb-6">
-          <h2 className="text-2xl sm:text-3xl font-heading text-foreground mb-2">Token Info</h2>
+          <h2 className="text-3xl font-heading text-foreground mb-2">
+              Token Info
+              <button
+                onClick={handleRefresh}
+                disabled={refreshing}
+                className="inline-flex items-center ml-2 text-main hover:text-foreground transition-colors"
+                title="Refresh data"
+              >
+                <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
+              </button>
+            </h2>
           <p className="text-sm font-base text-foreground/60 max-w-lg mx-auto">
             Live data from PumpFun. Prices update automatically.
           </p>

@@ -11,7 +11,6 @@ const STATS_TTL = 60; // seconds
 const TOKEN_TTL = 30; // seconds
 
 const COINGECKO_SOL_URL = "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd";
-const PUMPFUN_SUPPLY = 1_000_000_000;
 
 export type CachedStats = {
   totalCats: number;
@@ -208,38 +207,38 @@ async function fetchFreshTokenInfo(): Promise<CachedTokenInfo | null> {
 
   try {
     const res = await fetch(
-      `https://advanced-api-v2.pump.fun/coins/metadata/${tokenCa}`,
-      { next: { revalidate: 30 } }
+      `https://api.dexscreener.com/latest/dex/tokens/${tokenCa}`,
+      { cache: "no-store" }
     );
-    if (!res.ok) throw new Error(`PumpFun ${res.status}`);
+    if (!res.ok) throw new Error(`DexScreener ${res.status}`);
     const data = await res.json();
+    const pairs = data?.pairs;
 
-    const marketCap = data.marketcap ? Number(data.marketcap) : null;
-    const priceUsd = marketCap ? marketCap / PUMPFUN_SUPPLY : null;
-    const volume = data.volume_usd ? Number(data.volume_usd) : null;
-    const holders = data.num_holders_v2
-      ? Number(data.num_holders_v2)
-      : data.num_holders
-      ? Number(data.num_holders)
-      : null;
+    if (!pairs || pairs.length === 0) throw new Error("No pairs");
+
+    const solanaPairs = pairs.filter((p: { chainId: string }) => p.chainId === "solana");
+    const pair = solanaPairs.length > 0 ? solanaPairs[0] : pairs[0];
+
+    const priceUsd = pair.priceUsd ? Number(pair.priceUsd) : null;
+    const marketCap = pair.marketCap ? Number(pair.marketCap) : null;
+    const volume = pair.volume?.h24 ? Number(pair.volume.h24) : null;
+    const txns = pair.txns?.h24;
 
     return {
       ca: tokenCa,
-      name: data.name || projectName,
-      symbol: data.ticker || projectName,
+      name: pair.baseToken?.name || projectName,
+      symbol: pair.baseToken?.symbol || projectName,
       price: priceUsd ? `$${priceUsd.toFixed(10)}` : null,
       marketCap: marketCap ? `$${marketCap.toLocaleString("en-US")}` : null,
       volume: volume ? `$${volume.toLocaleString("en-US")}` : null,
-      holders: holders ? holders.toLocaleString("en-US") : null,
-      totalTx: formatNumber(data.transactions ? Number(data.transactions) : null),
-      buyTx: formatNumber(data.buy_transactions ? Number(data.buy_transactions) : null),
-      sellTx: formatNumber(data.sell_transactions ? Number(data.sell_transactions) : null),
-      snipers: formatNumber(data.sniper_count ? Number(data.sniper_count) : null),
-      athMarketCap: data.ath_market_cap ? `$${Number(data.ath_market_cap).toLocaleString("en-US")}` : null,
-      devHolding: data.bundler_owned_percentage_v2
-        ? `${(Number(data.bundler_owned_percentage_v2) * 100).toFixed(2)}%`
-        : "0.00%",
-      imageUrl: data.imageUrl || null,
+      holders: null,
+      totalTx: txns ? formatNumber(txns.buys + txns.sells) : null,
+      buyTx: txns ? formatNumber(txns.buys) : null,
+      sellTx: txns ? formatNumber(txns.sells) : null,
+      snipers: null,
+      athMarketCap: null,
+      devHolding: "0.00%",
+      imageUrl: pair.info?.imageUrl || null,
       buyUrl: `https://pump.fun/coin/${tokenCa}`,
     };
   } catch {
@@ -251,6 +250,8 @@ export async function getTokenInfo(): Promise<CachedTokenInfo> {
   const settings = getSettings();
   const tokenCa = settings.tokenCa || process.env.NEXT_PUBLIC_TOKEN_CA || "CATFUNDeio111111111111111111111111111111111";
   const cacheKey = `${TOKEN_KEY}:${tokenCa}`;
+  
+  console.log("[getTokenInfo] tokenCa:", tokenCa, "cacheKey:", cacheKey);
   
   const cached = await getFromCache<CachedTokenInfo>(cacheKey);
   if (cached !== null) return cached;

@@ -55,7 +55,7 @@ export function FAQ() {
   ];
 
   return (
-    <section id="faq" className="w-full bg-gradient-to-b from-secondary-background to-background py-8">
+    <section id="faq" className="w-full bg-gradient-to-b from-background to-secondary-background py-8">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         
         {/* Heading */}

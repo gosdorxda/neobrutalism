@@ -495,6 +495,7 @@ export function BatchHistory() {
   const [batches, setBatches] = useState<Batch[]>([]);
   const [loading, setLoading] = useState(true);
   const [now, setNow] = useState(0);
+  const [viewMode, setViewMode] = useState<"list" | "table">("list");
 
   useEffect(() => {
     async function loadBatches() {
@@ -521,7 +522,7 @@ export function BatchHistory() {
     <section id="batches" className="w-full bg-background py-8">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-4">
           <h2 className="text-3xl font-heading text-foreground mb-3">
             Batch History
           </h2>
@@ -530,27 +531,36 @@ export function BatchHistory() {
           </p>
         </div>
 
+        {/* View toggle */}
+        <div className="flex justify-center mb-6">
+          <button
+            onClick={() => setViewMode(viewMode === "list" ? "table" : "list")}
+            className="inline-flex items-center gap-2 font-base text-xs text-foreground/50 hover:text-foreground transition-colors"
+          >
+            <span className={viewMode === "list" ? "text-foreground font-heading" : ""}>
+              List
+            </span>
+            <div className={`relative w-7 h-4 rounded-full border border-border transition-colors ${viewMode === "list" ? "bg-main" : "bg-foreground/10"}`}>
+              <div className={`absolute top-[2px] w-3 h-3 rounded-full bg-foreground transition-all ${viewMode === "list" ? "left-[calc(100%-14px)]" : "left-[2px]"}`} />
+            </div>
+            <span className={viewMode === "table" ? "text-foreground font-heading" : ""}>
+              Table
+            </span>
+          </button>
+        </div>
+
         {/* Data Table */}
         {loading ? (
           <div className="text-center py-12">
             <p className="text-sm font-base text-foreground/50">Loading batches...</p>
           </div>
-        ) : (
+        ) : viewMode === "table" ? (
           <DataTable columns={columns} data={batches} />
-        )}
+        ) : null}
 
         {/* Improved Card List View */}
-        {!loading && batches.length > 0 && (
-          <div className="mt-16">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-heading text-foreground mb-2">
-                Batch List (Improved)
-              </h2>
-              <p className="text-xs font-base text-foreground/50">
-                Alternative compact card view with progress
-              </p>
-            </div>
-
+        {!loading && viewMode === "list" && batches.length > 0 && (
+          <div>
             <div className="space-y-3">
               {batches.map((batch) => {
                 const isActive = batch.status === "In Progress";
