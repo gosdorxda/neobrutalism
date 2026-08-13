@@ -26,9 +26,9 @@ export function AreaCover() {
         </div>
 
         {/* Map */}
-        <div className="relative w-full max-w-4xl mx-auto overflow-x-auto">
+        <div className="relative w-full max-w-4xl mx-auto">
           <div
-            className="relative w-full min-w-[600px] indonesia-map"
+            className="relative w-full indonesia-map [&_svg]:w-full [&_svg]:h-auto"
             dangerouslySetInnerHTML={{ __html: svg }}
           />
         </div>

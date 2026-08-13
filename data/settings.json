@@ -1,7 +1,7 @@
 {
   "tokenCa": "CX2v7JSHJQDcNooubzzvZG8TPaDwbaPgfzcXRSWJpump",
   "projectName": "CatBowl",
-  "projectLogo": "/uploads/logo/1786608122703-Untitled_design__2_.jpg",
+  "projectLogo": "/uploads/logo/1786611652922-CatBowl_bg_white.jpg",
   "creatorWallet": "7VPJHsm1bqMDd1ZCKRQyjv9bduPpEwpNmCmiikBBHs9F",
   "foundationWallet": "7VPJHsm1bqMDd1ZCKRQyjv9bduPpEwpNmCmiikBBHs9F",
   "telegram": "",
@@ -40,5 +40,6 @@
   "seoTitle": "",
   "seoDescription": "",
   "seoKeywords": "",
-  "ogImage": ""
+  "ogImage": "",
+  "favicon": ""
 }
