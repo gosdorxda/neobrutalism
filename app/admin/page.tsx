@@ -154,6 +154,7 @@ export default function AdminPage() {
   const [seoDescription, setSeoDescription] = useState("");
   const [seoKeywords, setSeoKeywords] = useState("");
   const [ogImage, setOgImage] = useState("");
+  const [favicon, setFavicon] = useState("");
 
   useEffect(() => {
     const storedPassword = sessionStorage.getItem("adminPassword");
@@ -195,6 +196,7 @@ export default function AdminPage() {
       setSeoDescription(data.seoDescription || "");
       setSeoKeywords(data.seoKeywords || "");
       setOgImage(data.ogImage || "");
+      setFavicon(data.favicon || "");
     } catch {
       setMessage("Failed to load settings");
     }
@@ -228,6 +230,7 @@ export default function AdminPage() {
           seoDescription,
           seoKeywords,
           ogImage,
+          favicon,
         }),
       });
       if (res.ok) {
@@ -1000,6 +1003,24 @@ export default function AdminPage() {
                     {ogImage && (
                       <div className="mt-2 rounded-base border-2 border-border overflow-hidden">
                         <img src={ogImage} alt="OG preview" className="w-full h-auto" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-base text-foreground/60 block">Favicon URL</label>
+                    <Input
+                      value={favicon}
+                      onChange={(e) => setFavicon(e.target.value)}
+                      placeholder="/favicon.ico or https://example.com/favicon.png"
+                      className="w-full"
+                    />
+                    <p className="text-[10px] font-base text-foreground/50">
+                      Browser tab icon. Use .ico, .png, or .svg. Recommended: 32x32px or 64x64px.
+                    </p>
+                    {favicon && (
+                      <div className="mt-2 flex items-center gap-2">
+                        <img src={favicon} alt="Favicon preview" className="w-8 h-8 rounded-base border-2 border-border" />
+                        <span className="text-[10px] font-base text-foreground/50">Preview</span>
                       </div>
                     )}
                   </div>

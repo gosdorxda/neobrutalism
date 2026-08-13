@@ -36,6 +36,7 @@ export type Settings = {
   seoDescription: string;
   seoKeywords: string;
   ogImage: string;
+  favicon: string;
 };
 
 const defaultSettings: Settings = {
@@ -56,6 +57,7 @@ const defaultSettings: Settings = {
   seoDescription: "",
   seoKeywords: "",
   ogImage: "",
+  favicon: "",
 };
 
 export function getSettings(): Settings {

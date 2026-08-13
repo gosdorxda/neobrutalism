@@ -40,6 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords,
     openGraph,
     twitter,
+    ...(s.favicon ? { icons: { icon: s.favicon, shortcut: s.favicon, apple: s.favicon } } : {}),
   };
 }
 

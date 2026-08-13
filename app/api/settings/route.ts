@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
       updates.notificationText = body.notificationText.trim();
     }
 
-    const seoFields = ["seoTitle", "seoDescription", "seoKeywords", "ogImage"] as const;
+    const seoFields = ["seoTitle", "seoDescription", "seoKeywords", "ogImage", "favicon"] as const;
     seoFields.forEach((field) => {
       if (body[field] !== undefined) {
         if (typeof body[field] !== "string") {
