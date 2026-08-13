@@ -6,6 +6,7 @@ import { Gallery } from "@/components/gallery";
 import { HowItWorks } from "@/components/how-it-works";
 import { FAQ } from "@/components/faq";
 import { Partners } from "@/components/partners";
+import { AreaCover } from "@/components/area-cover";
 import { getAllPhotos } from "@/lib/data";
 import { getStats, getTokenInfo } from "@/lib/cache";
 
@@ -22,6 +23,7 @@ export default async function Home() {
       <HowItWorks />
       <Partners />
       <TokenInfo initialToken={token} />
+      <AreaCover />
       <FAQ />
     </div>
   );

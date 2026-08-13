@@ -36,6 +36,13 @@ export async function POST(request: NextRequest) {
       updates.projectName = body.projectName.trim();
     }
 
+    if (body.projectLogo !== undefined) {
+      if (typeof body.projectLogo !== "string") {
+        return NextResponse.json({ error: "Invalid project logo" }, { status: 400 });
+      }
+      updates.projectLogo = body.projectLogo.trim();
+    }
+
     if (body.creatorWallet !== undefined) {
       if (typeof body.creatorWallet !== "string") {
         return NextResponse.json({ error: "Invalid creator wallet" }, { status: 400 });
@@ -73,6 +80,16 @@ export async function POST(request: NextRequest) {
       }
       updates.notificationText = body.notificationText.trim();
     }
+
+    const seoFields = ["seoTitle", "seoDescription", "seoKeywords", "ogImage"] as const;
+    seoFields.forEach((field) => {
+      if (body[field] !== undefined) {
+        if (typeof body[field] !== "string") {
+          return;
+        }
+        (updates as Record<string, string>)[field] = body[field].trim();
+      }
+    });
 
     if (body.partners !== undefined) {
       if (!Array.isArray(body.partners)) {

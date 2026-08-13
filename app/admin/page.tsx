@@ -23,7 +23,7 @@ type Batch = {
   food: string;
   txHash: string;
   isActive: boolean;
-  receiptImage: string;
+  receiptImages: string[];
   receiptStore: string;
   receiptItem: string;
   receiptTotal: string;
@@ -139,6 +139,7 @@ export default function AdminPage() {
   const [topDonorsMessage, setTopDonorsMessage] = useState("");
   const [tokenCa, setTokenCa] = useState("");
   const [projectName, setProjectName] = useState("");
+  const [projectLogo, setProjectLogo] = useState("");
   const [creatorWallet, setCreatorWallet] = useState("");
   const [foundationWallet, setFoundationWallet] = useState("");
   const [telegram, setTelegram] = useState("");
@@ -149,6 +150,10 @@ export default function AdminPage() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [theme, setTheme] = useState<Theme>("original");
   const [notificationText, setNotificationText] = useState("");
+  const [seoTitle, setSeoTitle] = useState("");
+  const [seoDescription, setSeoDescription] = useState("");
+  const [seoKeywords, setSeoKeywords] = useState("");
+  const [ogImage, setOgImage] = useState("");
 
   useEffect(() => {
     const storedPassword = sessionStorage.getItem("adminPassword");
@@ -175,6 +180,7 @@ export default function AdminPage() {
       const data = await res.json();
       setTokenCa(data.tokenCa || "");
       setProjectName(data.projectName || "");
+      setProjectLogo(data.projectLogo || "");
       setCreatorWallet(data.creatorWallet || "");
       setFoundationWallet(data.foundationWallet || "");
       setTelegram(data.telegram || "");
@@ -185,6 +191,10 @@ export default function AdminPage() {
       setPartners(Array.isArray(data.partners) ? data.partners : []);
       setTheme(data.theme && ["original", "mint", "lavender", "lemon"].includes(data.theme) ? data.theme : "original");
       setNotificationText(data.notificationText || "");
+      setSeoTitle(data.seoTitle || "");
+      setSeoDescription(data.seoDescription || "");
+      setSeoKeywords(data.seoKeywords || "");
+      setOgImage(data.ogImage || "");
     } catch {
       setMessage("Failed to load settings");
     }
@@ -203,6 +213,7 @@ export default function AdminPage() {
         body: JSON.stringify({
           tokenCa,
           projectName,
+          projectLogo,
           creatorWallet,
           foundationWallet,
           telegram,
@@ -213,6 +224,10 @@ export default function AdminPage() {
           partners,
           theme,
           notificationText,
+          seoTitle,
+          seoDescription,
+          seoKeywords,
+          ogImage,
         }),
       });
       if (res.ok) {
@@ -272,6 +287,16 @@ export default function AdminPage() {
       setMessage("Partner logo uploaded");
     } else {
       setMessage("Partner logo upload failed");
+    }
+  }
+
+  async function uploadProjectLogo(file: File) {
+    const path = await uploadSingleFile(file, "logo", "photo");
+    if (path) {
+      setProjectLogo(path);
+      setMessage("Project logo uploaded");
+    } else {
+      setMessage("Project logo upload failed");
     }
   }
 
@@ -393,14 +418,25 @@ export default function AdminPage() {
     }
   }
 
-  async function uploadReceipt(file: File, batchId: number) {
+  async function uploadReceipts(files: FileList, batchId: number) {
     setLoading(true);
-    const path = await uploadSingleFile(file, `batch-${batchId}`, "receipt");
-    if (path) {
-      const batch = batches.find((b) => b.id === batchId);
-      if (batch) {
-        await saveBatch({ ...batch, receiptImage: path });
+    const batch = batches.find((b) => b.id === batchId);
+    if (!batch) {
+      setLoading(false);
+      return;
+    }
+
+    const newPaths: string[] = [];
+    for (const file of Array.from(files)) {
+      const path = await uploadSingleFile(file, `batch-${batchId}`, "receipt");
+      if (path) {
+        newPaths.push(path);
       }
+    }
+
+    if (newPaths.length > 0) {
+      await saveBatch({ ...batch, receiptImages: [...batch.receiptImages, ...newPaths] });
+      setMessage(`${newPaths.length} receipt image(s) uploaded`);
     } else {
       setMessage("Receipt upload failed");
     }
@@ -466,7 +502,7 @@ export default function AdminPage() {
       food: "0kg",
       txHash: "-",
       isActive: true,
-      receiptImage: "",
+      receiptImages: [],
       receiptStore: "",
       receiptItem: "",
       receiptTotal: "$0",
@@ -611,23 +647,32 @@ export default function AdminPage() {
               <CardContent className="pt-5 pb-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                   <div className="space-y-4">
-                    <label className="text-xs font-base text-foreground/60 block">Receipt</label>
-                    {batch.receiptImage && (
-                      <div className="relative w-full max-w-xs h-36 border-2 border-border rounded-base overflow-hidden bg-secondary-background">
-                        <Image
-                          src={batch.receiptImage}
-                          alt="Receipt"
-                          fill
-                          sizes="300px"
-                          className="object-cover"
-                          unoptimized
-                        />
+                    <label className="text-xs font-base text-foreground/60 block">Receipt ({batch.receiptImages.length})</label>
+                    {batch.receiptImages.length > 0 && (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {batch.receiptImages.map((img, idx) => (
+                          <div key={idx} className="relative w-full aspect-[4/3] border-2 border-border rounded-base overflow-hidden bg-secondary-background">
+                            <Image
+                              src={img}
+                              alt={`Receipt ${idx + 1}`}
+                              fill
+                              sizes="150px"
+                              className="object-cover"
+                              unoptimized
+                            />
+                          </div>
+                        ))}
                       </div>
                     )}
                     <Input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => e.target.files?.[0] && uploadReceipt(e.target.files[0], batch.id)}
+                      multiple
+                      onChange={(e) => {
+                        if (e.target.files) {
+                          uploadReceipts(e.target.files, batch.id);
+                        }
+                      }}
                       className="text-sm"
                     />
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
@@ -850,6 +895,41 @@ export default function AdminPage() {
                       />
                     </div>
                   </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-base text-foreground/60 block">Project Logo</label>
+                    <div className="flex flex-wrap items-center gap-3">
+                      {projectLogo && (
+                        <div className="relative w-12 h-12 border-2 border-border rounded-base overflow-hidden bg-secondary-background">
+                          <Image
+                            src={projectLogo}
+                            alt="Project logo preview"
+                            fill
+                            sizes="48px"
+                            className="object-cover"
+                            unoptimized
+                          />
+                        </div>
+                      )}
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) uploadProjectLogo(file);
+                        }}
+                        className="text-sm w-auto flex-1 min-w-[200px]"
+                      />
+                      <Input
+                        value={projectLogo}
+                        onChange={(e) => setProjectLogo(e.target.value)}
+                        placeholder="Or paste logo URL"
+                        className="text-sm flex-[2] min-w-[200px]"
+                      />
+                    </div>
+                    <p className="text-[10px] font-base text-foreground/50">
+                      If set, logo will replace project name text in navbar.
+                    </p>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <label className="text-xs font-base text-foreground/60 block">Creator Wallet</label>
@@ -869,6 +949,59 @@ export default function AdminPage() {
                         className="w-full"
                       />
                     </div>
+                  </div>
+                </div>
+
+                {/* SEO & Metadata */}
+                <div className="space-y-4 pt-4 border-t-2 border-border">
+                  <h3 className="text-sm font-heading text-foreground">SEO & Metadata</h3>
+                  <p className="text-[10px] font-base text-foreground/50">
+                    Used for Google SEO and social media sharing (OG tags). Leave empty to use defaults.
+                  </p>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-base text-foreground/60 block">Meta Title</label>
+                    <Input
+                      value={seoTitle}
+                      onChange={(e) => setSeoTitle(e.target.value)}
+                      placeholder={`${projectName || "CatBowl"} - Revolutionary Meme Coin`}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-base text-foreground/60 block">Meta Description</label>
+                    <Textarea
+                      value={seoDescription}
+                      onChange={(e) => setSeoDescription(e.target.value)}
+                      placeholder="Join the future of decentralized finance with CatBowl..."
+                      className="w-full min-h-[80px]"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-base text-foreground/60 block">Keywords</label>
+                    <Input
+                      value={seoKeywords}
+                      onChange={(e) => setSeoKeywords(e.target.value)}
+                      placeholder="cat food, charity, solana, meme coin, donation"
+                      className="w-full"
+                    />
+                    <p className="text-[10px] font-base text-foreground/50">Comma-separated</p>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-base text-foreground/60 block">OG Image URL</label>
+                    <Input
+                      value={ogImage}
+                      onChange={(e) => setOgImage(e.target.value)}
+                      placeholder="https://example.com/og-image.png"
+                      className="w-full"
+                    />
+                    <p className="text-[10px] font-base text-foreground/50">
+                      Recommended: 1200x630px. Used for social media preview cards.
+                    </p>
+                    {ogImage && (
+                      <div className="mt-2 rounded-base border-2 border-border overflow-hidden">
+                        <img src={ogImage} alt="OG preview" className="w-full h-auto" />
+                      </div>
+                    )}
                   </div>
                 </div>
 

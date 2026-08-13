@@ -21,6 +21,7 @@ export type Theme = "original" | "mint" | "lavender" | "lemon";
 export type Settings = {
   tokenCa: string;
   projectName: string;
+  projectLogo: string;
   creatorWallet: string;
   foundationWallet: string;
   telegram: string;
@@ -31,11 +32,16 @@ export type Settings = {
   partners: Partner[];
   theme: Theme;
   notificationText: string;
+  seoTitle: string;
+  seoDescription: string;
+  seoKeywords: string;
+  ogImage: string;
 };
 
 const defaultSettings: Settings = {
   tokenCa: "CATFUNDeio111111111111111111111111111111111",
   projectName: "CATFUND",
+  projectLogo: "",
   creatorWallet: "",
   foundationWallet: "",
   telegram: "",
@@ -46,6 +52,10 @@ const defaultSettings: Settings = {
   partners: [],
   theme: "original",
   notificationText: "",
+  seoTitle: "",
+  seoDescription: "",
+  seoKeywords: "",
+  ogImage: "",
 };
 
 export function getSettings(): Settings {

@@ -62,14 +62,9 @@ export function HowItWorks() {
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="text-center mb-10 sm:mb-12">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-3xl font-heading text-foreground mb-3"
-          >
+          <h2 className="text-3xl font-heading text-foreground mb-3">
             How {projectName} Works
-          </motion.h2>
+          </h2>
           <p className="text-base font-base text-foreground/60 max-w-xl mx-auto">
             From every swap to a full bowl. Here&apos;s how creator rewards become cat food.
           </p>

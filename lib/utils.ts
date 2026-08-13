@@ -13,6 +13,12 @@ export function getThumbPath(fullPath: string): string {
   return parts.join("/");
 }
 
+export function formatTxHash(txHash: string): string {
+  if (!txHash || txHash === "-") return "-";
+  if (txHash.length <= 12) return txHash;
+  return `${txHash.slice(0, 6)}...${txHash.slice(-4)}`;
+}
+
 export function formatUsd(value: number): string {
   const absValue = Math.abs(value);
   let fractionDigits = 2;

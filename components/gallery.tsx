@@ -68,7 +68,7 @@ export function Gallery({ photos }: { photos: GalleryPhoto[] }) {
             Feeding Gallery
           </h2>
           <p className="text-base font-base text-foreground/60 max-w-xl mx-auto">
-            Real photos from every feeding batch. No stock images, no filters — just hungry street cats getting fed.
+            Real photos from every feeding batch. No stock images or filters. Just hungry street cats getting fed.
           </p>
           <p className="text-sm font-base text-foreground/40 mt-2">
             {photos.length} photos total

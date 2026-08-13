@@ -10,7 +10,7 @@ const defaultBatch = {
   food: "0kg",
   txHash: "-",
   isActive: true,
-  receiptImage: "",
+  receiptImages: [],
   receiptStore: "",
   receiptItem: "",
   receiptTotal: "$0",

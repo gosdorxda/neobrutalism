@@ -1,6 +1,7 @@
 {
   "tokenCa": "CX2v7JSHJQDcNooubzzvZG8TPaDwbaPgfzcXRSWJpump",
   "projectName": "CatBowl",
+  "projectLogo": "/uploads/logo/1786608122703-Untitled_design__2_.jpg",
   "creatorWallet": "7VPJHsm1bqMDd1ZCKRQyjv9bduPpEwpNmCmiikBBHs9F",
   "foundationWallet": "7VPJHsm1bqMDd1ZCKRQyjv9bduPpEwpNmCmiikBBHs9F",
   "telegram": "",
@@ -35,5 +36,9 @@
     }
   ],
   "theme": "original",
-  "notificationText": "cek"
+  "notificationText": "cek",
+  "seoTitle": "",
+  "seoDescription": "",
+  "seoKeywords": "",
+  "ogImage": ""
 }

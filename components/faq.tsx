@@ -40,7 +40,7 @@ export function FAQ() {
     {
       question: `Who is behind ${projectName}?`,
       answer:
-        "We are a small team of cat lovers. No big investors, no fancy offices — just people using crypto to help street cats in a transparent way.",
+        "We are a small team of cat lovers. No big investors, no fancy offices. Just people using crypto to feed street cats transparently.",
     },
     {
       question: `How can I support ${projectName}?`,

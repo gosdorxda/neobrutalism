@@ -12,10 +12,11 @@ export type Batch = {
   food: string;
   txHash: string;
   isActive: boolean;
-  receiptImage: string;
+  receiptImages: string[];
   receiptStore: string;
   receiptItem: string;
   receiptTotal: string;
+  notes: string;
   photos: string[];
 };
 
@@ -24,7 +25,13 @@ const dataFilePath = path.join(process.cwd(), "data", "batches.json");
 export function getBatches(): Batch[] {
   try {
     const data = fs.readFileSync(dataFilePath, "utf8");
-    return JSON.parse(data);
+    const batches = JSON.parse(data) as (Batch & { receiptImage?: string })[];
+    return batches.map((b) => {
+      if (b.receiptImage && (!b.receiptImages || b.receiptImages.length === 0)) {
+        return { ...b, receiptImages: [b.receiptImage] };
+      }
+      return b;
+    });
   } catch {
     return [];
   }

@@ -11,11 +11,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DataTable } from "@/components/ui/data-table";
-import { Receipt, Camera, ExternalLink, Package, Wallet, ShoppingCart, Link2, FileCheck, Clock, CircleCheck, Cat, Soup, Info, PartyPopper, Calendar, Store, DollarSign, FileText } from "lucide-react";
+import { Receipt, Camera, ExternalLink, Package, Wallet, ShoppingCart, Link2, FileCheck, Clock, CircleCheck, Cat, Soup, Info, PartyPopper, DollarSign, ChevronLeft, ChevronRight } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { getThumbPath } from "@/lib/utils";
+import { getThumbPath, formatTxHash } from "@/lib/utils";
+import { InvoiceCompactView, getInvoiceCode, type InvoiceBatch, type InvoiceSettings } from "./invoice";
 
 type Batch = {
   id: number;
@@ -28,7 +29,7 @@ type Batch = {
   food: string;
   txHash: string;
   isActive: boolean;
-  receiptImage: string;
+  receiptImages: string[];
   receiptStore: string;
   receiptItem: string;
   receiptTotal: string;
@@ -36,10 +37,15 @@ type Batch = {
   photos: string[];
 };
 
-function formatTxHash(txHash: string) {
-  if (!txHash || txHash === "-") return "-";
-  if (txHash.length <= 12) return txHash;
-  return `${txHash.slice(0, 6)}...${txHash.slice(-4)}`;
+function getReceiptImages(batch: Batch): string[] {
+  const legacy = (batch as unknown as { receiptImage?: string }).receiptImage;
+  if (Array.isArray(batch.receiptImages) && batch.receiptImages.length > 0) {
+    return batch.receiptImages;
+  }
+  if (legacy) {
+    return [legacy];
+  }
+  return [];
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -91,7 +97,20 @@ function BatchStatusAlert({ status }: { status: string }) {
   return null;
 }
 
-function ReceiptDialog({ batch }: { batch: Batch }) {
+function ReceiptDialog({ batch, settings }: { batch: Batch; settings: InvoiceSettings }) {
+  const receiptImages = getReceiptImages(batch);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const hasReceipts = receiptImages.length > 0;
+  const hasMultiple = receiptImages.length > 1;
+
+  function nextImage() {
+    setCurrentIndex((prev) => (prev + 1) % receiptImages.length);
+  }
+
+  function prevImage() {
+    setCurrentIndex((prev) => (prev - 1 + receiptImages.length) % receiptImages.length);
+  }
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -104,8 +123,8 @@ function ReceiptDialog({ batch }: { batch: Batch }) {
         <DialogHeader className="pr-8">
           <DialogTitle className="text-lg leading-tight">{batch.name}</DialogTitle>
           <DialogDescription>
-            {batch.receiptImage
-              ? "Receipt proof for this batch's cat food purchase."
+            {hasReceipts
+              ? `Receipt proof for this batch's cat food purchase. ${receiptImages.length} image${receiptImages.length > 1 ? "s" : ""} available.`
               : "No receipt uploaded for this batch yet."}
           </DialogDescription>
         </DialogHeader>
@@ -113,13 +132,13 @@ function ReceiptDialog({ batch }: { batch: Batch }) {
         <BatchStatusAlert status={batch.status} />
 
         <div className="space-y-4 mt-2">
-          {/* Receipt Image */}
-          {batch.receiptImage ? (
+          {/* Receipt Image Carousel */}
+          {hasReceipts ? (
             <div className="space-y-2">
-              <div className="relative w-full h-[200px] sm:h-[240px] border-2 border-border rounded-base overflow-hidden bg-secondary-background">
+              <div className="relative w-full h-[200px] sm:h-[240px] border border-border rounded-base overflow-hidden bg-secondary-background">
                 <Image
-                  src={batch.receiptImage}
-                  alt="Receipt"
+                  src={receiptImages[currentIndex]}
+                  alt={`Receipt ${currentIndex + 1}`}
                   fill
                   sizes="(max-width: 768px) 100vw, 500px"
                   className="object-contain"
@@ -131,19 +150,49 @@ function ReceiptDialog({ batch }: { batch: Batch }) {
                 >
                   {batch.status}
                 </div>
+
+                {/* Navigation Arrows */}
+                {hasMultiple && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={prevImage}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 border-2 border-border shadow-sm flex items-center justify-center hover:bg-white transition-colors"
+                      aria-label="Previous receipt"
+                    >
+                      <ChevronLeft className="w-4 h-4 text-foreground" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={nextImage}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 border-2 border-border shadow-sm flex items-center justify-center hover:bg-white transition-colors"
+                      aria-label="Next receipt"
+                    >
+                      <ChevronRight className="w-4 h-4 text-foreground" />
+                    </button>
+                  </>
+                )}
               </div>
-              <a
-                href={batch.receiptImage}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs font-base text-foreground/60 hover:text-main transition-colors inline-flex items-center gap-1"
-              >
-                View Full Image
-                <ExternalLink className="w-3 h-3" />
-              </a>
+
+              <div className="flex items-center justify-between">
+                <a
+                  href={receiptImages[currentIndex]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-base text-foreground/60 hover:text-main transition-colors inline-flex items-center gap-1"
+                >
+                  View Full Image
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+                {hasMultiple && (
+                  <span className="text-xs font-base text-foreground/60">
+                    {currentIndex + 1} / {receiptImages.length}
+                  </span>
+                )}
+              </div>
             </div>
           ) : (
-            <div className="relative bg-secondary-background border-2 border-border rounded-base p-6 flex items-center justify-center h-[200px] overflow-hidden">
+            <div className="relative bg-secondary-background border border-border rounded-base p-6 flex items-center justify-center h-[200px] overflow-hidden">
               {/* Status Watermark */}
               <div
                 className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl sm:text-4xl font-heading font-black uppercase tracking-widest rotate-[-12deg] select-none pointer-events-none whitespace-nowrap ${getStatusWatermarkColor(batch.status)}`}
@@ -157,117 +206,36 @@ function ReceiptDialog({ batch }: { batch: Batch }) {
             </div>
           )}
 
-          {/* Invoice Table */}
-          <div className="border-2 border-border rounded-base overflow-hidden bg-white">
-            <div className="bg-gray-50 px-4 py-2 border-b-2 border-border">
-              <h4 className="text-sm font-heading text-foreground">Invoice Summary</h4>
-            </div>
-            <table className="w-full text-xs" style={{ fontFamily: "var(--font-sans)" }}>
-              <tbody>
-                <tr className="border-b border-border">
-                  <td className="px-4 py-2.5 font-base text-foreground/60 w-2/5 sm:w-1/3">
-                    <span className="flex items-start gap-1.5 whitespace-nowrap">
-                      <Calendar className="w-3 h-3 mt-0.5 shrink-0" />
-                      Date
-                    </span>
-                  </td>
-                  <td className="px-4 py-2.5 font-heading text-foreground">{batch.targetDate || "-"}</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="px-4 py-2.5 font-base text-foreground/60 w-2/5 sm:w-1/3">
-                    <span className="flex items-start gap-1.5 whitespace-nowrap">
-                      <Store className="w-3 h-3 mt-0.5 shrink-0" />
-                      Store
-                    </span>
-                  </td>
-                  <td className="px-4 py-2.5 font-heading text-foreground">{batch.receiptStore || "-"}</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="px-4 py-2.5 font-base text-foreground/60 w-2/5 sm:w-1/3">
-                    <span className="flex items-start gap-1.5 whitespace-nowrap">
-                      <ShoppingCart className="w-3 h-3 mt-0.5 shrink-0" />
-                      Item
-                    </span>
-                  </td>
-                  <td className="px-4 py-2.5 font-heading text-foreground">{batch.receiptItem || "-"}</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="px-4 py-2.5 font-base text-foreground/60 w-2/5 sm:w-1/3">
-                    <span className="flex items-start gap-1.5 whitespace-nowrap">
-                      <Wallet className="w-3 h-3 mt-0.5 shrink-0" />
-                      Creator Rewards
-                    </span>
-                  </td>
-                  <td className="px-4 py-2.5 font-heading text-foreground">{batch.fees}</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="px-4 py-2.5 font-base text-foreground/60 w-2/5 sm:w-1/3">
-                    <span className="flex items-start gap-1.5 whitespace-nowrap">
-                      <Cat className="w-3 h-3 mt-0.5 shrink-0" />
-                      Cats Fed
-                    </span>
-                  </td>
-                  <td className="px-4 py-2.5 font-heading text-foreground">{batch.cats}</td>
-                </tr>
-                <tr className="border-b border-border">
-                  <td className="px-4 py-2.5 font-base text-foreground/60 w-2/5 sm:w-1/3">
-                    <span className="flex items-start gap-1.5 whitespace-nowrap">
-                      <Soup className="w-3 h-3 mt-0.5 shrink-0" />
-                      Food Bought
-                    </span>
-                  </td>
-                  <td className="px-4 py-2.5 font-heading text-foreground">{batch.food}</td>
-                </tr>
-                <tr className={batch.notes || (batch.txHash && batch.txHash !== "-") ? "border-b border-border" : ""}>
-                  <td className="px-4 py-3 font-base font-bold text-foreground w-2/5 sm:w-1/3">
-                    <span className="flex items-start gap-1.5 whitespace-nowrap">
-                      <DollarSign className="w-3 h-3 mt-0.5 shrink-0" />
-                      Total Spent
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 font-heading font-bold text-foreground">
-                    {batch.receiptTotal && batch.receiptTotal !== "$0" ? batch.receiptTotal : "-"}
-                  </td>
-                </tr>
-                {batch.notes && (
-                  <tr className={batch.txHash && batch.txHash !== "-" ? "border-b border-border" : ""}>
-                    <td className="px-4 py-3 font-base text-foreground/60 w-2/5 sm:w-1/3">
-                      <span className="flex items-center gap-1.5 whitespace-nowrap">
-                        <FileText className="w-3 h-3 shrink-0" />
-                        Notes
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="bg-yellow-50 border border-border rounded-base p-2.5 text-xs font-base text-foreground whitespace-pre-wrap">
-                        {batch.notes}
-                      </div>
-                    </td>
-                  </tr>
-                )}
-                {batch.txHash && batch.txHash !== "-" && (
-                  <tr className="border-t-2 border-border">
-                    <td className="px-4 py-3 font-base text-foreground/60 w-2/5 sm:w-1/3">
-                      <span className="flex items-start gap-1.5 whitespace-nowrap">
-                        <Link2 className="w-3 h-3 mt-0.5 shrink-0" />
-                        Transaction Hash
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 font-heading text-foreground">
-                      <a
-                        href={`https://web3.okx.com/explorer/solana/tx/${batch.txHash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-main underline hover:text-foreground transition-colors break-all"
-                        title={batch.txHash}
-                      >
-                        {formatTxHash(batch.txHash)}
-                      </a>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+          {/* Invoice */}
+          <InvoiceCompactView
+            batch={{
+              id: batch.id,
+              name: batch.name,
+              status: batch.status,
+              startDate: batch.startDate,
+              targetDate: batch.targetDate,
+              fees: batch.fees,
+              cats: batch.cats,
+              food: batch.food,
+              txHash: batch.txHash,
+              receiptImages: getReceiptImages(batch),
+              receiptStore: batch.receiptStore,
+              receiptItem: batch.receiptItem,
+              receiptTotal: batch.receiptTotal,
+              notes: batch.notes,
+            }}
+            actionLink={
+              <a
+                href={`/invoice/${getInvoiceCode(batch)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-base text-main underline hover:text-foreground transition-colors"
+              >
+                View Full Invoice
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            }
+          />
         </div>
       </DialogContent>
     </Dialog>
@@ -300,7 +268,7 @@ function PhotosDialog({ batch }: { batch: Batch }) {
 
         <BatchStatusAlert status={batch.status} />
 
-        <div className="flex flex-wrap items-center gap-3 mt-2 text-xs font-base text-foreground/60 bg-secondary-background border-2 border-border rounded-base p-3">
+        <div className="flex flex-wrap items-center gap-3 mt-2 text-xs font-base text-foreground/60 bg-secondary-background border border-border rounded-base p-3">
           {photoTarget > 0 && batch.photos.length >= photoTarget ? (
             <span className="flex flex-wrap items-center gap-1.5 text-chart-4">
               <PartyPopper className="w-4 h-4 shrink-0" />
@@ -327,7 +295,7 @@ function PhotosDialog({ batch }: { batch: Batch }) {
         </div>
 
         {batch.photos.length === 0 ? (
-          <div className="bg-secondary-background border-2 border-border rounded-base p-8 flex flex-col items-center justify-center mt-4">
+          <div className="bg-secondary-background border border-border rounded-base p-8 flex flex-col items-center justify-center mt-4">
             <Camera className="w-12 h-12 text-foreground/30 mb-3" />
             <p className="text-sm font-base text-foreground/50">No photos uploaded yet</p>
           </div>
@@ -340,7 +308,7 @@ function PhotosDialog({ batch }: { batch: Batch }) {
                   href={photo}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="relative aspect-square bg-secondary-background border-2 border-border rounded-base overflow-hidden hover:border-main transition-colors group"
+                  className="relative aspect-square bg-secondary-background border border-border rounded-base overflow-hidden hover:border-main transition-colors group"
                 >
                   <Image
                     src={getThumbPath(photo)}
@@ -376,7 +344,8 @@ function PhotosDialog({ batch }: { batch: Batch }) {
   );
 }
 
-export const columns: ColumnDef<Batch>[] = [
+function getColumns(settings: InvoiceSettings): ColumnDef<Batch>[] {
+  return [
   {
     accessorKey: "batch",
     header: () => (
@@ -416,9 +385,14 @@ export const columns: ColumnDef<Batch>[] = [
       </div>
     ),
     meta: { className: "hidden md:table-cell" },
-    cell: ({ row }) => (
-      <div className="text-base font-heading text-foreground">{row.getValue("fees")}</div>
-    ),
+    cell: ({ row }) => {
+      const batch = row.original;
+      return (
+        <div className="text-base font-heading text-foreground">
+          {batch.status === "In Progress" ? "~" : row.getValue("fees")}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "cats",
@@ -429,9 +403,14 @@ export const columns: ColumnDef<Batch>[] = [
       </div>
     ),
     meta: { className: "hidden md:table-cell" },
-    cell: ({ row }) => (
-      <div className="text-base font-heading text-foreground">{row.getValue("cats")}</div>
-    ),
+    cell: ({ row }) => {
+      const batch = row.original;
+      return (
+        <div className="text-base font-heading text-foreground">
+          {batch.status === "In Progress" ? "~" : row.getValue("cats")}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "food",
@@ -442,9 +421,14 @@ export const columns: ColumnDef<Batch>[] = [
       </div>
     ),
     meta: { className: "hidden lg:table-cell" },
-    cell: ({ row }) => (
-      <div className="text-base font-heading text-foreground">{row.getValue("food")}</div>
-    ),
+    cell: ({ row }) => {
+      const batch = row.original;
+      return (
+        <div className="text-base font-heading text-foreground">
+          {batch.status === "In Progress" ? "~" : row.getValue("food")}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "txHash",
@@ -484,26 +468,33 @@ export const columns: ColumnDef<Batch>[] = [
       const batch = row.original;
       return (
         <div className="flex items-center gap-2">
-          <ReceiptDialog batch={batch} />
+          <ReceiptDialog batch={batch} settings={settings} />
           <PhotosDialog batch={batch} />
         </div>
       );
     },
   },
-];
+  ];
+}
 
 export function BatchHistory() {
   const [batches, setBatches] = useState<Batch[]>([]);
   const [loading, setLoading] = useState(true);
   const [now, setNow] = useState(0);
   const [viewMode, setViewMode] = useState<"list" | "table">("list");
+  const [settings, setSettings] = useState<InvoiceSettings>({ projectName: "CATFUND" });
 
   useEffect(() => {
     async function loadBatches() {
       try {
-        const res = await fetch("/api/batches", { cache: "no-store" });
-        const data = await res.json();
+        const [batchesRes, settingsRes] = await Promise.all([
+          fetch("/api/batches", { cache: "no-store" }),
+          fetch("/api/settings", { cache: "no-store" }),
+        ]);
+        const data = await batchesRes.json();
+        const settingsData = await settingsRes.json().catch(() => ({}));
         setBatches(data);
+        setSettings({ projectName: settingsData.projectName || "CATFUND" });
       } catch {
         setBatches([]);
       }
@@ -556,7 +547,7 @@ export function BatchHistory() {
             <p className="text-sm font-base text-foreground/50">Loading batches...</p>
           </div>
         ) : viewMode === "table" ? (
-          <DataTable columns={columns} data={batches} />
+          <DataTable columns={getColumns(settings)} data={batches} />
         ) : null}
 
         {/* Improved Card List View */}
@@ -622,7 +613,7 @@ export function BatchHistory() {
 
                       {/* Actions */}
                       <div className="shrink-0 flex items-center gap-1.5">
-                        <ReceiptDialog batch={batch} />
+                        <ReceiptDialog batch={batch} settings={settings} />
                         <PhotosDialog batch={batch} />
                       </div>
                     </div>

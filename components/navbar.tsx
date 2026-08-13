@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { SolPricePill } from "@/components/sol-price-pill";
 
 export function Navbar({ initialSolPrice }: { initialSolPrice?: number | null }) {
-  const { projectName } = useProjectName();
+  const { projectName, projectLogo } = useProjectName();
   const { settings } = useSettings();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const closeMenu = () => setIsMenuOpen(false);
@@ -26,9 +26,17 @@ export function Navbar({ initialSolPrice }: { initialSolPrice?: number | null })
             {/* Logo */}
             <div className="flex items-center h-full">
               <Link href="/" className="flex items-center h-full">
-                <span className="text-2xl font-heading text-foreground leading-none">
-                  {projectName}
-                </span>
+                {projectLogo ? (
+                  <img
+                    src={projectLogo}
+                    alt={projectName}
+                    className="h-8 sm:h-9 w-auto object-contain"
+                  />
+                ) : (
+                  <span className="text-xl font-heading text-foreground leading-none">
+                    {projectName}
+                  </span>
+                )}
               </Link>
             </div>
 
