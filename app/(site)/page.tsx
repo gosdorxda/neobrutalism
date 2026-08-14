@@ -10,6 +10,8 @@ import { AreaCover } from "@/components/area-cover";
 import { getAllPhotos } from "@/lib/data";
 import { getStats, getTokenInfo } from "@/lib/cache";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const photos = getAllPhotos();
   const [stats, token] = await Promise.all([getStats(), getTokenInfo()]);

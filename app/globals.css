@@ -3,6 +3,27 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: "OakSans";
+  src: url("/fonts/OakSansVF-BF648bbebd4d82b.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "OakSans";
+  src: url("/fonts/OakSans-ItalicVF-BF648bbebd3e58b.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+html.font-custom body {
+  font-family: "OakSans", var(--font-sans), ui-sans-serif, system-ui, sans-serif !important;
+  font-size-adjust: 0.55;
+}
+
 :root,
 .theme-original {
   --background: oklch(95.38% 0.0357 72.89);

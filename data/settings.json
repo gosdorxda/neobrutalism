@@ -36,7 +36,8 @@
     }
   ],
   "theme": "original",
-  "notificationText": "cek",
+  "font": "custom",
+  "notificationText": "",
   "seoTitle": "",
   "seoDescription": "",
   "seoKeywords": "",

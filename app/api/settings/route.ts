@@ -2,6 +2,7 @@ import { getSettings, saveSettings, type Settings, type Partner } from "@/lib/se
 import { NextRequest, NextResponse } from "next/server";
 
 const validThemes = ["original", "mint", "lavender", "lemon"] as const;
+const validFonts = ["default", "custom"] as const;
 
 function checkAuth(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
@@ -72,6 +73,13 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Invalid theme" }, { status: 400 });
       }
       updates.theme = body.theme;
+    }
+
+    if (body.font !== undefined) {
+      if (!validFonts.includes(body.font)) {
+        return NextResponse.json({ error: "Invalid font" }, { status: 400 });
+      }
+      updates.font = body.font;
     }
 
     if (body.notificationText !== undefined) {

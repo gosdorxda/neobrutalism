@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Copy, ExternalLink, ShieldCheck, TrendingUp, ArrowRightLeft, Swords, Trophy, UserCheck } from "lucide-react";
+import { Check, Copy, ExternalLink, ShieldCheck, TrendingUp, ArrowRightLeft, Swords, Users, UserCheck } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useProjectName } from "@/components/project-name-provider";
 import { NetworkSolana, WalletPhantom } from "@web3icons/react";
@@ -67,10 +67,20 @@ function useCountUp(value: string | null, duration: number = 800) {
     const prevMatch = prevValueRef.current?.match(/^[^0-9\-\.]*([\d,.]+).*$/);
     const start = prevMatch ? parseFloat(prevMatch[1].replace(/,/g, "")) : 0;
     const startTime = performance.now();
-    const isPercentage = suffix.includes("%");
+    const decimalPlaces = (numericString.split(".")[1] || "").length;
 
     function easeOutQuart(t: number) {
       return 1 - Math.pow(1 - t, 4);
+    }
+
+    function formatCountUp(num: number, decimals: number): string {
+      if (decimals === 0 && num >= 1000) {
+        return Math.round(num).toLocaleString();
+      }
+      return num.toLocaleString("en-US", {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      });
     }
 
     function frame(now: number) {
@@ -79,16 +89,7 @@ function useCountUp(value: string | null, duration: number = 800) {
       const eased = easeOutQuart(progress);
       const current = start + (target - start) * eased;
 
-      let formatted: string;
-      if (isPercentage) {
-        formatted = current.toFixed(2);
-      } else if (target >= 1000) {
-        formatted = Math.round(current).toLocaleString();
-      } else if (target >= 1) {
-        formatted = current.toFixed(2);
-      } else {
-        formatted = current.toFixed(8);
-      }
+      const formatted = formatCountUp(current, decimalPlaces);
 
       setDisplay(`${prefix}${formatted}${suffix}`);
 
@@ -261,7 +262,7 @@ export function TokenInfo({ initialToken }: { initialToken?: {
   buyTx: string | null;
   sellTx: string | null;
   snipers: string | null;
-  athMarketCap: string | null;
+  insiders: string | null;
   devHolding: string;
   imageUrl: string | null;
   buyUrl: string;
@@ -300,7 +301,7 @@ export function TokenInfo({ initialToken }: { initialToken?: {
 
   const badges = [
     { icon: ArrowRightLeft, label: "Total TX", value: token?.totalTx },
-    { icon: Trophy, label: "ATH", value: token?.athMarketCap },
+    { icon: Users, label: "Insider", value: token?.insiders },
     { icon: Swords, label: "Snipers", value: token?.snipers },
     { icon: UserCheck, label: "Dev Holding", value: token?.devHolding },
   ];
@@ -314,7 +315,7 @@ export function TokenInfo({ initialToken }: { initialToken?: {
             Token Info
           </h2>
           <p className="text-sm font-base text-foreground/60 max-w-lg mx-auto">
-            Live data from PumpFun. Prices update automatically.
+            Live data from SolanaTracker. Prices update automatically.
           </p>
         </div>
 

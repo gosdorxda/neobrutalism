@@ -12,7 +12,7 @@ Panduan lengkap deploy project ini ke VPS pribadi (Ubuntu).
 - **Node.js:** 20.x LTS atau lebih baru (Next.js 16 + React 19)
 - **RAM:** Minimal 1 GB (2 GB recommended untuk `npm run build`)
 - **Storage:** Tergantung jumlah foto/media yang di-upload
-- **Network:** IPv4 outbound diperlukan untuk API eksternal (CoinGecko, Solana RPC, PumpFun, pumpdev.io, GMGN)
+- **Network:** IPv4 outbound diperlukan untuk API eksternal (CoinGecko, Solana RPC, SolanaTracker, Solscan)
 - **Upstash Redis:** Akun gratis di [upstash.com](https://upstash.com) untuk caching data
 
 ---
@@ -80,17 +80,18 @@ ADMIN_PASSWORD=your-strong-admin-password-here
 # --- SOCIAL MEDIA (opsional, tapi direkomendasikan) ---
 # Isi dari admin panel Settings > Social Links
 
-# --- GMGN (untuk fitur Top Donors) ---
-# Dapatkan API key dari https://gmgn.ai/ai
-GMGN_API_KEY=your-gmgn-api-key
-
-# --- CRON (untuk update top donors otomatis) ---
-CRON_SECRET=your-random-cron-secret-string
-
 # --- SOLANA RPC (opsional, untuk wallet balance & stats realtime) ---
 # Default: https://api.mainnet-beta.solana.com
 # Untuk production, pakai RPC provider seperti Helius, QuickNode, atau Triton
 SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+
+# --- SOLSCAN API (untuk transaction history) ---
+# Daftar di https://solscan.io/apis
+SOLSCAN_API_KEY=your-solscan-api-key
+
+# --- SOLANA TRACKER DATA API (untuk token info) ---
+# Daftar di https://solanatracker.io
+SOLANA_TRACKER_API_KEY=your-solana-tracker-api-key
 
 # --- UPSTASH REDIS (WAJIB untuk caching) ---
 # 1. Daftar di https://console.upstash.com/redis
@@ -128,8 +129,7 @@ Project ini menggunakan Redis untuk caching data realtime global. Tanpa Redis, d
 |-----|-----|-----|
 | `sol:price` | Harga SOL dalam USD | 60 detik |
 | `stats:summary` | Statistik kumulatif (total fees, cats, bowls) | 60 detik |
-| `token:info` | Data token dari PumpFun | 30 detik |
-| `wallets:summary` | Balance Foundation & Creator wallet | 60 detik |
+| `token:info` | Data token dari SolanaTracker | 15 menit |
 
 ---
 
@@ -141,7 +141,6 @@ Project menyimpan data di folder `data/`:
 |------|--------|
 | `data/batches.json` | Data batch, receipt, foto |
 | `data/settings.json` | Konfigurasi proyek, tema, partner, notification |
-| `data/top-donors.json` | Data top donors |
 | `data/stats-cache.json` | Cache stats (fallback kalau Redis mati) |
 
 Pastikan folder ada dan writable:
@@ -265,11 +264,9 @@ Ikuti prompt. Certbot akan otomatis konfigurasi HTTPS dan redirect HTTP ke HTTPS
 
 ---
 
-## 10. Cron Jobs
+## 10. Cron Jobs (Opsional)
 
-Cron jobs untuk update data otomatis.
-
-### Top Donors (setiap 6 jam)
+Untuk memastikan data Redis selalu fresh, bisa tambah cron:
 
 ```bash
 crontab -e
@@ -278,21 +275,12 @@ crontab -e
 Tambah baris:
 
 ```cron
-0 */6 * * * curl -fsS -H "Authorization: Bearer YOUR_CRON_SECRET" https://your-domain.com/api/admin/update-top-donors >> /home/<user>/neobrutalism/logs/cron.log 2>&1
-```
-
-### Refresh Redis Cache (setiap 2 menit, opsional)
-
-Untuk memastikan data Redis selalu fresh, bisa tambah cron:
-
-```cron
 */2 * * * * curl -fsS https://your-domain.com/api/sol-price > /dev/null 2>&1
 */2 * * * * curl -fsS https://your-domain.com/api/stats > /dev/null 2>&1
 */2 * * * * curl -fsS https://your-domain.com/api/token > /dev/null 2>&1
-*/2 * * * * curl -fsS https://your-domain.com/api/wallets > /dev/null 2>&1
 ```
 
-Ini akan memicu refresh Redis cache setiap 2 menit, jadi data selalu fresh untuk semua user.
+Ini akan memicu refresh Redis cache setiap 2 menit.
 
 ---
 
@@ -302,17 +290,10 @@ Ini akan memicu refresh Redis cache setiap 2 menit, jadi data selalu fresh untuk
 2. ✅ Buka `https://your-domain.com/admin` — login dengan password dari `ADMIN_PASSWORD`
 3. ✅ Buka tab **Settings** → **Notification Banner** — isi teks, simpan, cek muncul di homepage
 4. ✅ Buka tab **Settings** → **Theme** — ganti tema, simpan, refresh homepage
-5. ✅ Buka `https://your-domain.com/dashboard` — data wallet dan transaksi harus muncul
-6. ✅ Cek SOL price di navbar — harus muncul setelah beberapa detik
-7. ✅ Cek Token Info — data harus muncul
-8. ✅ Cek Redis: login ke console Upstash, cek ada data di key `sol:price`, `stats:summary`, dll
-9. ✅ Test Top Donors:
-
-```bash
-curl -H "Authorization: Bearer YOUR_CRON_SECRET" https://your-domain.com/api/admin/update-top-donors
-```
-
-10. ✅ Cek log cron setelah scheduled run pertama:
+5. ✅ Cek SOL price di navbar — harus muncul setelah beberapa detik
+6. ✅ Cek Token Info — data harus muncul
+7. ✅ Cek Redis: login ke console Upstash, cek ada data di key `sol:price`, `stats:summary`, dll
+8. ✅ Cek log cron setelah scheduled run pertama:
 
 ```bash
 tail -f /home/<user>/neobrutalism/logs/cron.log
@@ -379,7 +360,6 @@ pm2 restart neobrutalism
 | `lucide-react` | Icon UI |
 | `@radix-ui/*` | Aksesibel UI primitives |
 | `sharp` | Image optimization |
-| `gmgn-cli` | GMGN top donors |
 | `tw-animate-css` | Tailwind CSS animations |
 
 ---
@@ -400,13 +380,8 @@ pm2 restart neobrutalism
 ### Token Info kosong / error
 
 - Pastikan Token CA di admin panel Settings benar
-- Cek: `curl -s https://advanced-api-v2.pump.fun/coins/metadata/TOKEN_CA`
-
-### GMGN errors / 401 Unauthorized
-
-- Check `GMGN_API_KEY` di `.env.local`
-- Pastikan VPS pakai IPv4 outbound: `curl -s https://ipv4.icanhazip.com`
-- Jika IPv6 muncul, force IPv4: `sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1`
+- Pastikan `SOLANA_TRACKER_API_KEY` di `.env.local` valid
+- Cek: `curl -s -H "x-api-key: YOUR_API_KEY" https://data.solanatracker.io/tokens/TOKEN_CA`
 
 ### Build gagal karena memory
 

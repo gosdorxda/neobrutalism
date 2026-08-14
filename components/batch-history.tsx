@@ -157,7 +157,7 @@ function ReceiptDialog({ batch, settings }: { batch: Batch; settings: InvoiceSet
                     <button
                       type="button"
                       onClick={prevImage}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 border-2 border-border shadow-sm flex items-center justify-center hover:bg-white transition-colors"
+                      className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 border border-border shadow-sm flex items-center justify-center hover:bg-white transition-colors"
                       aria-label="Previous receipt"
                     >
                       <ChevronLeft className="w-4 h-4 text-foreground" />
@@ -165,7 +165,7 @@ function ReceiptDialog({ batch, settings }: { batch: Batch; settings: InvoiceSet
                     <button
                       type="button"
                       onClick={nextImage}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 border-2 border-border shadow-sm flex items-center justify-center hover:bg-white transition-colors"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 border border-border shadow-sm flex items-center justify-center hover:bg-white transition-colors"
                       aria-label="Next receipt"
                     >
                       <ChevronRight className="w-4 h-4 text-foreground" />

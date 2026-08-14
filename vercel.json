@@ -1,8 +1,0 @@
-{
-  "crons": [
-    {
-      "path": "/api/admin/update-top-donors",
-      "schedule": "0 */6 * * *"
-    }
-  ]
-}

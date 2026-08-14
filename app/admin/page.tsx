@@ -8,8 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { getThumbPath } from "@/lib/utils";
-import { ChevronDown, Cat, Home, PawPrint, Shield, Heart, Plus, Trash2 } from "lucide-react";
-import { type Partner } from "@/lib/settings";
+import { ChevronDown, Cat, Home, PawPrint, Shield, Heart, Plus, Trash2, Check } from "lucide-react";
+import { type Partner, type Font } from "@/lib/settings";
 import { themes, type Theme } from "@/components/theme-provider";
 
 type Batch = {
@@ -135,8 +135,6 @@ export default function AdminPage() {
   const [message, setMessage] = useState("");
   const [expandedPhotos, setExpandedPhotos] = useState<Set<number>>(new Set());
   const [expandedBatches, setExpandedBatches] = useState<Set<number>>(new Set());
-  const [topDonorsLoading, setTopDonorsLoading] = useState(false);
-  const [topDonorsMessage, setTopDonorsMessage] = useState("");
   const [tokenCa, setTokenCa] = useState("");
   const [projectName, setProjectName] = useState("");
   const [projectLogo, setProjectLogo] = useState("");
@@ -149,6 +147,7 @@ export default function AdminPage() {
   const [partnerApplyLink, setPartnerApplyLink] = useState("");
   const [partners, setPartners] = useState<Partner[]>([]);
   const [theme, setTheme] = useState<Theme>("original");
+  const [font, setFont] = useState<Font>("default");
   const [notificationText, setNotificationText] = useState("");
   const [seoTitle, setSeoTitle] = useState("");
   const [seoDescription, setSeoDescription] = useState("");
@@ -191,6 +190,7 @@ export default function AdminPage() {
       setPartnerApplyLink(data.partnerApplyLink || "");
       setPartners(Array.isArray(data.partners) ? data.partners : []);
       setTheme(data.theme && ["original", "mint", "lavender", "lemon"].includes(data.theme) ? data.theme : "original");
+      setFont(data.font && ["default", "custom"].includes(data.font) ? data.font : "default");
       setNotificationText(data.notificationText || "");
       setSeoTitle(data.seoTitle || "");
       setSeoDescription(data.seoDescription || "");
@@ -225,6 +225,7 @@ export default function AdminPage() {
           partnerApplyLink,
           partners,
           theme,
+          font,
           notificationText,
           seoTitle,
           seoDescription,
@@ -316,26 +317,6 @@ export default function AdminPage() {
       setMessage("Failed to load batches");
     }
     setLoading(false);
-  }
-
-  async function updateTopDonors() {
-    setTopDonorsLoading(true);
-    setTopDonorsMessage("");
-    try {
-      const res = await fetch("/api/admin/update-top-donors", {
-        cache: "no-store",
-        headers: { authorization: `Bearer ${password}` },
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) {
-        setTopDonorsMessage(`Updated ${data.count || 0} top donors successfully`);
-      } else {
-        setTopDonorsMessage(data.error || "Failed to update top donors");
-      }
-    } catch {
-      setTopDonorsMessage("Error updating top donors");
-    }
-    setTopDonorsLoading(false);
   }
 
   async function handleLogin(e: React.FormEvent) {
@@ -558,9 +539,8 @@ export default function AdminPage() {
         </div>
 
         <Tabs defaultValue="batches" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-3">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
             <TabsTrigger value="batches">Batches</TabsTrigger>
-            <TabsTrigger value="top-donors">Top Donors</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
@@ -809,32 +789,6 @@ export default function AdminPage() {
         </div>
         </TabsContent>
 
-        <TabsContent value="top-donors" className="space-y-6">
-          {topDonorsMessage && (
-            <div className="bg-main border-2 border-border rounded-base px-4 py-3 text-sm font-base text-main-foreground">
-              {topDonorsMessage}
-            </div>
-          )}
-
-          <Card className="border-2 border-border shadow-shadow bg-white">
-            <CardContent className="p-5 space-y-4">
-              <div>
-                <h3 className="text-lg font-heading text-foreground">Top Donors Data</h3>
-                <p className="text-sm font-base text-foreground/60">
-                  Refresh top traders from GMGN using the token contract address. Updates are also run automatically every 6 hours.
-                </p>
-              </div>
-              <Button
-                onClick={updateTopDonors}
-                disabled={topDonorsLoading}
-                variant="reverse"
-              >
-                {topDonorsLoading ? "Updating..." : "Refresh Top Donors"}
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
         <TabsContent value="settings" className="space-y-6">
           {message && (
             <div className="bg-main border-2 border-border rounded-base px-4 py-3 text-sm font-base text-main-foreground">
@@ -842,412 +796,493 @@ export default function AdminPage() {
             </div>
           )}
 
-          <Card className="border-2 border-border shadow-shadow bg-white">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-heading text-foreground">Redis Cache</h3>
-                <Button
-                  type="button"
-                  variant="neutral"
-                  size="sm"
-                  onClick={async () => {
-                    try {
-                      const res = await fetch("/api/admin/clear-cache", {
-                        method: "POST",
-                        headers: { authorization: `Bearer ${password}` },
-                      });
-                      const data = await res.json();
-                      setMessage(data.message || data.error || "Done");
-                    } catch {
-                      setMessage("Failed to clear cache");
-                    }
-                  }}
-                >
-                  Clear Cache
-                </Button>
-              </div>
-              <p className="text-[10px] font-base text-foreground/50">
-                Clears all cached data (SOL price, stats, token info, wallets). Data will refresh on next page load.
-              </p>
-            </CardContent>
-          </Card>
+          <Tabs defaultValue="project" className="w-full">
+            <TabsList className="grid w-full max-w-md grid-cols-4">
+              <TabsTrigger value="project">Project</TabsTrigger>
+              <TabsTrigger value="partners">Partners</TabsTrigger>
+              <TabsTrigger value="seo">SEO</TabsTrigger>
+              <TabsTrigger value="appearance">Appearance</TabsTrigger>
+            </TabsList>
 
-          <Card className="border-2 border-border shadow-shadow bg-white">
-            <CardContent className="p-4">
-              <form onSubmit={saveSettings} className="space-y-6">
-                {/* Core settings */}
-                <div className="space-y-4">
-                  <h3 className="text-sm font-heading text-foreground">Project</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-base text-foreground/60 block">Project Name</label>
-                      <Input
-                        value={projectName}
-                        onChange={(e) => setProjectName(e.target.value)}
-                        placeholder="e.g. CATFUND"
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-base text-foreground/60 block">Token CA</label>
-                      <Input
-                        value={tokenCa}
-                        onChange={(e) => setTokenCa(e.target.value)}
-                        placeholder="Solana address"
-                        className="w-full"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-base text-foreground/60 block">Project Logo</label>
-                    <div className="flex flex-wrap items-center gap-3">
-                      {projectLogo && (
-                        <div className="relative w-12 h-12 border-2 border-border rounded-base overflow-hidden bg-secondary-background">
-                          <Image
-                            src={projectLogo}
-                            alt="Project logo preview"
-                            fill
-                            sizes="48px"
-                            className="object-cover"
-                            unoptimized
-                          />
-                        </div>
-                      )}
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) uploadProjectLogo(file);
-                        }}
-                        className="text-sm w-auto flex-1 min-w-[200px]"
-                      />
-                      <Input
-                        value={projectLogo}
-                        onChange={(e) => setProjectLogo(e.target.value)}
-                        placeholder="Or paste logo URL"
-                        className="text-sm flex-[2] min-w-[200px]"
-                      />
-                    </div>
-                    <p className="text-[10px] font-base text-foreground/50">
-                      If set, logo will replace project name text in navbar.
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-base text-foreground/60 block">Creator Wallet</label>
-                      <Input
-                        value={creatorWallet}
-                        onChange={(e) => setCreatorWallet(e.target.value)}
-                        placeholder="PumpFun creator wallet address (optional)"
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-base text-foreground/60 block">Foundation Wallet</label>
-                      <Input
-                        value={foundationWallet}
-                        onChange={(e) => setFoundationWallet(e.target.value)}
-                        placeholder="Solana wallet address for fees and donations (optional)"
-                        className="w-full"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* SEO & Metadata */}
-                <div className="space-y-4 pt-4 border-t-2 border-border">
-                  <h3 className="text-sm font-heading text-foreground">SEO & Metadata</h3>
-                  <p className="text-[10px] font-base text-foreground/50">
-                    Used for Google SEO and social media sharing (OG tags). Leave empty to use defaults.
-                  </p>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-base text-foreground/60 block">Meta Title</label>
-                    <Input
-                      value={seoTitle}
-                      onChange={(e) => setSeoTitle(e.target.value)}
-                      placeholder={`${projectName || "CatBowl"} - Revolutionary Meme Coin`}
-                      className="w-full"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-base text-foreground/60 block">Meta Description</label>
-                    <Textarea
-                      value={seoDescription}
-                      onChange={(e) => setSeoDescription(e.target.value)}
-                      placeholder="Join the future of decentralized finance with CatBowl..."
-                      className="w-full min-h-[80px]"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-base text-foreground/60 block">Keywords</label>
-                    <Input
-                      value={seoKeywords}
-                      onChange={(e) => setSeoKeywords(e.target.value)}
-                      placeholder="cat food, charity, solana, meme coin, donation"
-                      className="w-full"
-                    />
-                    <p className="text-[10px] font-base text-foreground/50">Comma-separated</p>
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-base text-foreground/60 block">OG Image URL</label>
-                    <Input
-                      value={ogImage}
-                      onChange={(e) => setOgImage(e.target.value)}
-                      placeholder="https://example.com/og-image.png"
-                      className="w-full"
-                    />
-                    <p className="text-[10px] font-base text-foreground/50">
-                      Recommended: 1200x630px. Used for social media preview cards.
-                    </p>
-                    {ogImage && (
-                      <div className="mt-2 rounded-base border-2 border-border overflow-hidden">
-                        <img src={ogImage} alt="OG preview" className="w-full h-auto" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-base text-foreground/60 block">Favicon URL</label>
-                    <Input
-                      value={favicon}
-                      onChange={(e) => setFavicon(e.target.value)}
-                      placeholder="/favicon.ico or https://example.com/favicon.png"
-                      className="w-full"
-                    />
-                    <p className="text-[10px] font-base text-foreground/50">
-                      Browser tab icon. Use .ico, .png, or .svg. Recommended: 32x32px or 64x64px.
-                    </p>
-                    {favicon && (
-                      <div className="mt-2 flex items-center gap-2">
-                        <img src={favicon} alt="Favicon preview" className="w-8 h-8 rounded-base border-2 border-border" />
-                        <span className="text-[10px] font-base text-foreground/50">Preview</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Theme */}
-                <div className="space-y-4 pt-4 border-t-2 border-border">
-                  <h3 className="text-sm font-heading text-foreground">Theme</h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    {themes.map(({ id, label, bg, main }) => (
-                      <button
-                        key={id}
-                        type="button"
-                        onClick={() => setTheme(id)}
-                        className={`flex flex-col items-center gap-2 p-3 rounded-base border-2 transition-all ${
-                          theme === id
-                            ? "border-foreground bg-secondary-background"
-                            : "border-border bg-white hover:border-foreground/50"
-                        }`}
-                      >
-                        <span
-                          className="w-8 h-8 rounded-base border-2 border-border shadow-shadow"
-                          style={{ background: `linear-gradient(135deg, ${bg} 50%, ${main} 50%)` }}
-                        />
-                        <span className="text-xs font-heading text-foreground">{label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Notification Banner */}
-                <div className="space-y-4 pt-4 border-t-2 border-border">
-                  <h3 className="text-sm font-heading text-foreground">Notification Banner</h3>
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-base text-foreground/60 block">
-                      Announcement Text
-                    </label>
-                    <Input
-                      value={notificationText}
-                      onChange={(e) => setNotificationText(e.target.value)}
-                      placeholder="e.g. We just donated 100 bowls of cat food! 🐱"
-                      className="w-full"
-                    />
-                    <p className="text-[10px] font-base text-foreground/50">
-                      Shows at the top of every page. Leave empty to hide.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Social links */}
-                <div className="space-y-4 pt-4 border-t-2 border-border">
-                  <h3 className="text-sm font-heading text-foreground">Social Links</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-base text-foreground/60 block">Telegram</label>
-                      <Input
-                        value={telegram}
-                        onChange={(e) => setTelegram(e.target.value)}
-                        placeholder="https://t.me/yourusername"
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-base text-foreground/60 block">X / Twitter</label>
-                      <Input
-                        value={twitter}
-                        onChange={(e) => setTwitter(e.target.value)}
-                        placeholder="https://x.com/yourusername"
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-base text-foreground/60 block">Instagram</label>
-                      <Input
-                        value={instagram}
-                        onChange={(e) => setInstagram(e.target.value)}
-                        placeholder="https://instagram.com/yourusername"
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-base text-foreground/60 block">TikTok</label>
-                      <Input
-                        value={tiktok}
-                        onChange={(e) => setTiktok(e.target.value)}
-                        placeholder="https://tiktok.com/@yourusername"
-                        className="w-full"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Partners */}
-                <div className="space-y-4 pt-4 border-t-2 border-border">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-heading text-foreground">Rescue Partners</h3>
-                    <Button type="button" variant="noShadow" size="sm" onClick={addPartner}>
-                      <Plus className="w-3 h-3 mr-1" />
-                      Add Partner
+            <TabsContent value="project" className="space-y-6">
+              <Card className="border-2 border-border shadow-shadow bg-white">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-heading text-foreground">Redis Cache</h3>
+                    <Button
+                      type="button"
+                      variant="neutral"
+                      size="sm"
+                      onClick={async () => {
+                        try {
+                          const res = await fetch("/api/admin/clear-cache", {
+                            method: "POST",
+                            headers: { authorization: `Bearer ${password}` },
+                          });
+                          const data = await res.json();
+                          setMessage(data.message || data.error || "Done");
+                        } catch {
+                          setMessage("Failed to clear cache");
+                        }
+                      }}
+                    >
+                      Clear Cache
                     </Button>
                   </div>
+                  <p className="text-[10px] font-base text-foreground/50">
+                    Clears all cached data (SOL price, stats, token info, wallets). Data will refresh on next page load.
+                  </p>
+                </CardContent>
+              </Card>
 
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-base text-foreground/60 block">Partner Application Link</label>
-                    <Input
-                      value={partnerApplyLink}
-                      onChange={(e) => setPartnerApplyLink(e.target.value)}
-                      placeholder="https://forms.google.com/... or mailto:partner@example.com"
-                      className="w-full"
-                    />
-                    <p className="text-[10px] font-base text-foreground/50">
-                      Link untuk tombol &quot;Become a Partner&quot; di landing page.
-                    </p>
-                  </div>
-
-                  {partners.length === 0 && (
-                    <p className="text-xs font-base text-foreground/50">No partners added yet.</p>
-                  )}
-
-                  <div className="space-y-4">
-                    {partners.map((partner, index) => (
-                      <div key={index} className="border-2 border-border rounded-base p-3 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-heading text-foreground/60">Partner #{index + 1}</span>
-                          <Button
-                            type="button"
-                            variant="neutral"
-                            size="sm"
-                            onClick={() => removePartner(index)}
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Card className="border-2 border-border shadow-shadow bg-white">
+                <CardContent className="p-4">
+                  <form onSubmit={saveSettings} className="space-y-6">
+                    {/* Core settings */}
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-heading text-foreground">Project</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-base text-foreground/60 block">Project Name</label>
                           <Input
-                            value={partner.name}
-                            onChange={(e) => updatePartner(index, "name", e.target.value)}
-                            placeholder="Partner name"
-                            className="text-sm"
-                          />
-                          <Input
-                            value={partner.href}
-                            onChange={(e) => updatePartner(index, "href", e.target.value)}
-                            placeholder="Website link"
-                            className="text-sm"
+                            value={projectName}
+                            onChange={(e) => setProjectName(e.target.value)}
+                            placeholder="e.g. CATFUND"
+                            className="w-full"
                           />
                         </div>
-                        <Input
-                          value={partner.description}
-                          onChange={(e) => updatePartner(index, "description", e.target.value)}
-                          placeholder="Short description"
-                          className="text-sm"
-                        />
-                        <div className="space-y-2">
-                          <label className="text-xs font-base text-foreground/50 block">Logo</label>
-                          <div className="flex flex-wrap items-center gap-3">
-                            {partner.logo && (
-                              <div className="relative w-12 h-12 border-2 border-border rounded-base overflow-hidden bg-secondary-background">
-                                <Image
-                                  src={partner.logo}
-                                  alt={`${partner.name || "Partner"} logo`}
-                                  fill
-                                  sizes="48px"
-                                  className="object-cover"
-                                  unoptimized
-                                />
-                              </div>
-                            )}
-                            <Input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) uploadPartnerLogo(index, file);
-                              }}
-                              className="text-sm w-auto flex-1 min-w-[200px]"
-                            />
-                            <Input
-                              value={partner.logo}
-                              onChange={(e) => updatePartner(index, "logo", e.target.value)}
-                              placeholder="Or paste logo URL"
-                              className="text-sm flex-[2] min-w-[200px]"
-                            />
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                          <select
-                            value={partner.icon}
-                            onChange={(e) => updatePartner(index, "icon", e.target.value)}
-                            className="h-10 rounded-base border-2 border-border bg-secondary-background px-3 text-sm font-base text-foreground"
-                          >
-                            <option value="Cat">Cat</option>
-                            <option value="Home">Home</option>
-                            <option value="PawPrint">PawPrint</option>
-                            <option value="Shield">Shield</option>
-                            <option value="Heart">Heart</option>
-                          </select>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-base text-foreground/60 block">Token CA</label>
                           <Input
-                            value={partner.socials.instagram}
-                            onChange={(e) => updatePartnerSocial(index, "instagram", e.target.value)}
-                            placeholder="Instagram"
-                            className="text-sm"
-                          />
-                          <Input
-                            value={partner.socials.facebook}
-                            onChange={(e) => updatePartnerSocial(index, "facebook", e.target.value)}
-                            placeholder="Facebook"
-                            className="text-sm"
-                          />
-                          <Input
-                            value={partner.socials.tiktok}
-                            onChange={(e) => updatePartnerSocial(index, "tiktok", e.target.value)}
-                            placeholder="TikTok"
-                            className="text-sm"
+                            value={tokenCa}
+                            onChange={(e) => setTokenCa(e.target.value)}
+                            placeholder="Solana address"
+                            className="w-full"
                           />
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-base text-foreground/60 block">Project Logo</label>
+                        <div className="flex flex-wrap items-center gap-3">
+                          {projectLogo && (
+                            <div className="relative w-12 h-12 border-2 border-border rounded-base overflow-hidden bg-secondary-background">
+                              <Image
+                                src={projectLogo}
+                                alt="Project logo preview"
+                                fill
+                                sizes="48px"
+                                className="object-cover"
+                                unoptimized
+                              />
+                            </div>
+                          )}
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) uploadProjectLogo(file);
+                            }}
+                            className="text-sm w-auto flex-1 min-w-[200px]"
+                          />
+                          <Input
+                            value={projectLogo}
+                            onChange={(e) => setProjectLogo(e.target.value)}
+                            placeholder="Or paste logo URL"
+                            className="text-sm flex-[2] min-w-[200px]"
+                          />
+                        </div>
+                        <p className="text-[10px] font-base text-foreground/50">
+                          If set, logo will replace project name text in navbar.
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-base text-foreground/60 block">Creator Wallet</label>
+                          <Input
+                            value={creatorWallet}
+                            onChange={(e) => setCreatorWallet(e.target.value)}
+                            placeholder="PumpFun creator wallet address (optional)"
+                            className="w-full"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-base text-foreground/60 block">Foundation Wallet</label>
+                          <Input
+                            value={foundationWallet}
+                            onChange={(e) => setFoundationWallet(e.target.value)}
+                            placeholder="Solana wallet address for fees and donations (optional)"
+                            className="w-full"
+                          />
+                        </div>
+                      </div>
+                    </div>
 
-                <Button type="submit" size="sm" disabled={loading || !tokenCa.trim() || !projectName.trim()}>
-                  Save Settings
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+                    {/* Social links */}
+                    <div className="space-y-4 pt-4 border-t-2 border-border">
+                      <h3 className="text-sm font-heading text-foreground">Social Links</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-base text-foreground/60 block">Telegram</label>
+                          <Input
+                            value={telegram}
+                            onChange={(e) => setTelegram(e.target.value)}
+                            placeholder="https://t.me/yourusername"
+                            className="w-full"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-base text-foreground/60 block">X / Twitter</label>
+                          <Input
+                            value={twitter}
+                            onChange={(e) => setTwitter(e.target.value)}
+                            placeholder="https://x.com/yourusername"
+                            className="w-full"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-base text-foreground/60 block">Instagram</label>
+                          <Input
+                            value={instagram}
+                            onChange={(e) => setInstagram(e.target.value)}
+                            placeholder="https://instagram.com/yourusername"
+                            className="w-full"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-base text-foreground/60 block">TikTok</label>
+                          <Input
+                            value={tiktok}
+                            onChange={(e) => setTiktok(e.target.value)}
+                            placeholder="https://tiktok.com/@yourusername"
+                            className="w-full"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Notification Banner */}
+                    <div className="space-y-4 pt-4 border-t-2 border-border">
+                      <h3 className="text-sm font-heading text-foreground">Notification Banner</h3>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-base text-foreground/60 block">
+                          Announcement Text
+                        </label>
+                        <Input
+                          value={notificationText}
+                          onChange={(e) => setNotificationText(e.target.value)}
+                          placeholder="e.g. We just donated 100 bowls of cat food! 🐱"
+                          className="w-full"
+                        />
+                        <p className="text-[10px] font-base text-foreground/50">
+                          Shows at the top of every page. Leave empty to hide.
+                        </p>
+                      </div>
+                    </div>
+
+                    <Button type="submit" size="sm" disabled={loading || !tokenCa.trim() || !projectName.trim()}>
+                      Save Settings
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="partners" className="space-y-6">
+              <Card className="border-2 border-border shadow-shadow bg-white">
+                <CardContent className="p-4">
+                  <form onSubmit={saveSettings} className="space-y-6">
+                    {/* Partners */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-heading text-foreground">Rescue Partners</h3>
+                        <Button type="button" variant="noShadow" size="sm" onClick={addPartner}>
+                          <Plus className="w-3 h-3 mr-1" />
+                          Add Partner
+                        </Button>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-base text-foreground/60 block">Partner Application Link</label>
+                        <Input
+                          value={partnerApplyLink}
+                          onChange={(e) => setPartnerApplyLink(e.target.value)}
+                          placeholder="https://forms.google.com/... or mailto:partner@example.com"
+                          className="w-full"
+                        />
+                        <p className="text-[10px] font-base text-foreground/50">
+                          Link untuk tombol &quot;Become a Partner&quot; di landing page.
+                        </p>
+                      </div>
+
+                      {partners.length === 0 && (
+                        <p className="text-xs font-base text-foreground/50">No partners added yet.</p>
+                      )}
+
+                      <div className="space-y-4">
+                        {partners.map((partner, index) => (
+                          <div key={index} className="border-2 border-border rounded-base p-3 space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-heading text-foreground/60">Partner #{index + 1}</span>
+                              <Button
+                                type="button"
+                                variant="neutral"
+                                size="sm"
+                                onClick={() => removePartner(index)}
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              <Input
+                                value={partner.name}
+                                onChange={(e) => updatePartner(index, "name", e.target.value)}
+                                placeholder="Partner name"
+                                className="text-sm"
+                              />
+                              <Input
+                                value={partner.href}
+                                onChange={(e) => updatePartner(index, "href", e.target.value)}
+                                placeholder="Website link"
+                                className="text-sm"
+                              />
+                            </div>
+                            <Input
+                              value={partner.description}
+                              onChange={(e) => updatePartner(index, "description", e.target.value)}
+                              placeholder="Short description"
+                              className="text-sm"
+                            />
+                            <div className="space-y-2">
+                              <label className="text-xs font-base text-foreground/50 block">Logo</label>
+                              <div className="flex flex-wrap items-center gap-3">
+                                {partner.logo && (
+                                  <div className="relative w-12 h-12 border-2 border-border rounded-base overflow-hidden bg-secondary-background">
+                                    <Image
+                                      src={partner.logo}
+                                      alt={`${partner.name || "Partner"} logo`}
+                                      fill
+                                      sizes="48px"
+                                      className="object-cover"
+                                      unoptimized
+                                    />
+                                  </div>
+                                )}
+                                <Input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) uploadPartnerLogo(index, file);
+                                  }}
+                                  className="text-sm w-auto flex-1 min-w-[200px]"
+                                />
+                                <Input
+                                  value={partner.logo}
+                                  onChange={(e) => updatePartner(index, "logo", e.target.value)}
+                                  placeholder="Or paste logo URL"
+                                  className="text-sm flex-[2] min-w-[200px]"
+                                />
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                              <select
+                                value={partner.icon}
+                                onChange={(e) => updatePartner(index, "icon", e.target.value)}
+                                className="h-10 rounded-base border-2 border-border bg-secondary-background px-3 text-sm font-base text-foreground"
+                              >
+                                <option value="Cat">Cat</option>
+                                <option value="Home">Home</option>
+                                <option value="PawPrint">PawPrint</option>
+                                <option value="Shield">Shield</option>
+                                <option value="Heart">Heart</option>
+                              </select>
+                              <Input
+                                value={partner.socials.instagram}
+                                onChange={(e) => updatePartnerSocial(index, "instagram", e.target.value)}
+                                placeholder="Instagram"
+                                className="text-sm"
+                              />
+                              <Input
+                                value={partner.socials.facebook}
+                                onChange={(e) => updatePartnerSocial(index, "facebook", e.target.value)}
+                                placeholder="Facebook"
+                                className="text-sm"
+                              />
+                              <Input
+                                value={partner.socials.tiktok}
+                                onChange={(e) => updatePartnerSocial(index, "tiktok", e.target.value)}
+                                placeholder="TikTok"
+                                className="text-sm"
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <Button type="submit" size="sm" disabled={loading}>
+                      Save Settings
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="seo" className="space-y-6">
+              <Card className="border-2 border-border shadow-shadow bg-white">
+                <CardContent className="p-4">
+                  <form onSubmit={saveSettings} className="space-y-6">
+                    {/* SEO & Metadata */}
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-heading text-foreground">SEO & Metadata</h3>
+                      <p className="text-[10px] font-base text-foreground/50">
+                        Used for Google SEO and social media sharing (OG tags). Leave empty to use defaults.
+                      </p>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-base text-foreground/60 block">Meta Title</label>
+                        <Input
+                          value={seoTitle}
+                          onChange={(e) => setSeoTitle(e.target.value)}
+                          placeholder={`${projectName || "CatBowl"} - Revolutionary Meme Coin`}
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-base text-foreground/60 block">Meta Description</label>
+                        <Textarea
+                          value={seoDescription}
+                          onChange={(e) => setSeoDescription(e.target.value)}
+                          placeholder="Join the future of decentralized finance with CatBowl..."
+                          className="w-full min-h-[80px]"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-base text-foreground/60 block">Keywords</label>
+                        <Input
+                          value={seoKeywords}
+                          onChange={(e) => setSeoKeywords(e.target.value)}
+                          placeholder="cat food, charity, solana, meme coin, donation"
+                          className="w-full"
+                        />
+                        <p className="text-[10px] font-base text-foreground/50">Comma-separated</p>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-base text-foreground/60 block">OG Image URL</label>
+                        <Input
+                          value={ogImage}
+                          onChange={(e) => setOgImage(e.target.value)}
+                          placeholder="https://example.com/og-image.png"
+                          className="w-full"
+                        />
+                        <p className="text-[10px] font-base text-foreground/50">
+                          Recommended: 1200x630px. Used for social media preview cards.
+                        </p>
+                        {ogImage && (
+                          <div className="mt-2 rounded-base border-2 border-border overflow-hidden">
+                            <img src={ogImage} alt="OG preview" className="w-full h-auto" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-base text-foreground/60 block">Favicon URL</label>
+                        <Input
+                          value={favicon}
+                          onChange={(e) => setFavicon(e.target.value)}
+                          placeholder="/favicon.ico or https://example.com/favicon.png"
+                          className="w-full"
+                        />
+                        <p className="text-[10px] font-base text-foreground/50">
+                          Browser tab icon. Use .ico, .png, or .svg. Recommended: 32x32px or 64x64px.
+                        </p>
+                        {favicon && (
+                          <div className="mt-2 flex items-center gap-2">
+                            <img src={favicon} alt="Favicon preview" className="w-8 h-8 rounded-base border-2 border-border" />
+                            <span className="text-[10px] font-base text-foreground/50">Preview</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <Button type="submit" size="sm" disabled={loading}>
+                      Save Settings
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="appearance" className="space-y-6">
+              <Card className="border-2 border-border shadow-shadow bg-white">
+                <CardContent className="p-4">
+                  <form onSubmit={saveSettings} className="space-y-6">
+                    {/* Theme */}
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-heading text-foreground">Theme</h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {themes.map(({ id, label, bg, main }) => (
+                          <button
+                            key={id}
+                            type="button"
+                            onClick={() => setTheme(id)}
+                            className={`flex flex-col items-center gap-2 p-3 rounded-base border-2 transition-all ${
+                              theme === id
+                                ? "border-foreground bg-secondary-background"
+                                : "border-border bg-white hover:border-foreground/50"
+                            }`}
+                          >
+                            <span
+                              className="w-8 h-8 rounded-base border-2 border-border shadow-shadow"
+                              style={{ background: `linear-gradient(135deg, ${bg} 50%, ${main} 50%)` }}
+                            />
+                            <span className="text-xs font-heading text-foreground">{label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Font */}
+                    <div className="space-y-4 pt-4 border-t-2 border-border">
+                      <div>
+                        <h3 className="text-sm font-heading text-foreground">Font</h3>
+                        <p className="text-xs font-base text-foreground/60">Pilih font, lalu Save Settings dan refresh homepage.</p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setFont("default")}
+                          className={`relative flex items-center justify-center gap-2 p-3 rounded-base border-2 transition-all ${
+                            font === "default"
+                              ? "border-main bg-main text-main-foreground shadow-shadow"
+                              : "border-border bg-white text-foreground hover:border-foreground/50"
+                          }`}
+                        >
+                          {font === "default" && <Check className="w-4 h-4" />}
+                          <span className="text-sm font-heading">Default</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFont("custom")}
+                          className={`relative flex items-center justify-center gap-2 p-3 rounded-base border-2 transition-all ${
+                            font === "custom"
+                              ? "border-main bg-main text-main-foreground shadow-shadow"
+                              : "border-border bg-white text-foreground hover:border-foreground/50"
+                          }`}
+                        >
+                          {font === "custom" && <Check className="w-4 h-4" />}
+                          <span className="text-sm font-heading" style={{ fontFamily: "OakSans, sans-serif" }}>OakSans</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <Button type="submit" size="sm" disabled={loading}>
+                      Save Settings
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </TabsContent>
         </Tabs>
       </div>

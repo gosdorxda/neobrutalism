@@ -18,6 +18,8 @@ export type Partner = {
 
 export type Theme = "original" | "mint" | "lavender" | "lemon";
 
+export type Font = "default" | "custom";
+
 export type Settings = {
   tokenCa: string;
   projectName: string;
@@ -31,6 +33,7 @@ export type Settings = {
   partnerApplyLink: string;
   partners: Partner[];
   theme: Theme;
+  font: Font;
   notificationText: string;
   seoTitle: string;
   seoDescription: string;
@@ -52,6 +55,7 @@ const defaultSettings: Settings = {
   partnerApplyLink: "",
   partners: [],
   theme: "original",
+  font: "default",
   notificationText: "",
   seoTitle: "",
   seoDescription: "",

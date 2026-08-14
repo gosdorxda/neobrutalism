@@ -23,7 +23,10 @@
     "food": "4kg",
     "txHash": "63789tNzBWjHfmgS84WLBzuDFNywpy9Y4wNjt6gX5udfWLaCaHkqMhVciWy3vFRfDNniTUAUdT3eXgD3zrW5V2nn",
     "isActive": true,
-    "receiptImages": ["/uploads/batch-0/1786363387196-photo_2026-08-10_17-53-28.jpg"],
+    "receiptImages": [
+      "/uploads/batch-0/1786363387196-photo_2026-08-10_17-53-28.jpg",
+      "/uploads/batch-0/1786697929162-Screenshot_2026-07-29_113738.jpg"
+    ],
     "receiptStore": "Omeo PetShop Magelang",
     "receiptItem": "Nutrition Cat Food",
     "receiptTotal": "$15",

@@ -51,7 +51,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${plusJakartaSans.variable} theme-${settings.theme} h-full antialiased`}
+      className={`${plusJakartaSans.variable} theme-${settings.theme} ${settings.font === "custom" ? "font-custom" : ""} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
         <ThemeProvider initialTheme={settings.theme}>

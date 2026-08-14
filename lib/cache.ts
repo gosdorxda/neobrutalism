@@ -8,7 +8,7 @@ const TOKEN_KEY = "token:info";
 
 const SOL_PRICE_TTL = 60; // seconds
 const STATS_TTL = 60; // seconds
-const TOKEN_TTL = 30; // seconds
+const TOKEN_TTL = 900; // seconds (15 minutes) - SolanaTracker free tier: 2500 req/month
 
 const COINGECKO_SOL_URL = "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd";
 
@@ -34,7 +34,7 @@ export type CachedTokenInfo = {
   buyTx: string | null;
   sellTx: string | null;
   snipers: string | null;
-  athMarketCap: string | null;
+  insiders: string | null;
   devHolding: string;
   imageUrl: string | null;
   buyUrl: string;
@@ -200,45 +200,61 @@ function formatNumber(value: number | null): string | null {
   return new Intl.NumberFormat("en-US").format(value);
 }
 
+function formatPrice(value: number): string {
+  if (value === 0) return "0";
+  if (value >= 1) return value.toFixed(4);
+  if (value >= 0.0001) return value.toFixed(8).replace(/\.?0+$/, "");
+  return value.toExponential(4);
+}
+
 async function fetchFreshTokenInfo(): Promise<CachedTokenInfo | null> {
   const settings = getSettings();
   const tokenCa = settings.tokenCa || process.env.NEXT_PUBLIC_TOKEN_CA || "CATFUNDeio111111111111111111111111111111111";
   const projectName = settings.projectName || "CATFUND";
+  const apiKey = process.env.SOLANA_TRACKER_API_KEY || "208b2ae4-7ab1-48b1-86b2-76ccfc163f91";
 
   try {
     const res = await fetch(
-      `https://api.dexscreener.com/latest/dex/tokens/${tokenCa}`,
-      { cache: "no-store" }
+      `https://data.solanatracker.io/tokens/${tokenCa}`,
+      {
+        headers: { "x-api-key": apiKey },
+        cache: "no-store",
+      }
     );
-    if (!res.ok) throw new Error(`DexScreener ${res.status}`);
+    if (!res.ok) throw new Error(`SolanaTracker ${res.status}`);
     const data = await res.json();
-    const pairs = data?.pairs;
 
-    if (!pairs || pairs.length === 0) throw new Error("No pairs");
+    const pools = data?.pools;
+    const bestPool = Array.isArray(pools) && pools.length > 0
+      ? pools.reduce((best: { liquidity?: { usd?: number } }, current: { liquidity?: { usd?: number } }) => {
+          const bestLiquidity = best.liquidity?.usd ?? 0;
+          const currentLiquidity = current.liquidity?.usd ?? 0;
+          return currentLiquidity > bestLiquidity ? current : best;
+        }, pools[0])
+      : null;
 
-    const solanaPairs = pairs.filter((p: { chainId: string }) => p.chainId === "solana");
-    const pair = solanaPairs.length > 0 ? solanaPairs[0] : pairs[0];
-
-    const priceUsd = pair.priceUsd ? Number(pair.priceUsd) : null;
-    const marketCap = pair.marketCap ? Number(pair.marketCap) : null;
-    const volume = pair.volume?.h24 ? Number(pair.volume.h24) : null;
-    const txns = pair.txns?.h24;
+    const priceUsd = bestPool?.price?.usd ? Number(bestPool.price.usd) : null;
+    const marketCap = bestPool?.marketCap?.usd ? Number(bestPool.marketCap.usd) : null;
+    const volume = bestPool?.txns?.volume24h ? Number(bestPool.txns.volume24h) : null;
+    const poolTxns = bestPool?.txns;
 
     return {
       ca: tokenCa,
-      name: pair.baseToken?.name || projectName,
-      symbol: pair.baseToken?.symbol || projectName,
-      price: priceUsd ? `$${priceUsd.toFixed(10)}` : null,
+      name: data.token?.name || projectName,
+      symbol: data.token?.symbol || projectName,
+      price: priceUsd ? `$${formatPrice(priceUsd)}` : null,
       marketCap: marketCap ? `$${marketCap.toLocaleString("en-US")}` : null,
       volume: volume ? `$${volume.toLocaleString("en-US")}` : null,
-      holders: null,
-      totalTx: txns ? formatNumber(txns.buys + txns.sells) : null,
-      buyTx: txns ? formatNumber(txns.buys) : null,
-      sellTx: txns ? formatNumber(txns.sells) : null,
-      snipers: null,
-      athMarketCap: null,
-      devHolding: "0.00%",
-      imageUrl: pair.info?.imageUrl || null,
+      holders: data.holders != null ? formatNumber(Number(data.holders)) : null,
+      totalTx: data.txns != null ? formatNumber(Number(data.txns)) : poolTxns != null ? formatNumber(poolTxns.total) : null,
+      buyTx: data.buys != null ? formatNumber(Number(data.buys)) : poolTxns != null ? formatNumber(poolTxns.buys) : null,
+      sellTx: data.sells != null ? formatNumber(Number(data.sells)) : poolTxns != null ? formatNumber(poolTxns.sells) : null,
+      snipers: data.risk?.snipers?.count != null ? formatNumber(Number(data.risk.snipers.count)) : null,
+      insiders: data.risk?.insiders?.count != null ? formatNumber(Number(data.risk.insiders.count)) : null,
+      devHolding: data.risk?.dev?.percentage != null
+        ? `${Number(data.risk.dev.percentage).toFixed(2)}%`
+        : "0.00%",
+      imageUrl: data.token?.image || null,
       buyUrl: `https://pump.fun/coin/${tokenCa}`,
     };
   } catch {
@@ -272,120 +288,12 @@ export async function getTokenInfo(): Promise<CachedTokenInfo> {
       buyTx: null,
       sellTx: null,
       snipers: null,
-      athMarketCap: null,
+      insiders: null,
       devHolding: "0.00%",
       imageUrl: null,
       buyUrl: `https://pump.fun/coin/${tokenCa}`,
     };
 
   await setCache(cacheKey, result, TOKEN_TTL);
-  return result;
-}
-
-// Wallet caching
-const WALLETS_KEY = "wallets:summary";
-const WALLETS_TTL = 60; // seconds
-
-const SOLANA_RPC = process.env.SOLANA_RPC_URL || "https://api.mainnet-beta.solana.com";
-
-export type CachedWallet = {
-  address: string;
-  solBalance: number | null;
-  solValueUsd: number | null;
-  devClaimableSol?: number | null;
-  devClaimableUsd?: number | null;
-};
-
-export type CachedWallets = {
-  foundation: CachedWallet | null;
-  creator: CachedWallet | null;
-};
-
-async function rpcCall(method: string, params: unknown[]) {
-  const res = await fetch(SOLANA_RPC, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
-    cache: "no-store",
-  });
-  const data = await res.json();
-  return data?.result;
-}
-
-async function fetchWalletSolBalance(wallet: string): Promise<number | null> {
-  try {
-    const result = await rpcCall("getBalance", [wallet]);
-    const lamports = result?.value;
-    return typeof lamports === "number" ? lamports / 1_000_000_000 : null;
-  } catch {
-    return null;
-  }
-}
-
-async function fetchWalletDevClaimable(wallet: string, mint: string): Promise<number | null> {
-  try {
-    const url = `https://pumpdev.io/api/claim-account?publicKey=${encodeURIComponent(wallet)}&mint=${encodeURIComponent(mint)}`;
-    const res = await fetch(url, { cache: "no-store" });
-    const data = await res.json();
-    return typeof data?.totalClaimable === "number" ? data.totalClaimable : null;
-  } catch {
-    return null;
-  }
-}
-
-async function fetchFreshWallets(): Promise<CachedWallets | null> {
-  const settings = getSettings();
-  const { creatorWallet, foundationWallet, tokenCa } = settings;
-
-  if (!creatorWallet && !foundationWallet) return null;
-
-  const [foundationBalance, creatorBalance, devClaimable, solPrice] = await Promise.all([
-    foundationWallet ? fetchWalletSolBalance(foundationWallet) : Promise.resolve(null),
-    creatorWallet ? fetchWalletSolBalance(creatorWallet) : Promise.resolve(null),
-    creatorWallet && tokenCa ? fetchWalletDevClaimable(creatorWallet, tokenCa) : Promise.resolve(null),
-    getSolPrice(),
-  ]);
-
-  return {
-    foundation: foundationWallet
-      ? {
-          address: foundationWallet,
-          solBalance: foundationBalance,
-          solValueUsd:
-            foundationBalance != null && solPrice != null ? foundationBalance * solPrice : null,
-        }
-      : null,
-    creator: creatorWallet
-      ? {
-          address: creatorWallet,
-          solBalance: creatorBalance,
-          solValueUsd:
-            creatorBalance != null && solPrice != null ? creatorBalance * solPrice : null,
-          devClaimableSol: devClaimable,
-          devClaimableUsd:
-            devClaimable != null && solPrice != null ? devClaimable * solPrice : null,
-        }
-      : null,
-  };
-}
-
-export async function getWallets(): Promise<CachedWallets> {
-  const cached = await getFromCache<CachedWallets>(WALLETS_KEY);
-  if (cached !== null) return cached;
-
-  const settings = getSettings();
-  const { creatorWallet, foundationWallet } = settings;
-
-  const fresh = await fetchFreshWallets();
-  const result = fresh ?? {
-    foundation: foundationWallet
-      ? { address: foundationWallet, solBalance: null, solValueUsd: null }
-      : null,
-    creator: creatorWallet
-      ? { address: creatorWallet, solBalance: null, solValueUsd: null, devClaimableSol: null, devClaimableUsd: null }
-      : null,
-  };
-
-  await setCache(WALLETS_KEY, result, WALLETS_TTL);
   return result;
 }
