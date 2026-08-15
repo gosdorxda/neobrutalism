@@ -39,12 +39,12 @@ html.font-custom nav .font-base {
   --navbar-bg: oklch(90% 0.035 72.89);
   --foreground: oklch(0% 0 0);
   --main-foreground: oklch(0% 0 0);
-  --main: oklch(72.27% 0.1894 50.19);
+  --main: #ff8e3a;
   --border: oklch(0% 0 0);
   --ring: oklch(0% 0 0);
   --overlay: oklch(0% 0 0 / 0.8);
   --shadow: 0px 2px 0px 0px var(--border);
-  --chart-1: #FF7A05;
+  --chart-1: #ff8e3a;
   --chart-2: #0099FF;
   --chart-3: #FFBF00;
   --chart-4: #00D696;
@@ -59,11 +59,11 @@ html.font-custom nav .font-base {
   --navbar-bg: oklch(32% 0.032 60.06);
   --foreground: oklch(92.49% 0 0);
   --main-foreground: oklch(0% 0 0);
-  --main: oklch(67.56% 0.1796 49.61);
+  --main: #e67e2e;
   --border: oklch(0% 0 0);
   --ring: oklch(100% 0 0);
   --shadow: 0px 2px 0px 0px var(--border);
-  --chart-1: #EB6D00;
+  --chart-1: #e67e2e;
   --chart-2: #008AE5;
   --chart-3: #E5AC00;
   --chart-4: #00BD84;
