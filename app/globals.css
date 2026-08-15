@@ -24,6 +24,14 @@ html.font-custom body {
   font-size-adjust: 0.55;
 }
 
+html.font-custom .font-base {
+  font-weight: 400;
+}
+
+html.font-custom nav .font-base {
+  font-weight: 500;
+}
+
 :root,
 .theme-original {
   --background: oklch(95.38% 0.0357 72.89);

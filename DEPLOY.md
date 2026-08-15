@@ -275,7 +275,6 @@ crontab -e
 Tambah baris:
 
 ```cron
-*/2 * * * * curl -fsS https://your-domain.com/api/sol-price > /dev/null 2>&1
 */2 * * * * curl -fsS https://your-domain.com/api/stats > /dev/null 2>&1
 */2 * * * * curl -fsS https://your-domain.com/api/token > /dev/null 2>&1
 ```
