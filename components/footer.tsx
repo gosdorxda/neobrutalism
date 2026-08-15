@@ -30,7 +30,7 @@ const tiktokIcon = (
 );
 
 const navLinks = [
-  { label: "Batch History", href: "#batches" },
+  { label: "Impact History", href: "#batches" },
   { label: "Gallery", href: "#gallery" },
   { label: "How It Works", href: "#how-it-works" },
   { label: "FAQ", href: "#faq" },

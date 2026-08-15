@@ -111,7 +111,7 @@ function AnimatedValue({ value }: { value: string | null }) {
 }
 
 function formatCa(ca: string) {
-  return `${ca.slice(0, 8)}...${ca.slice(-6)}`;
+  return ca;
 }
 
 function FoundationWalletCard() {
@@ -373,12 +373,12 @@ export function TokenInfo({ initialToken }: { initialToken?: {
                   href={`https://solscan.io/token/${token?.ca}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 h-10 bg-secondary-background border-2 border-border rounded-base px-3 flex items-center min-w-0 hover:border-main transition-colors"
+                  className="flex-1 h-auto min-h-[2.5rem] bg-secondary-background border-2 border-border rounded-base px-3 py-2 flex items-center min-w-0 hover:border-main transition-colors"
                 >
                   {loading ? (
                     <Skeleton height={20} width="100%" borderRadius={4} />
                   ) : (
-                    <code className="text-sm font-mono text-foreground truncate" title={token?.ca}>
+                    <code className="text-sm font-mono text-foreground break-all leading-tight" title={token?.ca}>
                       {displayCa}
                     </code>
                   )}

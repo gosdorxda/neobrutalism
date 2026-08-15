@@ -516,7 +516,7 @@ export function BatchHistory() {
         {/* Heading */}
         <div className="text-center mb-4">
           <h2 className="text-3xl font-heading text-foreground mb-3">
-            Batch History
+            Impact History
           </h2>
           <p className="text-sm font-base text-foreground/60">
             Every feeding batch is documented with receipts and photos

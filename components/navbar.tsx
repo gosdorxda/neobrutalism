@@ -42,7 +42,7 @@ export function Navbar() {
             {/* Desktop Navigation Links */}
             <div className="hidden md:flex md:items-center md:h-full md:gap-4">
               <a href="#batches" className="flex items-center h-full font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
-                Batch History
+                Impact History
               </a>
               <a href="#gallery" className="flex items-center h-full font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
                 Gallery
@@ -124,7 +124,7 @@ export function Navbar() {
         >
           <div className="space-y-1 px-4 pb-3 pt-2">
             <a href="#batches" onClick={closeMenu} className="block py-2 font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
-              Batch History
+              Impact History
             </a>
             <a href="#gallery" onClick={closeMenu} className="block py-2 font-base text-sm text-foreground hover:text-foreground/70 transition-colors">
               Gallery

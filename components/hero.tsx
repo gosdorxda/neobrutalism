@@ -266,7 +266,7 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
             </Button>
             <Button variant="neutral" size="lg" asChild>
               <a href="#batches">
-                See Batch History
+                See Impact History
               </a>
             </Button>
           </div>
