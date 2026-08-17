@@ -48,6 +48,16 @@ function getReceiptImages(batch: Batch): string[] {
   return [];
 }
 
+function formatDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
 function StatusBadge({ status }: { status: string }) {
   const isActive = status === "In Progress";
   const isFeeding = status === "Feeding";
@@ -76,7 +86,7 @@ function getStatusWatermarkColor(status: string): string {
 function BatchStatusAlert({ status }: { status: string }) {
   if (status === "In Progress") {
     return (
-      <Alert className="!shadow-none" style={{ boxShadow: "none" }}>
+      <Alert className="!shadow-none border py-2" style={{ boxShadow: "none" }}>
         <Info />
         <AlertDescription>
           This batch is still in progress. Receipts, photos, and final data are not available yet.
@@ -86,7 +96,7 @@ function BatchStatusAlert({ status }: { status: string }) {
   }
   if (status === "Feeding") {
     return (
-      <Alert className="!shadow-none" style={{ boxShadow: "none" }}>
+      <Alert className="!shadow-none border py-2" style={{ boxShadow: "none" }}>
         <Info />
         <AlertDescription>
           This batch is currently being fed and may take some time before it is marked as completed.
@@ -226,12 +236,12 @@ function ReceiptDialog({ batch, settings }: { batch: Batch; settings: InvoiceSet
             }}
             actionLink={
               <a
-                href={`/invoice/${getInvoiceCode(batch)}`}
+                href={`/receipt/${getInvoiceCode(batch)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs font-base text-main underline hover:text-foreground transition-colors"
               >
-                View Full Invoice
+                View Full Receipt
                 <ExternalLink className="w-3 h-3" />
               </a>
             }
@@ -389,7 +399,7 @@ function getColumns(settings: InvoiceSettings): ColumnDef<Batch>[] {
       const batch = row.original;
       return (
         <div className="text-base font-heading text-foreground">
-          {batch.status === "In Progress" ? "~" : row.getValue("fees")}
+          {batch.status === "In Progress" || batch.status === "Feeding" ? "~" : row.getValue("fees")}
         </div>
       );
     },
@@ -407,7 +417,7 @@ function getColumns(settings: InvoiceSettings): ColumnDef<Batch>[] {
       const batch = row.original;
       return (
         <div className="text-base font-heading text-foreground">
-          {batch.status === "In Progress" ? "~" : row.getValue("cats")}
+          {batch.status === "In Progress" || batch.status === "Feeding" ? "~" : row.getValue("cats")}
         </div>
       );
     },
@@ -425,7 +435,7 @@ function getColumns(settings: InvoiceSettings): ColumnDef<Batch>[] {
       const batch = row.original;
       return (
         <div className="text-base font-heading text-foreground">
-          {batch.status === "In Progress" ? "~" : row.getValue("food")}
+          {batch.status === "In Progress" || batch.status === "Feeding" ? "~" : row.getValue("food")}
         </div>
       );
     },
@@ -598,7 +608,7 @@ export function BatchHistory() {
                           <h3 className="text-base sm:text-lg font-heading text-foreground">
                             {batch.name}
                           </h3>
-                          <span className={"text-xs font-heading px-1 inline-flex items-center gap-1 " + (isActive ? "text-main" : isFeeding ? "text-chart-3" : "text-chart-4")}>
+                          <span className={"text-xs font-heading px-2 py-0.5 rounded-full inline-flex items-center gap-1 " + (isActive ? "bg-main/10 text-main" : isFeeding ? "bg-chart-3/10 text-chart-3" : "bg-chart-4/10 text-chart-4")}>
                             {isActive ? (
                               <span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
                             ) : isFeeding ? (
@@ -621,15 +631,9 @@ export function BatchHistory() {
                     {/* Progress bar */}
                     <div className="px-4 pb-3">
                       <div className="flex items-center justify-between text-[10px] font-base text-foreground/50 mb-1">
-                        <span>{batch.startDate}</span>
-                        <span>
-                          {isActive
-                            ? daysLeft + "d left"
-                            : isCompleted
-                            ? "Completed"
-                            : "Feeding"}
-                        </span>
-                        <span>{batch.targetDate}</span>
+                        <span>{formatDate(batch.startDate)}</span>
+                        <span>{progress}%</span>
+                        <span>{formatDate(batch.targetDate)}</span>
                       </div>
                       <div className="h-2 bg-foreground/10 rounded-full overflow-hidden">
                         <div
@@ -640,39 +644,50 @@ export function BatchHistory() {
                     </div>
 
                     {/* Bottom row: stats */}
-                    <div className="grid grid-cols-4 divide-x-2 divide-border border-t-2 border-border">
-                      <div className="flex-1 flex items-center justify-center gap-2 py-3">
-                        <Cat className="w-4 h-4 text-foreground/50" />
-                        <span className="text-sm font-heading text-foreground">
-                          {isActive ? "~" : batch.cats}
+                    <div className="grid grid-cols-4 divide-x divide-border/40 border-t-2 border-border">
+                      <div className="flex flex-col items-center justify-center gap-1 py-3">
+                        <span className="text-[9px] font-base text-foreground/40 uppercase tracking-wider flex items-center gap-1">
+                          <Cat className="w-3 h-3" />
+                          Cats
                         </span>
-                        <span className="text-[10px] font-base text-foreground/50">cats</span>
-                      </div>
-                      <div className="flex-1 flex items-center justify-center gap-2 py-3">
-                        <ShoppingCart className="w-4 h-4 text-foreground/50" />
                         <span className="text-sm font-heading text-foreground">
-                          {isActive ? "~" : batch.food}
+                          {isActive || isFeeding ? "~" : batch.cats}
                         </span>
                       </div>
-                      <div className="flex-1 flex items-center justify-center gap-2 py-3">
-                        <DollarSign className="w-4 h-4 text-foreground/50" />
+                      <div className="flex flex-col items-center justify-center gap-1 py-3">
+                        <span className="text-[9px] font-base text-foreground/40 uppercase tracking-wider flex items-center gap-1">
+                          <ShoppingCart className="w-3 h-3" />
+                          Food
+                        </span>
                         <span className="text-sm font-heading text-foreground">
-                          {isActive ? "~" : batch.fees}
+                          {isActive || isFeeding ? "~" : batch.food}
                         </span>
                       </div>
-                      <div className="flex-1 flex items-center justify-center gap-2 py-3">
-                        <Link2 className="w-4 h-4 text-foreground/50" />
+                      <div className="flex flex-col items-center justify-center gap-1 py-3">
+                        <span className="text-[9px] font-base text-foreground/40 uppercase tracking-wider flex items-center gap-1">
+                          <DollarSign className="w-3 h-3" />
+                          Rewards
+                        </span>
+                        <span className="text-sm font-heading text-foreground">
+                          {isActive || isFeeding ? "~" : batch.fees}
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-center justify-center gap-1 py-3">
+                        <span className="text-[9px] font-base text-foreground/40 uppercase tracking-wider flex items-center gap-1">
+                          <Link2 className="w-3 h-3" />
+                          Tx
+                        </span>
                         {batch.txHash && batch.txHash !== "-" ? (
                           <a
                             href={`https://web3.okx.com/explorer/solana/tx/${batch.txHash}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-xs font-heading text-main underline hover:text-foreground truncate max-w-[80px]"
+                            className="text-xs font-base text-main underline hover:text-foreground truncate max-w-[80px]"
                           >
                             {formatTxHash(batch.txHash)}
                           </a>
                         ) : (
-                          <span className="text-sm font-heading text-foreground">—</span>
+                          <span className="text-xs font-base text-foreground/40">-</span>
                         )}
                       </div>
                     </div>

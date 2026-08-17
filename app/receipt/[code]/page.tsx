@@ -6,7 +6,7 @@ import { InvoiceView, getInvoiceCode, type InvoiceBatch, type InvoiceSettings } 
 export const dynamic = "force-dynamic";
 
 function parseInvoiceCode(code: string): number | null {
-  const match = code.match(/^INV-(\d+)$/i);
+  const match = code.match(/^RCP-(\d+)$/i);
   if (!match) return null;
   return Number(match[1]);
 }

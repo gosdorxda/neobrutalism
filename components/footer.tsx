@@ -110,7 +110,7 @@ export function Footer() {
           {/* Non-profit Notice */}
           <div className="max-w-xl rounded-base bg-zinc-100 px-4 py-3">
             <p className="text-xs font-base text-foreground/70 leading-relaxed">
-              Run by volunteers who love cats. No team allocation. No hidden fees. Every trade helps put real food in bowls for street cats.
+              Run by volunteers who love cats. No team allocation. No hidden fees. 100% of rewards become cat food.
             </p>
           </div>
 
@@ -159,7 +159,7 @@ export function Footer() {
 
           {/* Copyright */}
           <p className="text-xs font-heading text-foreground/50">
-            © 2026 {projectName}. All rights reserved.
+            © {new Date().getFullYear()} {projectName}. All rights reserved.
           </p>
         </div>
       </div>

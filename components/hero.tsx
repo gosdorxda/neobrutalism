@@ -154,7 +154,7 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
   }, [activeBatch]);
 
   return (
-    <section className="relative min-h-[calc(85vh-5rem)] overflow-hidden bg-background px-4 pt-12 pb-10 sm:px-6 lg:px-8">
+    <section className="relative min-h-[calc(85vh-5rem)] overflow-hidden bg-background px-4 pt-28 pb-10 sm:px-6 lg:px-8">
       {/* Animated paw print background decorations */}
       <div className="absolute inset-0 pointer-events-none select-none">
         <img
@@ -254,7 +254,7 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
 
           {/* Subtitle */}
           <p className="text-lg sm:text-xl font-base text-foreground/70 max-w-2xl">
-            All transaction fees go straight to food for street cats. Track every batch with receipts, photos, and on-chain records.
+            All creator rewards go straight to food for street cats. Track every batch with receipts, photos, and on-chain records.
           </p>
 
           {/* CTA Buttons */}
@@ -348,8 +348,8 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
                             {activeBatch
                               ? isFinished
                                 ? "Feeding time!"
-                                : "Next Weekly Feeding"
-                              : "No active batch"}
+                                : "Next Feeding"
+                                : "No Active Batch"}
                           </span>
                           <span>{activeBatch ? formatDisplayDate(activeBatch.targetDate) : "-"}</span>
                         </>
@@ -380,12 +380,12 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
                     {/* Transparency Info Below Progress Bar */}
                     <div className="flex items-center justify-between pt-1">
                       <p className="text-[10px] font-base text-foreground/50">
-                        100% of creator rewards become cat food. Verified{" "}
+                        100% of creator rewards become cat food. See{" "}
                         <a 
                           href="#token" 
                           className="text-foreground/70 font-heading underline hover:text-main transition-colors"
                         >
-                          here
+                          the proof
                         </a>
                       </p>
                       {/* Live Indicator - Minimal */}
@@ -394,7 +394,7 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
                           <div className="absolute inset-0 w-2 h-2 bg-green-500 rounded-full animate-ping opacity-50"></div>
                           <div className="relative w-2 h-2 bg-green-500 rounded-full"></div>
                         </div>
-                        <span className="text-[9px] font-heading text-green-500">LIVE</span>
+                        <span className="text-[9px] font-heading text-green-500/70">LIVE</span>
                       </div>
                     </div>
                   </div>
@@ -442,7 +442,7 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
                         {isLoading ? (
                           <Skeleton className="w-24 h-7 sm:w-32 sm:h-8 mb-0.5 mx-auto" borderRadius={4} />
                         ) : (
-                          <div className="text-lg sm:text-2xl font-heading text-foreground mb-0.5 transition-all duration-300">
+                          <div className="text-lg sm:text-2xl font-heading mb-0.5 transition-all duration-300" style={{ color: "#0e8535" }}>
                             {showSol
                               ? `${animatedTotalFeesSol.toFixed(4)} SOL`
                               : formatUsd(animatedTotalFees)}
@@ -494,11 +494,11 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
 
                     {/* CTA Button */}
                     <div className="shrink-0">
-                      <Button variant="noShadow" size="default" asChild className="px-2.5 sm:px-4 text-xs sm:text-sm">
+                      <Button variant="reverse" size="default" asChild className="px-2.5 sm:px-4 text-xs sm:text-sm">
                         <a href={buyUrl} target="_blank" rel="noopener noreferrer">
+                          <Cat className="w-4 h-4 mr-1" />
                           <span className="hidden sm:inline">Feed a Cat</span>
                           <span className="sm:hidden">Feed</span>
-                          <Cat className="w-4 h-4 ml-1" />
                         </a>
                       </Button>
                     </div>
@@ -525,15 +525,15 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
             </div>
             <div className="flex items-center justify-center gap-2 bg-background border-2 border-border px-3 py-2 rounded-base">
               <Calendar className="w-4 h-4 text-foreground flex-shrink-0" />
-              <span className="text-xs font-base text-foreground">Weekly Feeding</span>
+              <span className="text-xs font-base text-foreground">Regular Feeding</span>
             </div>
           </div>
 
           {/* Disclaimer/Note */}
           <div className="w-full max-w-4xl mt-4 px-2">
             <p className="text-xs font-base text-foreground/50 text-center leading-relaxed">
-              We&apos;re just a team of cat lovers who believe every street cat deserves a meal.
-              No office, no investors, just weekly trips to buy food, snap photos, and post receipts.
+              We&apos;re a volunteer team of cat lovers who believe every street cat deserves a meal.
+              Every batch we buy food, snap photos, and post receipts. No team allocation, no hidden fees.
               That&apos;s the {projectName} promise.
             </p>
           </div>

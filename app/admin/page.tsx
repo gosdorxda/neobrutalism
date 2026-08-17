@@ -295,7 +295,7 @@ export default function AdminPage() {
   }
 
   async function uploadProjectLogo(file: File) {
-    const path = await uploadSingleFile(file, "logo", "photo");
+    const path = await uploadSingleFile(file, "logo", "logo");
     if (path) {
       setProjectLogo(path);
       setMessage("Project logo uploaded");
@@ -701,7 +701,7 @@ export default function AdminPage() {
                       <Textarea
                         value={batch.notes || ""}
                         onChange={(e) => updateBatchField(batch.id, "notes", e.target.value)}
-                        placeholder="Purpose of this purchase, e.g. weekly dry food restock"
+                        placeholder="Purpose of this purchase, e.g. dry food restock"
                         className="text-sm min-h-[72px]"
                       />
                     </div>
@@ -995,7 +995,7 @@ export default function AdminPage() {
                     {/* Partners */}
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-heading text-foreground">Rescue Partners</h3>
+                        <h3 className="text-sm font-heading text-foreground">Cats We&apos;ve Helped</h3>
                         <Button type="button" variant="noShadow" size="sm" onClick={addPartner}>
                           <Plus className="w-3 h-3 mr-1" />
                           Add Partner
@@ -1003,20 +1003,20 @@ export default function AdminPage() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-xs font-base text-foreground/60 block">Partner Application Link</label>
+                        <label className="text-xs font-base text-foreground/60 block">Request Support Link</label>
                         <Input
                           value={partnerApplyLink}
                           onChange={(e) => setPartnerApplyLink(e.target.value)}
-                          placeholder="https://forms.google.com/... or mailto:partner@example.com"
+                          placeholder="https://forms.google.com/... or mailto:help@example.com"
                           className="w-full"
                         />
                         <p className="text-[10px] font-base text-foreground/50">
-                          Link untuk tombol &quot;Become a Partner&quot; di landing page.
+                          Link untuk tombol &quot;Request support&quot; di landing page.
                         </p>
                       </div>
 
                       {partners.length === 0 && (
-                        <p className="text-xs font-base text-foreground/50">No partners added yet.</p>
+                        <p className="text-xs font-base text-foreground/50">No entries yet.</p>
                       )}
 
                       <div className="space-y-4">

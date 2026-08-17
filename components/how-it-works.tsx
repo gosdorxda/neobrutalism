@@ -21,8 +21,8 @@ export function HowItWorks() {
     },
     {
       number: "2",
-      title: "Creator Rewards",
-      description: "All creator rewards from pump.fun are accumulated during each weekly batch period, ready to be converted into meals.",
+      title: "Rewards Pool",
+      description: "All creator rewards from pump.fun are accumulated during each batch period, ready to be converted into meals.",
       color: "bg-chart-4",
       icon: DollarSign,
     },
@@ -66,7 +66,7 @@ export function HowItWorks() {
             How {projectName} Works
           </h2>
           <p className="text-base font-base text-foreground/60 max-w-xl mx-auto">
-            From every swap to a full bowl. Here&apos;s how creator rewards become cat food.
+            Every swap fills a bowl for a street cat. Here&apos;s how it becomes a meal.
           </p>
         </div>
 

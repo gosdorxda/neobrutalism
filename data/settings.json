@@ -1,14 +1,14 @@
 {
   "tokenCa": "CX2v7JSHJQDcNooubzzvZG8TPaDwbaPgfzcXRSWJpump",
   "projectName": "CatBowl",
-  "projectLogo": "/uploads/logo/1786611652922-CatBowl_bg_white.jpg",
+  "projectLogo": "/uploads/logo/1786957889430-Logo_site.png",
   "creatorWallet": "7VPJHsm1bqMDd1ZCKRQyjv9bduPpEwpNmCmiikBBHs9F",
   "foundationWallet": "7VPJHsm1bqMDd1ZCKRQyjv9bduPpEwpNmCmiikBBHs9F",
   "telegram": "https://fabric.foundation/",
-  "twitter": "https://fabric.foundation/",
+  "twitter": "https://x.com/catbowltoken",
   "instagram": "https://fabric.foundation/",
   "tiktok": "https://fabric.foundation/",
-  "partnerApplyLink": "https://docs.google.com/forms/u/0/",
+  "partnerApplyLink": "https://forms.gle/cjzH1B2HYj3ZzZS87",
   "partners": [
     {
       "name": "keluarga kucing Lampung",
@@ -38,9 +38,9 @@
   "theme": "original",
   "font": "default",
   "notificationText": "",
-  "seoTitle": "",
-  "seoDescription": "",
-  "seoKeywords": "",
+  "seoTitle": "CatBowl :  Every Swap Fills A Bowl For Street Cats",
+  "seoDescription": "The first meme coin turning creator rewards into real impact, feeding street cats transparently. Every swap fills a bowl. Receipts, photos, on-chain proof.",
+  "seoKeywords": "cat bowl, meme coin, solana, pump.fun, street cats, cat rescue, cat charity, crypto charity, transparent donation, creator rewards, cat food, feeding cats, indonesia, solana meme coin",
   "ogImage": "",
-  "favicon": ""
+  "favicon": "https://wily-apricot-nbn67dgf.edgeone.dev/file.png"
 }

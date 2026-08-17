@@ -10,7 +10,7 @@ type ProjectNameContextValue = {
 
 const ProjectNameContext = createContext<ProjectNameContextValue>({
   projectName: "CATFUND",
-  tokenSymbol: "$CATFUND",
+  tokenSymbol: "CATFUND",
   projectLogo: "",
 });
 
@@ -24,7 +24,7 @@ export function ProjectNameProvider({
   initialProjectLogo?: string;
 }) {
   const projectName = initialProjectName.trim() || "CATFUND";
-  const tokenSymbol = `$${projectName}`;
+  const tokenSymbol = projectName;
   const projectLogo = initialProjectLogo.trim();
 
   return (

@@ -34,6 +34,26 @@ export async function POST(request: NextRequest) {
 
     const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
     const baseName = `${Date.now()}-${sanitizedName.replace(/\.[^/.]+$/, "")}`;
+
+    if (type === "logo") {
+      // Logo: preserve PNG for transparency, no thumbnail
+      const fullName = `${baseName}.png`;
+      const fullPath = path.join(uploadDir, fullName);
+
+      await sharp(buffer)
+        .resize({ width: 500, withoutEnlargement: true })
+        .png()
+        .toFile(fullPath);
+
+      const publicPath = `/uploads/${folder}/${fullName}`;
+      return NextResponse.json({
+        success: true,
+        path: publicPath,
+        thumbPath: publicPath,
+        filename: fullName,
+      });
+    }
+
     const ext = ".jpg";
 
     const fullName = `${baseName}${ext}`;

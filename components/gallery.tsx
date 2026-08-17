@@ -68,7 +68,7 @@ export function Gallery({ photos }: { photos: GalleryPhoto[] }) {
             Feeding Gallery
           </h2>
           <p className="text-base font-base text-foreground/60 max-w-xl mx-auto">
-            Real photos from every feeding batch. No stock images or filters. Just hungry street cats getting fed.
+            Real photos from every feeding batch. No stock images, no filters. Hungry street cats getting fed.
           </p>
           <p className="text-sm font-base text-foreground/40 mt-2">
             {photos.length} photos total
@@ -82,8 +82,8 @@ export function Gallery({ photos }: { photos: GalleryPhoto[] }) {
         ) : (
           <>
             <div
-              className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 ${
-                expanded ? "" : "max-sm:[&>*:nth-child(n+5)]:hidden"
+              className={`grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 ${
+                expanded ? "" : "max-sm:[&>*:nth-child(n+7)]:hidden"
               }`}
             >
               {visiblePhotos.map((photo, index) => (
@@ -98,7 +98,7 @@ export function Gallery({ photos }: { photos: GalleryPhoto[] }) {
                     src={getThumbPath(photo.url)}
                     alt={`Feeding photo from ${photo.batchName}`}
                     fill
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                    sizes="(max-width: 640px) 33vw, (max-width: 1024px) 33vw, 20vw"
                     className="object-cover"
                     unoptimized
                     loading={index < 10 ? "eager" : "lazy"}

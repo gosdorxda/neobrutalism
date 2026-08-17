@@ -20,17 +20,17 @@ export function FAQ() {
     {
       question: "How do creator rewards become cat food?",
       answer:
-        `Every time ${tokenSymbol} is traded on pump.fun, creator rewards are generated. We collect these rewards throughout each weekly batch. On feeding day, we cash them out and buy cat food.`,
+        `Every time ${tokenSymbol} is traded on pump.fun, creator rewards are generated. We collect these rewards throughout each batch. On feeding day, we convert them to funds and buy cat food.`,
     },
     {
-      question: "Is this really 100% transparent?",
+      question: "How is transparency ensured?",
       answer:
         "Yes. We publish the wallet address so anyone can verify the rewards collected on-chain. We also upload purchase receipts and photos of every feeding session.",
     },
     {
       question: "How often do you feed the cats?",
       answer:
-        "Once a week. Each batch lasts 7 days, then we withdraw the rewards, buy food, and feed the cats.",
+        "On a regular schedule. Each batch runs for a set period, then we withdraw the rewards, buy food, and feed the cats.",
     },
     {
       question: "How many cats have been fed so far?",
@@ -40,17 +40,17 @@ export function FAQ() {
     {
       question: `Who is behind ${projectName}?`,
       answer:
-        "We are a small team of cat lovers. No big investors, no fancy offices. Just people using crypto to feed street cats transparently.",
+        "We're a small volunteer team of cat lovers using crypto to feed street cats transparently. No team allocation, no hidden fees.",
     },
     {
       question: `How can I support ${projectName}?`,
       answer:
-        `The easiest way is to buy ${tokenSymbol} on pump.fun. Every trade contributes to the creator rewards. You can also follow us on social media and share our mission.`,
+        `The easiest way is to buy ${tokenSymbol}. Every trade contributes to the creator rewards. You can also follow us on social media and share our mission.`,
     },
     {
       question: `Where can I buy ${tokenSymbol}?`,
       answer:
-        `You can buy ${tokenSymbol} directly on pump.fun. The link is available in the navbar and hero section.`,
+        `You can buy ${tokenSymbol} directly on pump.fun.`,
     },
   ];
 

@@ -66,21 +66,21 @@ export function Partners() {
   const applyLink = settings?.partnerApplyLink?.trim();
 
   return (
-    <section id="partners" className="w-full bg-gradient-to-b from-background to-secondary-background border-y-2 border-border py-10">
+    <section id="helped" className="w-full bg-gradient-to-b from-background to-secondary-background border-y-2 border-border py-10">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-heading text-foreground mb-3">
-            Rescue Partners
+            Cats We&apos;ve Helped
           </h2>
           <p className="text-sm font-base text-foreground/60 max-w-lg mx-auto">
-            Working alongside local cat rescues and shelters to turn every swap into a meal for street cats.
+            Rescues and feeders we&apos;ve supported with food and supplies. Every swap helps us reach more cats.
           </p>
         </div>
 
         <div className="flex flex-wrap justify-center gap-4">
           {partners.length === 0 && (
             <p className="w-full text-center text-sm font-base text-foreground/50">
-              No rescue partners added yet.
+              We&apos;re preparing our first support. Check back soon.
             </p>
           )}
 
@@ -144,14 +144,14 @@ export function Partners() {
         {applyLink && (
           <div className="mt-8 text-center">
             <p className="text-sm font-base text-foreground/70">
-              Want to become a rescue partner?{" "}
+              Need support for your rescue?{" "}
               <a
                 href={applyLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-heading text-main underline hover:text-foreground transition-colors"
               >
-                Apply here
+                Request support
               </a>
             </p>
           </div>

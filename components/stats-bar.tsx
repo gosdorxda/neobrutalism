@@ -24,7 +24,7 @@ export function StatsBar() {
             Our Impact So Far
           </h2>
           <p className="text-sm font-base text-foreground/60">
-            Creator rewards turned into real meals for street cats. Every number is backed by receipts and photos.
+            Every swap fills a bowl for a street cat. Every number is backed by receipts and photos.
           </p>
         </div>
 
@@ -32,7 +32,7 @@ export function StatsBar() {
           {/* Creator Rewards */}
           <div className="flex flex-col items-center text-center bg-secondary-background border-2 border-border rounded-base p-4">
             <div className="text-xs font-heading text-foreground/50 uppercase tracking-wider mb-2">
-              Creator Rewards
+              Rewards Collected
             </div>
             <div className="text-2xl sm:text-3xl font-heading text-foreground">
               {formatUsd(stats.totalFees)}
@@ -55,7 +55,7 @@ export function StatsBar() {
               Food Bought
             </div>
             <div className="text-2xl sm:text-3xl font-heading text-foreground">
-              {stats.totalFood}kg
+              {stats.totalFood} kg
             </div>
           </div>
 

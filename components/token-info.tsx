@@ -159,7 +159,7 @@ function FoundationWalletCard() {
           <div>
             <h3 className="text-lg font-heading text-foreground leading-tight">Foundation Wallet</h3>
             <p className="text-xs font-base text-foreground/60 mt-0.5">
-              Public address for creator fees and donations
+              Public address for rewards and donations
             </p>
           </div>
         </div>
@@ -315,7 +315,7 @@ export function TokenInfo({ initialToken }: { initialToken?: {
             Token Info
           </h2>
           <p className="text-sm font-base text-foreground/60 max-w-lg mx-auto">
-            Live data from SolanaTracker. Prices update automatically.
+            Live data from SolanaTracker.
           </p>
         </div>
 
@@ -346,7 +346,7 @@ export function TokenInfo({ initialToken }: { initialToken?: {
                   </div>
                   <div className="flex items-center gap-1.5 text-xs font-base text-main mt-1">
                     <ShieldCheck className="w-3 h-3" />
-                    Verified on Solana
+                    Deployed on Solana
                   </div>
                 </div>
               </div>
@@ -404,7 +404,7 @@ export function TokenInfo({ initialToken }: { initialToken?: {
                   rel="noopener noreferrer"
                   className="text-xs font-base text-foreground/50 hover:text-main transition-colors inline-flex items-center gap-1"
                 >
-                  View on PumpFun
+                  View on pump.fun
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
@@ -470,9 +470,7 @@ export function TokenInfo({ initialToken }: { initialToken?: {
         {/* Foundation Wallet Note */}
         <div className="mt-4 bg-white border-2 border-border rounded-base p-4">
           <p className="text-xs font-base text-foreground/70 leading-relaxed">
-            This foundation wallet accepts donations in any form. Funds are reserved for future needs,
-            such as covering medical care for sick or injured street cats, emergency rescues, and other
-            welfare expenses that go beyond our regular weekly feeding batches.
+            Donations to this wallet fund emergency needs beyond regular feeding: medical care for sick or injured cats, rescues, and other welfare expenses.
           </p>
         </div>
       </div>
