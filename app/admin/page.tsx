@@ -304,6 +304,16 @@ export default function AdminPage() {
     }
   }
 
+  async function uploadFavicon(file: File) {
+    const path = await uploadSingleFile(file, "favicon", "logo");
+    if (path) {
+      setFavicon(path);
+      setMessage("Favicon uploaded");
+    } else {
+      setMessage("Favicon upload failed");
+    }
+  }
+
   async function fetchBatches() {
     setLoading(true);
     try {
@@ -1185,22 +1195,32 @@ export default function AdminPage() {
                         )}
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-xs font-base text-foreground/60 block">Favicon URL</label>
-                        <Input
-                          value={favicon}
-                          onChange={(e) => setFavicon(e.target.value)}
-                          placeholder="/favicon.ico or https://example.com/favicon.png"
-                          className="w-full"
-                        />
+                        <label className="text-xs font-base text-foreground/60 block">Favicon</label>
+                        <div className="flex flex-wrap items-center gap-3">
+                          {favicon && (
+                            <div className="relative w-8 h-8 border-2 border-border rounded-base overflow-hidden bg-secondary-background">
+                              <img src={favicon} alt="Favicon preview" className="w-full h-full object-contain" />
+                            </div>
+                          )}
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) uploadFavicon(file);
+                            }}
+                            className="text-sm w-auto flex-1 min-w-[200px]"
+                          />
+                          <Input
+                            value={favicon}
+                            onChange={(e) => setFavicon(e.target.value)}
+                            placeholder="Or paste favicon URL"
+                            className="text-sm flex-[2] min-w-[200px]"
+                          />
+                        </div>
                         <p className="text-[10px] font-base text-foreground/50">
-                          Browser tab icon. Use .ico, .png, or .svg. Recommended: 32x32px or 64x64px.
+                          Browser tab icon. PNG with transparent background recommended. Recommended: 32x32px or 64x64px.
                         </p>
-                        {favicon && (
-                          <div className="mt-2 flex items-center gap-2">
-                            <img src={favicon} alt="Favicon preview" className="w-8 h-8 rounded-base border-2 border-border" />
-                            <span className="text-[10px] font-base text-foreground/50">Preview</span>
-                          </div>
-                        )}
                       </div>
                     </div>
 
