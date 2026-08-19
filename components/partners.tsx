@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useSettings } from "@/components/settings-provider";
-import { Cat, Heart, Home, PawPrint, Shield, type LucideIcon } from "lucide-react";
+import { Cat, Dog, Heart, Home, PawPrint, Shield, type LucideIcon } from "lucide-react";
 
 const iconMap: Record<string, LucideIcon> = {
   Cat,
@@ -80,7 +80,7 @@ export function Partners() {
         <div className="flex flex-wrap justify-center gap-4">
           {partners.length === 0 && (
             <p className="w-full text-center text-sm font-base text-foreground/50">
-              We&apos;re preparing our first support. Check back soon.
+              We&apos;re preparing to support our first rescue. Check back soon.
             </p>
           )}
 
@@ -156,6 +156,41 @@ export function Partners() {
             </p>
           </div>
         )}
+
+        {/* Philosophy note */}
+        <div className="mt-8 flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-foreground/20">
+          {/* Other charities (problem) */}
+          <div className="flex-1 p-4 sm:p-5 flex items-start gap-3">
+            <div className="shrink-0 w-10 h-10 rounded-base bg-foreground/5 flex items-center justify-center">
+              <Dog className="w-5 h-5 text-foreground/30" />
+            </div>
+            <p className="text-sm font-base text-foreground/60 leading-relaxed">
+              Most charities wire money to shelters and spend it on
+              someone&apos;s word. You can&apos;t verify where it goes.
+            </p>
+          </div>
+          {/* CatBowl (solution) */}
+          <div className="flex-1 p-4 sm:p-5 flex items-start gap-3">
+            <div className="shrink-0 w-10 h-10 rounded-base bg-foreground/5 flex items-center justify-center overflow-hidden">
+              {settings?.projectLogo ? (
+                <img
+                  src={settings.projectLogo}
+                  alt={settings?.projectName || "CatBowl"}
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <PawPrint className="w-5 h-5 text-main" />
+              )}
+            </div>
+            <p className="text-sm font-base text-foreground/80 leading-relaxed">
+              <span className="font-heading text-foreground">
+                {settings?.projectName || "CatBowl"} replaces money with meals.
+              </span>{" "}
+              Every reward becomes cat food before it leaves our hands, so it
+              never exists as spendable cash.
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   );

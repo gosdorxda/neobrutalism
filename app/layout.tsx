@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { NotificationBanner } from "@/components/notification-banner";
+import { KalkulasiDrawer } from "@/components/kalkulasi";
 import { ProjectNameProvider } from "@/components/project-name-provider";
 import { SettingsProvider } from "@/components/settings-provider";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -16,8 +17,8 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 
 export async function generateMetadata(): Promise<Metadata> {
   const s = getSettings();
-  const title = s.seoTitle || `${s.projectName} - Revolutionary Meme Coin`;
-  const description = s.seoDescription || `Join the future of decentralized finance with ${s.projectName} - bold design meets community power`;
+  const title = s.seoTitle || `${s.projectName} | Feeding Street Cats with Crypto`;
+  const description = s.seoDescription || `Every swap fills a bowl for a street cat. ${s.projectName} turns creator rewards into meals, with receipts and photos for every batch.`;
   const keywords = s.seoKeywords ? s.seoKeywords.split(",").map((k) => k.trim()).filter(Boolean) : undefined;
 
   const openGraph = {
@@ -57,8 +58,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <ThemeProvider initialTheme={settings.theme}>
           <ProjectNameProvider initialProjectName={projectName} initialProjectLogo={projectLogo}>
             <SettingsProvider initialSettings={settings}>
-              <NotificationBanner text={settings.notificationText} />
-              {children}
+            <NotificationBanner text={settings.notificationText} />
+            {children}
+            <KalkulasiDrawer />
             </SettingsProvider>
           </ProjectNameProvider>
         </ThemeProvider>

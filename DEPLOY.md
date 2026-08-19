@@ -286,7 +286,7 @@ Ini akan memicu refresh Redis cache setiap 2 menit.
 ## 11. Post-Deploy Checklist
 
 1. ✅ Buka `https://your-domain.com` — homepage harus load
-2. ✅ Buka `https://your-domain.com/admin` — login dengan password dari `ADMIN_PASSWORD`
+2. ✅ Buka `https://your-domain.com/gosdorxda` — login dengan password dari `ADMIN_PASSWORD`
 3. ✅ Buka tab **Settings** → **Notification Banner** — isi teks, simpan, cek muncul di homepage
 4. ✅ Buka tab **Settings** → **Theme** — ganti tema, simpan, refresh homepage
 5. ✅ Cek SOL price di navbar — harus muncul setelah beberapa detik

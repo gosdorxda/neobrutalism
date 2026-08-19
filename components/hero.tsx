@@ -249,7 +249,7 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
 
           {/* Headline */}
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading text-foreground leading-tight tracking-tight max-w-3xl">
-            Every Swap Fills A Bowl
+            Every Swap Fills a Bowl
           </h1>
 
           {/* Subtitle */}
@@ -442,7 +442,7 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
                         {isLoading ? (
                           <Skeleton className="w-24 h-7 sm:w-32 sm:h-8 mb-0.5 mx-auto" borderRadius={4} />
                         ) : (
-                          <div className="text-lg sm:text-2xl font-heading mb-0.5 transition-all duration-300" style={{ color: "#0e8535" }}>
+                          <div className="text-lg sm:text-2xl font-heading mb-0.5 transition-all duration-300" style={{ background: "linear-gradient(90deg,#5a9a0c 34.62%,#009970)", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                             {showSol
                               ? `${animatedTotalFeesSol.toFixed(4)} SOL`
                               : formatUsd(animatedTotalFees)}
@@ -533,7 +533,7 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
           <div className="w-full max-w-4xl mt-4 px-2">
             <p className="text-xs font-base text-foreground/50 text-center leading-relaxed">
               We&apos;re a volunteer team of cat lovers who believe every street cat deserves a meal.
-              Every batch we buy food, snap photos, and post receipts. No team allocation, no hidden fees.
+              For every batch, we buy food, snap photos, and post receipts. No team allocation, no hidden fees.
               That&apos;s the {projectName} promise.
             </p>
           </div>

@@ -99,7 +99,7 @@ function BatchStatusAlert({ status }: { status: string }) {
       <Alert className="!shadow-none border py-2" style={{ boxShadow: "none" }}>
         <Info />
         <AlertDescription>
-          This batch is currently being fed and may take some time before it is marked as completed.
+          Feeding is currently in progress for this batch. It may take some time before it is marked as completed.
         </AlertDescription>
       </Alert>
     );
@@ -282,7 +282,7 @@ function PhotosDialog({ batch }: { batch: Batch }) {
           {photoTarget > 0 && batch.photos.length >= photoTarget ? (
             <span className="flex flex-wrap items-center gap-1.5 text-chart-4">
               <PartyPopper className="w-4 h-4 shrink-0" />
-              <span className="font-heading">All target reached!</span>
+              <span className="font-heading">All cats photographed!</span>
               <span>Every cat in this batch has been photographed and fed.</span>
             </span>
           ) : (
@@ -529,7 +529,7 @@ export function BatchHistory() {
             Impact History
           </h2>
           <p className="text-sm font-base text-foreground/60">
-            Every feeding batch is documented with receipts and photos
+            Every feeding batch is documented with receipts and photos.
           </p>
         </div>
 

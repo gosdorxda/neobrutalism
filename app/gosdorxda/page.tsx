@@ -154,13 +154,30 @@ export default function AdminPage() {
   const [seoKeywords, setSeoKeywords] = useState("");
   const [ogImage, setOgImage] = useState("");
   const [favicon, setFavicon] = useState("");
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [maintenanceMessage, setMaintenanceMessage] = useState("");
 
   useEffect(() => {
     const storedPassword = sessionStorage.getItem("adminPassword");
-    if (storedPassword) {
-      setPassword(storedPassword);
-      setIsAuthenticated(true);
-    }
+    if (!storedPassword) return;
+    let cancelled = false;
+    fetch("/api/auth", {
+      cache: "no-store",
+      headers: { authorization: `Bearer ${storedPassword}` },
+    })
+      .then((res) => {
+        if (cancelled) return;
+        if (res.ok) {
+          setPassword(storedPassword);
+          setIsAuthenticated(true);
+        } else {
+          sessionStorage.removeItem("adminPassword");
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -197,6 +214,8 @@ export default function AdminPage() {
       setSeoKeywords(data.seoKeywords || "");
       setOgImage(data.ogImage || "");
       setFavicon(data.favicon || "");
+      setMaintenanceMode(Boolean(data.maintenanceMode));
+      setMaintenanceMessage(data.maintenanceMessage || "");
     } catch {
       setMessage("Failed to load settings");
     }
@@ -232,6 +251,8 @@ export default function AdminPage() {
           seoKeywords,
           ogImage,
           favicon,
+          maintenanceMode,
+          maintenanceMessage,
         }),
       });
       if (res.ok) {
@@ -333,7 +354,7 @@ export default function AdminPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch("/api/batches", {
+      const res = await fetch("/api/auth", {
         cache: "no-store",
         headers: { authorization: `Bearer ${password}` },
       });
@@ -842,6 +863,64 @@ export default function AdminPage() {
                   <p className="text-[10px] font-base text-foreground/50">
                     Clears all cached data (SOL price, stats, token info, wallets). Data will refresh on next page load.
                   </p>
+                </CardContent>
+              </Card>
+
+              {/* Maintenance mode */}
+              <Card className="border-2 border-border shadow-shadow bg-white">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h3 className="text-sm font-heading text-foreground">Maintenance Mode</h3>
+                      <p className="text-[10px] font-base text-foreground/50 mt-0.5">
+                        Hide the site behind an &quot;under maintenance&quot; screen.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setMaintenanceMode((v) => !v)}
+                      className={`relative h-7 w-12 rounded-full border-2 border-border transition-colors ${maintenanceMode ? "bg-main" : "bg-secondary-background"}`}
+                      aria-pressed={maintenanceMode}
+                      aria-label="Toggle maintenance mode"
+                    >
+                      <span
+                        className={`absolute top-0.5 h-5 w-5 rounded-full bg-white border-2 border-border transition-transform ${maintenanceMode ? "translate-x-5" : "translate-x-0.5"}`}
+                      />
+                    </button>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-base text-foreground/60 block">Maintenance Message (optional)</label>
+                    <Input
+                      value={maintenanceMessage}
+                      onChange={(e) => setMaintenanceMessage(e.target.value)}
+                      placeholder="We're upgrading to serve more cats. Back soon."
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="mt-3"
+                    disabled={loading}
+                    onClick={async () => {
+                      setLoading(true);
+                      try {
+                        const res = await fetch("/api/settings", {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                            authorization: `Bearer ${password}`,
+                          },
+                          body: JSON.stringify({ maintenanceMode, maintenanceMessage }),
+                        });
+                        setMessage(res.ok ? "Maintenance setting saved" : "Failed to save");
+                      } catch {
+                        setMessage("Error saving maintenance setting");
+                      }
+                      setLoading(false);
+                    }}
+                  >
+                    Save Maintenance
+                  </Button>
                 </CardContent>
               </Card>
 

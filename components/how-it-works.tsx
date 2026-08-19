@@ -29,7 +29,7 @@ export function HowItWorks() {
     {
       number: "3",
       title: "Buy Cat Food",
-      description: "100% of the collected rewards are used to purchase cat food from local stores. No fees, no middlemen.",
+      description: "100% of the collected rewards are used to purchase cat food from local stores. No hidden fees, no middlemen.",
       color: "bg-chart-2",
       icon: ShoppingCart,
     },

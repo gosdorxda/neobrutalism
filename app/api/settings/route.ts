@@ -99,6 +99,17 @@ export async function POST(request: NextRequest) {
       }
     });
 
+    if (body.maintenanceMode !== undefined) {
+      updates.maintenanceMode = Boolean(body.maintenanceMode);
+    }
+
+    if (body.maintenanceMessage !== undefined) {
+      if (typeof body.maintenanceMessage !== "string") {
+        return NextResponse.json({ error: "Invalid maintenance message" }, { status: 400 });
+      }
+      updates.maintenanceMessage = body.maintenanceMessage.trim();
+    }
+
     if (body.partners !== undefined) {
       if (!Array.isArray(body.partners)) {
         return NextResponse.json({ error: "Invalid partners" }, { status: 400 });

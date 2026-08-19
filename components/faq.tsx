@@ -20,12 +20,12 @@ export function FAQ() {
     {
       question: "How do creator rewards become cat food?",
       answer:
-        `Every time ${tokenSymbol} is traded on pump.fun, creator rewards are generated. We collect these rewards throughout each batch. On feeding day, we convert them to funds and buy cat food.`,
+        `Every time ${tokenSymbol} is traded on pump.fun, creator rewards are generated. We collect these rewards throughout each batch. On feeding day, we convert them into funds and buy cat food.`,
     },
     {
-      question: "How is transparency ensured?",
+      question: "How do you ensure transparency?",
       answer:
-        "Yes. We publish the wallet address so anyone can verify the rewards collected on-chain. We also upload purchase receipts and photos of every feeding session.",
+        "We publish the wallet address so anyone can verify the rewards collected on-chain. We also upload purchase receipts and photos of every feeding session.",
     },
     {
       question: "How often do you feed the cats?",
@@ -40,7 +40,7 @@ export function FAQ() {
     {
       question: `Who is behind ${projectName}?`,
       answer:
-        "We're a small volunteer team of cat lovers using crypto to feed street cats transparently. No team allocation, no hidden fees.",
+        "We're a small volunteer team of cat lovers using crypto to transparently feed street cats. No team allocation, no hidden fees.",
     },
     {
       question: `How can I support ${projectName}?`,
@@ -64,7 +64,7 @@ export function FAQ() {
             Frequently Asked Questions
           </h2>
           <p className="text-base font-base text-foreground/60">
-            Everything you need to know about {projectName}
+            Everything you need to know about {projectName}.
           </p>
         </div>
 

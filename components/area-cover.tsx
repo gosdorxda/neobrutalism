@@ -18,7 +18,7 @@ export function AreaCover() {
         {/* Heading */}
         <div className="text-center mb-8">
           <h2 className="text-3xl font-heading text-foreground mb-3">
-            Area We Cover
+            Areas We Cover
           </h2>
           <p className="text-sm font-base text-foreground/60 max-w-lg mx-auto">
             We are starting in Central Java, Indonesia. More regions will be added as our community grows.

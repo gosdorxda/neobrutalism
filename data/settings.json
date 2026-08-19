@@ -3,7 +3,7 @@
   "projectName": "CatBowl",
   "projectLogo": "/uploads/logo/1786957889430-Logo_site.png",
   "creatorWallet": "7VPJHsm1bqMDd1ZCKRQyjv9bduPpEwpNmCmiikBBHs9F",
-  "foundationWallet": "7VPJHsm1bqMDd1ZCKRQyjv9bduPpEwpNmCmiikBBHs9F",
+  "foundationWallet": "Hiyq6ue8rGpmQKBFnP2VF4szRB2Z7tq2Bf3YZyCgKdWU",
   "telegram": "https://fabric.foundation/",
   "twitter": "https://x.com/catbowltoken",
   "instagram": "https://fabric.foundation/",
@@ -33,14 +33,40 @@
         "facebook": "https://www.facebook.com/profile.php?id=61578951778752&locale=nl_NL#",
         "tiktok": ""
       }
+    },
+    {
+      "name": "anna_catrescue",
+      "description": "📍Pekanbaru, Indonesia",
+      "href": "",
+      "icon": "Cat",
+      "logo": "/uploads/partners/1787132174066-Screenshot_2026-08-19_163607.jpg",
+      "socials": {
+        "instagram": "https://www.instagram.com/anna_catrescue/",
+        "facebook": "",
+        "tiktok": "https://www.tiktok.com/@anna_catrescue"
+      }
+    },
+    {
+      "name": "catrescue_jambi",
+      "description": "📍Jambi, Jawa Tengah",
+      "href": "",
+      "icon": "Cat",
+      "logo": "/uploads/partners/1787132201868-348315274_775461387398399_973423311658290674_n.jpg",
+      "socials": {
+        "instagram": "https://www.instagram.com/catrescue_jambi/",
+        "facebook": "",
+        "tiktok": ""
+      }
     }
   ],
   "theme": "original",
   "font": "default",
   "notificationText": "",
-  "seoTitle": "CatBowl :  Every Swap Fills A Bowl For Street Cats",
+  "seoTitle": "CatBowl :  Every Swap Fills a Bowl For Street Cats",
   "seoDescription": "The first meme coin turning creator rewards into real impact, feeding street cats transparently. Every swap fills a bowl. Receipts, photos, on-chain proof.",
   "seoKeywords": "cat bowl, meme coin, solana, pump.fun, street cats, cat rescue, cat charity, crypto charity, transparent donation, creator rewards, cat food, feeding cats, indonesia, solana meme coin",
   "ogImage": "",
-  "favicon": "https://wily-apricot-nbn67dgf.edgeone.dev/file.png"
+  "favicon": "/uploads/favicon/1787048148406-favicon-96x96.png",
+  "maintenanceMode": false,
+  "maintenanceMessage": ""
 }

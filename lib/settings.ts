@@ -40,6 +40,8 @@ export type Settings = {
   seoKeywords: string;
   ogImage: string;
   favicon: string;
+  maintenanceMode: boolean;
+  maintenanceMessage: string;
 };
 
 const defaultSettings: Settings = {
@@ -62,6 +64,8 @@ const defaultSettings: Settings = {
   seoKeywords: "",
   ogImage: "",
   favicon: "",
+  maintenanceMode: false,
+  maintenanceMessage: "",
 };
 
 export function getSettings(): Settings {
