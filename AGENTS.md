@@ -1,3 +1,5 @@
+<!-- Project context, conventions, and finalized decisions: see PROJECT_CONTEXT.md. Read it first. -->
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know
