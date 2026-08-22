@@ -204,7 +204,16 @@ function formatPrice(value: number): string {
   if (value === 0) return "0";
   if (value >= 1) return value.toFixed(4);
   if (value >= 0.0001) return value.toFixed(8).replace(/\.?0+$/, "");
+  if (value >= 0.00000001) return value.toFixed(12).replace(/\.?0+$/, "");
   return value.toExponential(4);
+}
+
+function formatUsdCompact(value: number): string {
+  const abs = Math.abs(value);
+  if (abs >= 1e9) return `$${(value / 1e9).toFixed(2)}B`;
+  if (abs >= 1e6) return `$${(value / 1e6).toFixed(2)}M`;
+  if (abs >= 1e3) return `$${(value / 1e3).toFixed(2)}K`;
+  return `$${Math.round(value).toLocaleString("en-US")}`;
 }
 
 async function fetchFreshTokenInfo(): Promise<CachedTokenInfo | null> {
@@ -243,8 +252,8 @@ async function fetchFreshTokenInfo(): Promise<CachedTokenInfo | null> {
       name: data.token?.name || projectName,
       symbol: data.token?.symbol || projectName,
       price: priceUsd ? `$${formatPrice(priceUsd)}` : null,
-      marketCap: marketCap ? `$${marketCap.toLocaleString("en-US")}` : null,
-      volume: volume ? `$${volume.toLocaleString("en-US")}` : null,
+      marketCap: marketCap ? formatUsdCompact(marketCap) : null,
+      volume: volume ? formatUsdCompact(volume) : null,
       holders: data.holders != null ? formatNumber(Number(data.holders)) : null,
       totalTx: data.txns != null ? formatNumber(Number(data.txns)) : poolTxns != null ? formatNumber(poolTxns.total) : null,
       buyTx: data.buys != null ? formatNumber(Number(data.buys)) : poolTxns != null ? formatNumber(poolTxns.buys) : null,

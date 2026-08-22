@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Check, Copy, ExternalLink, ShieldCheck, TrendingUp, ArrowRightLeft, Swords, Users, UserCheck } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useProjectName } from "@/components/project-name-provider";
+import { DonateDrawer } from "@/components/donate-drawer";
 import { NetworkSolana, WalletPhantom } from "@web3icons/react";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -205,19 +206,11 @@ function FoundationWalletCard() {
             <ExternalLink className="w-4 h-4" />
           </a>
         </Button>
-        <Button
-          variant="reverse"
-          size="sm"
+        <DonateDrawer
+          wallet={wallet}
+          projectName={projectName}
           className="h-9 px-3 text-xs shrink-0 bg-chart-4 text-black border-2 border-border hover:bg-chart-4/90"
-          asChild
-        >
-          <a
-            href={`solana:${wallet}?label=${encodeURIComponent(projectName)}&message=Donation`}
-            title="Donate SOL"
-          >
-            Donate
-          </a>
-        </Button>
+        />
       </div>
 
       {/* Mobile balance */}

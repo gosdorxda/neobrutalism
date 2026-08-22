@@ -110,6 +110,31 @@ export async function POST(request: NextRequest) {
       updates.maintenanceMessage = body.maintenanceMessage.trim();
     }
 
+    if (body.fundActivityEnabled !== undefined) {
+      updates.fundActivityEnabled = Boolean(body.fundActivityEnabled);
+    }
+
+    if (body.fundActivityMinUsd !== undefined) {
+      const v = Number(body.fundActivityMinUsd);
+      if (!isNaN(v) && v >= 0) {
+        updates.fundActivityMinUsd = v;
+      }
+    }
+
+    if (body.fundActivityPollSeconds !== undefined) {
+      const v = Number(body.fundActivityPollSeconds);
+      if (!isNaN(v) && v >= 15) {
+        updates.fundActivityPollSeconds = v;
+      }
+    }
+
+    const tplFields = ["tplDonation", "tplRewards", "tplPurchase", "tplBatch"] as const;
+    tplFields.forEach((field) => {
+      if (body[field] !== undefined && typeof body[field] === "string") {
+        (updates as Record<string, string>)[field] = body[field];
+      }
+    });
+
     if (body.partners !== undefined) {
       if (!Array.isArray(body.partners)) {
         return NextResponse.json({ error: "Invalid partners" }, { status: 400 });

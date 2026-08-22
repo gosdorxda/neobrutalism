@@ -104,6 +104,7 @@ Hero → StatsBar → BatchHistory → Gallery → HowItWorks → Partners → T
 - Community group **"Bowl Brigade"**, members called **"Feeders"**. Full Telegram setup guide & posting templates (group name, topics, `#fund-activity`/`#feeding-proof` formats, etc.) live in **`TELEGRAM_GUIDE.md`**.
 - Transparency topics planned: `#feeding-proof`, `#fund-activity` (public treasury log — every reward in, every food purchase out, with tx + receipt).
 - "Fund activity" is a priority theme — the project positions itself as a publicly auditable charity. Features that increase on-chain/wallet transparency align with the vision.
+- **Fund-activity bot (built-in)**: `lib/fund-activity.ts` auto-posts to Telegram `#fund-activity` (incoming donations to foundation wallet, filters: skip creator-wallet sender, skip dust < `fundActivityMinUsd`, classify SOL/USDC/USDT/CATBOWL/unknown) and `#current-batch` (live batch status, edit-on-change). Outgoing foundation tx + rewards transfer (creator→foundation) stay MANUAL. State in `data/fund-activity.json` (log + `lastSignature` dedupe + `currentBatchMessageId`). Config: `fundActivityEnabled` + `fundActivityMinUsd` in settings; Telegram env (`TELEGRAM_BOT_TOKEN`/`CHAT_ID`/`FUND_TOPIC_ID`/`BATCH_TOPIC_ID`) + `FUND_ACTIVITY_CRON_SECRET`. Routes: `/api/fund-activity/check` (cron + admin), `/api/fund-activity/log` (admin). Admin panel tab "Fund" shows log table + summary. See `TELEGRAM_GUIDE.md` §8.
 - The site is self-hosted Node (see `DEPLOY.md`, `ecosystem.config.js` PM2).
 
 ## 10. Dev Commands

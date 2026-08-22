@@ -1,9 +1,9 @@
 {
-  "tokenCa": "CX2v7JSHJQDcNooubzzvZG8TPaDwbaPgfzcXRSWJpump",
+  "tokenCa": "VJdpSDDLof7HuZiNmsRUSL4YCncsk1FGiVoHyAJpump",
   "projectName": "CatBowl",
   "projectLogo": "/uploads/logo/1786957889430-Logo_site.png",
-  "creatorWallet": "7VPJHsm1bqMDd1ZCKRQyjv9bduPpEwpNmCmiikBBHs9F",
-  "foundationWallet": "Hiyq6ue8rGpmQKBFnP2VF4szRB2Z7tq2Bf3YZyCgKdWU",
+  "creatorWallet": "JjoPyHpKi6cvtP6tqGtQSthp5SEnKWjX4ZUh18EGfCC",
+  "foundationWallet": "6LY1JzAFVZsP2a2xKrtU6znQMQ5h4i7tocWdgrkZzkzF",
   "telegram": "https://fabric.foundation/",
   "twitter": "https://x.com/catbowltoken",
   "instagram": "https://fabric.foundation/",
@@ -68,5 +68,12 @@
   "ogImage": "",
   "favicon": "/uploads/favicon/1787048148406-favicon-96x96.png",
   "maintenanceMode": false,
-  "maintenanceMessage": ""
+  "maintenanceMessage": "",
+  "fundActivityEnabled": false,
+  "fundActivityMinUsd": 1,
+  "fundActivityPollSeconds": 375,
+  "tplDonation": "💰 <b>Donation Received</b>\n\n• Date: <code>{date}</code>\n• Amount: <code>+ {amount} {token}{usd}</code>\n• Sender: <code>{sender}</code>\n\nHash <code>{tx}</code>",
+  "tplRewards": "💸 <b>Creator Rewards Received</b>\n\n• Date: <code>{date}</code>\n• Amount: <code>+{amount}{usd}</code>\n• Batch: <code>{batch}</code>\n\nHash <pre>{tx}</pre>",
+  "tplPurchase": "🛒 <b>Food Purchase</b>\n\n• Date: <code>{date}</code>\n• Amount: <code>−{amount}</code>\n• Store: <code>{store}</code>\n• Item: <code>{item}</code>\n• Receipt: <code>{receipt}</code>\n• Batch: <code>{batch}</code>\n\nHash <pre>{tx}</pre>",
+  "tplBatch": "📦 <b>Current Batch</b>\n\n• Batch: <code>{name}</code>\n• Status: <code>{status}</code>\n• Period: <code>{period}</code>\n• Rewards: <code>{rewards}</code>\n• Bowls: <code>{bowls}</code>"
 }

@@ -43,7 +43,8 @@ Telegram Topics = group jadi kayak forum. Aktifkan "Topics" di Group Settings.
 ### Tier 2 — Transparansi (inti misi)
 | Topic | Fungsi |
 |---|---|
-| `#fund-activity` | Log semua pergerakan dana: rewards masuk, beli makanan, saldo wallet |
+| `#fund-activity` | Log otomatis: donasi masuk (SOL/USDT/USDC/CATBOWL) + saldo periodik |
+| `#current-batch` | Auto info batch saat ini (seperti status card di hero page) — di-update otomatis |
 | `#batch-tracker` | Status batch (In Progress / Feeding / Completed) |
 | `#on-chain-receipts` | Tx hash & link verifikasi on-chain |
 
@@ -366,14 +367,45 @@ Status: [under review / approved / scheduled]
 
 ---
 
-## 8. Catatan Bot Fund Activity (opsional, kalau mau otomatis)
+## 8. Bot Otomatis (sudah di-build di proyek)
 
-Bot watch creator wallet & foundation wallet (Solana). Tiap transaksi:
-1. Deteksi tx (in/out).
-2. Post ke `#fund-activity` pakai format Tipe A/B (section 5.3).
-3. Ambil harga SOL realtime untuk konversi USD (sama kayak `lib/cache.ts` `getSolPrice()`).
-4. Saldo update tiap akhir batch (Tipe C).
+Bot built-in memposting 2 hal otomatis ke Telegram. Tinggal set env + toggle di admin panel (tab **Fund**).
 
-Bisa pakai layanan wallet alert (mis. Helius webhook / Solana Tracker) atau bot custom Node.
+### Yang otomatis (bot)
+- **`#fund-activity` — Donation received**: incoming tx ke **foundation wallet** dari sender **external**. Filter:
+  1. Sender = creator wallet → **skip** (transfer internal, manual Tipe A).
+  2. USD value < `fundActivityMinUsd` (configurable, default $1) → **skip** (dust/spam).
+  3. Token diklasifikasi: SOL / USDC / USDT / $CATBOWL / `⚠ unknown`.
+  4. Lainnya → post penuh dengan USD value.
+- **`#current-batch` — batch status**: baca batch aktif dari `data/batches.json`, post/edit pesan status (nama, status, period, rewards, cats, food). Post baru kalau ganti batch, edit kalau data berubah (no spam).
 
-> Sejalan sama `PROJECT_CONTEXT.md` §9: transparansi fund-activity = prioritas fitur.
+### Yang manual (tim posting)
+- **Tipe A — Creator rewards**: transfer rewards creator→foundation (tim kirim + post format Tipe A).
+- **Tipe B — Food purchase**: beli makanan (+ nota + foto).
+
+### Yang TIDAK di-auto
+- Outgoing foundation wallet (no auto-post, no "awaiting" flag).
+- Incoming dari creator wallet (skip).
+
+### Admin panel (tab Fund)
+- Toggle bot on/off + set min donation USD.
+- Status env Telegram (BOT_TOKEN / CHAT_ID / FUND_TOPIC / BATCH_TOPIC).
+- Tombol "Run Check Now" (trigger manual) + "Refresh Log".
+- **Tabel log** semua aksi bot: date | type | token | amount | USD | status (`posted`/`skipped_*`/`error`) | tx link.
+- Summary: posted / skipped / errors count.
+
+### Env (`.env.local`)
+```
+TELEGRAM_BOT_TOKEN=...        # dari @BotFather
+TELEGRAM_CHAT_ID=-100...      # group chat id
+TELEGRAM_FUND_TOPIC_ID=...    # message_thread_id #fund-activity
+TELEGRAM_BATCH_TOPIC_ID=...   # message_thread_id #current-batch
+FUND_ACTIVITY_CRON_SECRET=... # secret untuk cron trigger
+```
+
+### Cron trigger
+Hit `POST /api/fund-activity/check?secret=<FUND_ACTIVITY_CRON_SECRET>` tiap 30–60s (cron-job.org / PM2 cron / Vercel Cron). Bisa juga di-trigger manual dari admin (Run Check Now).
+
+### Log & storage
+- `data/fund-activity.json` — log entries (cap ~200) + `lastSignature` (dedupe) + `currentBatchId`/`currentBatchMessageId`.
+- Baca via `GET /api/fund-activity/log` (admin, Bearer).

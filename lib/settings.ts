@@ -42,6 +42,13 @@ export type Settings = {
   favicon: string;
   maintenanceMode: boolean;
   maintenanceMessage: string;
+  fundActivityEnabled: boolean;
+  fundActivityMinUsd: number;
+  fundActivityPollSeconds: number;
+  tplDonation: string;
+  tplRewards: string;
+  tplPurchase: string;
+  tplBatch: string;
 };
 
 const defaultSettings: Settings = {
@@ -66,6 +73,17 @@ const defaultSettings: Settings = {
   favicon: "",
   maintenanceMode: false,
   maintenanceMessage: "",
+  fundActivityEnabled: false,
+  fundActivityMinUsd: 1,
+  fundActivityPollSeconds: 60,
+  tplDonation:
+    "💰 FUND ACTIVITY\n\nDonation Received\nDate: {date}\nAmount: +{amount} {token}{usd}\nTx: {tx}\nSender: {sender}",
+  tplRewards:
+    "💰 FUND ACTIVITY\n\nCreator Rewards Received\nDate: {date}\nAmount: +{amount}{usd}\nTx: {tx}\nBatch: {batch}",
+  tplPurchase:
+    "🛒 FUND ACTIVITY\n\nFood Purchase\nDate: {date}\nAmount: −{amount}\nStore: {store}\nItem: {item}\nReceipt: {receipt}\nTx: {tx}\nBatch: {batch}",
+  tplBatch:
+    "📦 CURRENT BATCH\n\n{name} (#{id})\nStatus: {status}\nPeriod: {period}\nEst. Rewards: {rewards}\nEst. Bowls: {bowls}",
 };
 
 export function getSettings(): Settings {

@@ -156,6 +156,34 @@ export default function AdminPage() {
   const [favicon, setFavicon] = useState("");
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [maintenanceMessage, setMaintenanceMessage] = useState("");
+  const [fundActivityEnabled, setFundActivityEnabled] = useState(false);
+  const [fundActivityMinUsd, setFundActivityMinUsd] = useState(1);
+  const [fundActivityPollSeconds, setFundActivityPollSeconds] = useState(60);
+  const [tplDonation, setTplDonation] = useState("");
+  const [tplRewards, setTplRewards] = useState("");
+  const [tplPurchase, setTplPurchase] = useState("");
+  const [tplBatch, setTplBatch] = useState("");
+  const [fundLog, setFundLog] = useState<Array<{
+    id: number; ts: number; type: string; status: string;
+    token: string; amount: number | null; usdValue: number | null;
+    sender: string | null; txHash: string | null; message: string;
+  }>>([]);
+  const [fundTelegram, setFundTelegram] = useState<{
+    configured: boolean; bot: boolean; chat: boolean; fundTopic: boolean; batchTopic: boolean;
+  } | null>(null);
+  const [rwSol, setRwSol] = useState("");
+  const [rwUsd, setRwUsd] = useState("");
+  const [rwTx, setRwTx] = useState("");
+  const [rwBatch, setRwBatch] = useState("");
+  const [prStore, setPrStore] = useState("");
+  const [prItem, setPrItem] = useState("");
+  const [prUsd, setPrUsd] = useState("");
+  const [prTx, setPrTx] = useState("");
+  const [prReceipt, setPrReceipt] = useState("");
+  const [prBatch, setPrBatch] = useState("");
+  const [fundDebug, setFundDebug] = useState<
+    { ok: boolean; chats?: Array<{ id: number; title: string; topics: Array<{ threadId: number; name: string }> }>; error?: string }
+    | null>(null);
 
   useEffect(() => {
     const storedPassword = sessionStorage.getItem("adminPassword");
@@ -184,6 +212,7 @@ export default function AdminPage() {
     if (isAuthenticated) {
       fetchBatches();
       fetchSettings();
+      fetchFundLog();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
@@ -216,8 +245,33 @@ export default function AdminPage() {
       setFavicon(data.favicon || "");
       setMaintenanceMode(Boolean(data.maintenanceMode));
       setMaintenanceMessage(data.maintenanceMessage || "");
+      setFundActivityEnabled(Boolean(data.fundActivityEnabled));
+      setFundActivityMinUsd(
+        typeof data.fundActivityMinUsd === "number" ? data.fundActivityMinUsd : 1
+      );
+      setFundActivityPollSeconds(
+        typeof data.fundActivityPollSeconds === "number" ? data.fundActivityPollSeconds : 60
+      );
+      setTplDonation(data.tplDonation || "");
+      setTplRewards(data.tplRewards || "");
+      setTplPurchase(data.tplPurchase || "");
+      setTplBatch(data.tplBatch || "");
     } catch {
       setMessage("Failed to load settings");
+    }
+  }
+
+  async function fetchFundLog() {
+    try {
+      const res = await fetch("/api/fund-activity/log", {
+        cache: "no-store",
+        headers: { authorization: `Bearer ${password}` },
+      });
+      const data = await res.json();
+      setFundLog(Array.isArray(data.log) ? data.log : []);
+      setFundTelegram(data.telegram || null);
+    } catch {
+      // ignore
     }
   }
 
@@ -253,6 +307,13 @@ export default function AdminPage() {
           favicon,
           maintenanceMode,
           maintenanceMessage,
+          fundActivityEnabled,
+          fundActivityMinUsd,
+          fundActivityPollSeconds,
+          tplDonation,
+          tplRewards,
+          tplPurchase,
+          tplBatch,
         }),
       });
       if (res.ok) {
@@ -828,11 +889,12 @@ export default function AdminPage() {
           )}
 
           <Tabs defaultValue="project" className="w-full">
-            <TabsList className="grid w-full max-w-md grid-cols-4">
+            <TabsList className="grid w-full max-w-lg grid-cols-5">
               <TabsTrigger value="project">Project</TabsTrigger>
               <TabsTrigger value="partners">Partners</TabsTrigger>
               <TabsTrigger value="seo">SEO</TabsTrigger>
               <TabsTrigger value="appearance">Appearance</TabsTrigger>
+              <TabsTrigger value="fund">Fund</TabsTrigger>
             </TabsList>
 
             <TabsContent value="project" className="space-y-6">
@@ -884,7 +946,7 @@ export default function AdminPage() {
                       aria-label="Toggle maintenance mode"
                     >
                       <span
-                        className={`absolute top-0.5 h-5 w-5 rounded-full bg-white border-2 border-border transition-transform ${maintenanceMode ? "translate-x-5" : "translate-x-0.5"}`}
+                        className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white border-2 border-border transition-transform duration-200 ${maintenanceMode ? "translate-x-[18px]" : "translate-x-0"}`}
                       />
                     </button>
                   </div>
@@ -1378,6 +1440,510 @@ export default function AdminPage() {
                       Save Settings
                     </Button>
                   </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="fund" className="space-y-6">
+              {message && (
+                <div className="bg-main border-2 border-border rounded-base px-4 py-3 text-sm font-base text-main-foreground">
+                  {message}
+                </div>
+              )}
+
+              {/* Config + Telegram status */}
+              <Card className="border-2 border-border shadow-shadow bg-white">
+                <CardContent className="p-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-heading text-foreground">Fund Activity Bot</h3>
+                      <p className="text-[10px] font-base text-foreground/50 mt-0.5">
+                        Auto-post incoming donations & batch status to Telegram.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setFundActivityEnabled((v) => !v)}
+                      className={`relative h-7 w-12 rounded-full border-2 border-border transition-colors ${fundActivityEnabled ? "bg-main" : "bg-secondary-background"}`}
+                      aria-pressed={fundActivityEnabled}
+                      aria-label="Toggle fund activity bot"
+                    >
+                      <span
+                        className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white border-2 border-border transition-transform duration-200 ${fundActivityEnabled ? "translate-x-[18px]" : "translate-x-0"}`}
+                      />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-base text-foreground/60 block">Min Donation (USD)</label>
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.5"
+                        value={fundActivityMinUsd}
+                        onChange={(e) => setFundActivityMinUsd(Number(e.target.value) || 0)}
+                      />
+                      <p className="text-[10px] font-base text-foreground/50">
+                        Below this USD value, incoming donations are logged but not posted.
+                      </p>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-base text-foreground/60 block">Poll Interval (seconds)</label>
+                      <Input
+                        type="number"
+                        min="15"
+                        step="15"
+                        value={fundActivityPollSeconds}
+                        onChange={(e) => setFundActivityPollSeconds(Math.max(15, Number(e.target.value) || 60))}
+                      />
+                      <p className="text-[10px] font-base text-foreground/50">
+                        How often the bot checks for new donations & refreshes batch status. Min 15s.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Telegram env status */}
+                  <div className="rounded-base border-2 border-border bg-secondary-background/50 p-3">
+                    <p className="text-[10px] font-heading text-foreground/50 uppercase tracking-wider mb-2">
+                      Telegram Config (.env)
+                    </p>
+                    <div className="flex flex-wrap gap-2 text-[11px] font-base">
+                      <span className={`px-2 py-0.5 rounded-base border ${fundTelegram?.bot ? "bg-chart-4/20 border-chart-4 text-foreground" : "bg-secondary-background border-border text-foreground/50"}`}>
+                        BOT_TOKEN {fundTelegram?.bot ? "✓" : "✕"}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-base border ${fundTelegram?.chat ? "bg-chart-4/20 border-chart-4 text-foreground" : "bg-secondary-background border-border text-foreground/50"}`}>
+                        CHAT_ID {fundTelegram?.chat ? "✓" : "✕"}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-base border ${fundTelegram?.fundTopic ? "bg-chart-4/20 border-chart-4 text-foreground" : "bg-secondary-background border-border text-foreground/50"}`}>
+                        FUND_TOPIC {fundTelegram?.fundTopic ? "✓" : "✕"}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-base border ${fundTelegram?.batchTopic ? "bg-chart-4/20 border-chart-4 text-foreground" : "bg-secondary-background border-border text-foreground/50"}`}>
+                        BATCH_TOPIC {fundTelegram?.batchTopic ? "✓" : "✕"}
+                      </span>
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="noShadow"
+                      size="sm"
+                      className="bg-zinc-100 text-foreground hover:bg-zinc-200 border"
+                      onClick={async () => {
+                        try {
+                          const res = await fetch("/api/fund-activity/debug", {
+                            cache: "no-store",
+                            headers: { authorization: `Bearer ${password}` },
+                          });
+                          const data = await res.json();
+                          setFundDebug(data);
+                        } catch {
+                          setFundDebug({ ok: false, error: "request-failed" });
+                        }
+                      }}
+                    >
+                      Detect Telegram IDs
+                    </Button>
+
+                    {fundDebug && (
+                      <div className="rounded-base border-2 border-border bg-background p-3 text-[11px] font-base">
+                        {!fundDebug.ok ? (
+                          <p className="text-foreground/60">
+                            {fundDebug.error}. Pastikan bot udah ditambahin ke grup sebagai admin &amp; ada pesan di tiap topic, lalu coba lagi.
+                          </p>
+                        ) : (
+                          <div className="space-y-2">
+                            {fundDebug.chats?.map((c) => (
+                              <div key={c.id}>
+                                <p className="font-heading text-foreground">
+                                  {c.title} <span className="text-foreground/50">→ CHAT_ID = {c.id}</span>
+                                </p>
+                                {c.topics.length > 0 && (
+                                  <ul className="mt-1 space-y-0.5 text-foreground/60">
+                                    {c.topics.map((t) => (
+                                      <li key={t.threadId}>
+                                        {t.name} → TOPIC_ID = {t.threadId}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      disabled={loading}
+                      onClick={async () => {
+                        setLoading(true);
+                        try {
+                          const res = await fetch("/api/settings", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json", authorization: `Bearer ${password}` },
+                            body: JSON.stringify({ fundActivityEnabled, fundActivityMinUsd, fundActivityPollSeconds }),
+                          });
+                          setMessage(res.ok ? "Fund activity config saved" : "Failed to save");
+                        } catch {
+                          setMessage("Error saving fund activity config");
+                        }
+                        setLoading(false);
+                      }}
+                    >
+                      Save Config
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="neutral"
+                      size="sm"
+                      disabled={loading}
+                      onClick={async () => {
+                        setLoading(true);
+                        setMessage("Posting batch status...");
+                        try {
+                          const res = await fetch("/api/fund-activity/test-batch", {
+                            method: "POST",
+                            headers: { authorization: `Bearer ${password}` },
+                          });
+                          const data = await res.json();
+                          setMessage(
+                            res.ok && data.ok
+                              ? "Batch status posted to #current-batch"
+                              : `Failed: ${data.error || "error"}`
+                          );
+                          await fetchFundLog();
+                        } catch {
+                          setMessage("Error posting batch status");
+                        }
+                        setLoading(false);
+                      }}
+                    >
+                      Test Batch Post
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="neutral"
+                      size="sm"
+                      disabled={loading}
+                      onClick={async () => {
+                        setLoading(true);
+                        setMessage("Running check...");
+                        try {
+                          const res = await fetch("/api/fund-activity/check", {
+                            method: "POST",
+                            headers: { authorization: `Bearer ${password}` },
+                          });
+                          const data = await res.json();
+                          setMessage(
+                            res.ok
+                              ? `Check done: ${data.donationsPosted} posted, ${data.donationsSkipped} skipped, batch ${data.batchUpdated ? "updated" : "no change"}`
+                              : `Failed: ${data.error || "error"}`
+                          );
+                          await fetchFundLog();
+                        } catch {
+                          setMessage("Error running check");
+                        }
+                        setLoading(false);
+                      }}
+                    >
+                      Run Check Now
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="neutral"
+                      size="sm"
+                      onClick={() => fetchFundLog()}
+                    >
+                      Refresh Log
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Manual posts */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Tipe A — Rewards */}
+                <Card className="border-2 border-border shadow-shadow bg-white">
+                  <CardContent className="p-4 space-y-3">
+                    <div>
+                      <h3 className="text-sm font-heading text-foreground">Manual: Rewards (Tipe A)</h3>
+                      <p className="text-[10px] font-base text-foreground/50 mt-0.5">
+                        Post a creator-rewards transfer (creator → foundation).
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-base text-foreground/60 block">SOL</label>
+                        <Input value={rwSol} onChange={(e) => setRwSol(e.target.value)} placeholder="2.45" className="text-sm h-9" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-base text-foreground/60 block">USD (optional)</label>
+                        <Input value={rwUsd} onChange={(e) => setRwUsd(e.target.value)} placeholder="420" className="text-sm h-9" />
+                      </div>
+                      <div className="space-y-1 col-span-2">
+                        <label className="text-[10px] font-base text-foreground/60 block">Tx hash / link</label>
+                        <Input value={rwTx} onChange={(e) => setRwTx(e.target.value)} placeholder="0x... or https://solscan.io/tx/..." className="text-sm h-9" />
+                      </div>
+                      <div className="space-y-1 col-span-2">
+                        <label className="text-[10px] font-base text-foreground/60 block">Batch / note</label>
+                        <Input value={rwBatch} onChange={(e) => setRwBatch(e.target.value)} placeholder="Batch #6" className="text-sm h-9" />
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      disabled={loading}
+                      onClick={async () => {
+                        setLoading(true);
+                        try {
+                          const res = await fetch("/api/fund-activity/post", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json", authorization: `Bearer ${password}` },
+                            body: JSON.stringify({
+                              type: "rewards",
+                              amountSol: rwSol ? Number(rwSol) : undefined,
+                              amountUsd: rwUsd ? Number(rwUsd) : undefined,
+                              txHash: rwTx || undefined,
+                              batch: rwBatch || undefined,
+                            }),
+                          });
+                          const data = await res.json();
+                          setMessage(res.ok && data.ok ? "Rewards posted to #fund-activity" : `Failed: ${data.error || "error"}`);
+                          if (data.ok) { setRwSol(""); setRwUsd(""); setRwTx(""); setRwBatch(""); }
+                          await fetchFundLog();
+                        } catch {
+                          setMessage("Error posting rewards");
+                        }
+                        setLoading(false);
+                      }}
+                    >
+                      Post Rewards
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Tipe B — Purchase */}
+                <Card className="border-2 border-border shadow-shadow bg-white">
+                  <CardContent className="p-4 space-y-3">
+                    <div>
+                      <h3 className="text-sm font-heading text-foreground">Manual: Food Purchase (Tipe B)</h3>
+                      <p className="text-[10px] font-base text-foreground/50 mt-0.5">
+                        Post a food purchase (foundation outgoing).
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-base text-foreground/60 block">Store</label>
+                        <Input value={prStore} onChange={(e) => setPrStore(e.target.value)} placeholder="Pet Shop XYZ" className="text-sm h-9" />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-base text-foreground/60 block">Total (USD)</label>
+                        <Input value={prUsd} onChange={(e) => setPrUsd(e.target.value)} placeholder="380" className="text-sm h-9" />
+                      </div>
+                      <div className="space-y-1 col-span-2">
+                        <label className="text-[10px] font-base text-foreground/60 block">Item</label>
+                        <Input value={prItem} onChange={(e) => setPrItem(e.target.value)} placeholder="25kg Premium Cat Food" className="text-sm h-9" />
+                      </div>
+                      <div className="space-y-1 col-span-2">
+                        <label className="text-[10px] font-base text-foreground/60 block">Tx hash / link</label>
+                        <Input value={prTx} onChange={(e) => setPrTx(e.target.value)} placeholder="0x... or https://solscan.io/tx/..." className="text-sm h-9" />
+                      </div>
+                      <div className="space-y-1 col-span-2">
+                        <label className="text-[10px] font-base text-foreground/60 block">Receipt URL</label>
+                        <Input value={prReceipt} onChange={(e) => setPrReceipt(e.target.value)} placeholder="https://... or /uploads/..." className="text-sm h-9" />
+                      </div>
+                      <div className="space-y-1 col-span-2">
+                        <label className="text-[10px] font-base text-foreground/60 block">Batch / note</label>
+                        <Input value={prBatch} onChange={(e) => setPrBatch(e.target.value)} placeholder="Batch #6" className="text-sm h-9" />
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      disabled={loading}
+                      onClick={async () => {
+                        setLoading(true);
+                        try {
+                          const res = await fetch("/api/fund-activity/post", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json", authorization: `Bearer ${password}` },
+                            body: JSON.stringify({
+                              type: "purchase",
+                              store: prStore || undefined,
+                              item: prItem || undefined,
+                              totalUsd: prUsd ? Number(prUsd) : undefined,
+                              txHash: prTx || undefined,
+                              receiptUrl: prReceipt || undefined,
+                              batch: prBatch || undefined,
+                            }),
+                          });
+                          const data = await res.json();
+                          setMessage(res.ok && data.ok ? "Purchase posted to #fund-activity" : `Failed: ${data.error || "error"}`);
+                          if (data.ok) { setPrStore(""); setPrItem(""); setPrUsd(""); setPrTx(""); setPrReceipt(""); setPrBatch(""); }
+                          await fetchFundLog();
+                        } catch {
+                          setMessage("Error posting purchase");
+                        }
+                        setLoading(false);
+                      }}
+                    >
+                      Post Purchase
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Summary */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="rounded-base border-2 border-border bg-white p-3 text-center">
+                  <p className="text-[10px] font-base text-foreground/50">Posted</p>
+                  <p className="text-xl font-heading text-chart-4">{fundLog.filter((l) => l.status === "posted").length}</p>
+                </div>
+                <div className="rounded-base border-2 border-border bg-white p-3 text-center">
+                  <p className="text-[10px] font-base text-foreground/50">Skipped</p>
+                  <p className="text-xl font-heading text-foreground/60">
+                    {fundLog.filter((l) => l.status.startsWith("skipped")).length}
+                  </p>
+                </div>
+                <div className="rounded-base border-2 border-border bg-white p-3 text-center">
+                  <p className="text-[10px] font-base text-foreground/50">Errors</p>
+                  <p className="text-xl font-heading text-foreground/60">{fundLog.filter((l) => l.status === "error").length}</p>
+                </div>
+              </div>
+
+              {/* Log table */}
+              <Card className="border-2 border-border shadow-shadow bg-white">
+                <CardContent className="p-0">
+                  <div className="max-h-[360px] overflow-auto">
+                  <table className="w-full text-xs font-base">
+                    <thead className="sticky top-0 z-10">
+                      <tr className="border-b-2 border-border text-left text-foreground/50 bg-white">
+                        <th className="p-3 font-heading">Date</th>
+                        <th className="p-3 font-heading">Type</th>
+                        <th className="p-3 font-heading">Token</th>
+                        <th className="p-3 font-heading">Amount</th>
+                        <th className="p-3 font-heading">USD</th>
+                        <th className="p-3 font-heading">Status</th>
+                        <th className="p-3 font-heading">Tx</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {fundLog.length === 0 && (
+                        <tr>
+                          <td colSpan={7} className="p-6 text-center text-foreground/40">
+                            No fund activity yet. Enable the bot & run a check.
+                          </td>
+                        </tr>
+                      )}
+                      {fundLog.map((l) => (
+                        <tr key={l.id} className="border-b border-border/50 align-top">
+                          <td className="p-3 text-foreground/60 whitespace-nowrap">
+                            {new Date(l.ts * 1000).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                          </td>
+                          <td className="p-3 text-foreground">{l.type}</td>
+                          <td className="p-3 text-foreground">{l.token}</td>
+                          <td className="p-3 text-foreground tabular-nums">{l.amount ?? "-"}</td>
+                          <td className="p-3 text-foreground tabular-nums">{l.usdValue != null ? `$${l.usdValue.toLocaleString("en-US")}` : "-"}</td>
+                          <td className="p-3">
+                            <span className={`px-1.5 py-0.5 rounded-base border text-[10px] ${
+                              l.status === "posted" ? "bg-chart-4/20 border-chart-4 text-foreground"
+                              : l.status === "error" ? "bg-red-500/10 border-red-500/40 text-foreground"
+                              : "bg-secondary-background border-border text-foreground/60"
+                            }`}>
+                              {l.status}
+                            </span>
+                          </td>
+                          <td className="p-3">
+                            {l.txHash ? (
+                              <a href={`https://solscan.io/tx/${l.txHash}`} target="_blank" rel="noopener noreferrer" className="text-main underline underline-offset-2">
+                                view
+                              </a>
+                            ) : "-"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Templates */}
+              <Card className="border-2 border-border shadow-shadow bg-white">
+                <CardContent className="p-4 space-y-4">
+                  <div>
+                    <h3 className="text-sm font-heading text-foreground">Telegram Templates</h3>
+                    <p className="text-[10px] font-base text-foreground/50 mt-0.5">
+                      Edit format pesan yang dikirim ke Telegram. Pakai placeholder <code className="text-main">{"{placeholder}"}</code> — typo placeholder bakal tampil apa adanya.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-heading text-foreground">Donation Received</label>
+                      <textarea
+                        value={tplDonation}
+                        onChange={(e) => setTplDonation(e.target.value)}
+                        rows={6}
+                        className="w-full rounded-base border-2 border-border bg-secondary-background p-2 text-[11px] font-base text-foreground resize-y"
+                      />
+                      <p className="text-[10px] font-base text-foreground/40">placeholders: date, amount, token, usd, tx, sender</p>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-heading text-foreground">Creator Rewards (Tipe A)</label>
+                      <textarea
+                        value={tplRewards}
+                        onChange={(e) => setTplRewards(e.target.value)}
+                        rows={6}
+                        className="w-full rounded-base border-2 border-border bg-secondary-background p-2 text-[11px] font-base text-foreground resize-y"
+                      />
+                      <p className="text-[10px] font-base text-foreground/40">placeholders: date, amount, usd, tx, batch</p>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-heading text-foreground">Food Purchase (Tipe B)</label>
+                      <textarea
+                        value={tplPurchase}
+                        onChange={(e) => setTplPurchase(e.target.value)}
+                        rows={8}
+                        className="w-full rounded-base border-2 border-border bg-secondary-background p-2 text-[11px] font-base text-foreground resize-y"
+                      />
+                      <p className="text-[10px] font-base text-foreground/40">placeholders: date, amount, store, item, receipt, tx, batch</p>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-heading text-foreground">Current Batch</label>
+                      <textarea
+                        value={tplBatch}
+                        onChange={(e) => setTplBatch(e.target.value)}
+                        rows={6}
+                        className="w-full rounded-base border-2 border-border bg-secondary-background p-2 text-[11px] font-base text-foreground resize-y"
+                      />
+                      <p className="text-[10px] font-base text-foreground/40">placeholders: name, id, status, period, rewards, bowls</p>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    disabled={loading}
+                    onClick={async () => {
+                      setLoading(true);
+                      try {
+                        const res = await fetch("/api/settings", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json", authorization: `Bearer ${password}` },
+                          body: JSON.stringify({ tplDonation, tplRewards, tplPurchase, tplBatch }),
+                        });
+                        setMessage(res.ok ? "Templates saved" : "Failed to save templates");
+                      } catch {
+                        setMessage("Error saving templates");
+                      }
+                      setLoading(false);
+                    }}
+                  >
+                    Save Templates
+                  </Button>
                 </CardContent>
               </Card>
             </TabsContent>
