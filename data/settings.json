@@ -69,11 +69,12 @@
   "favicon": "/uploads/favicon/1787048148406-favicon-96x96.png",
   "maintenanceMode": false,
   "maintenanceMessage": "",
-  "fundActivityEnabled": true,
+  "fundActivityEnabled": false,
   "fundActivityMinUsd": 1,
   "fundActivityPollSeconds": 375,
   "tplDonation": "💰 <b>Donation Received</b>\n\n• Date: <code>{date}</code>\n• Amount: <code>+{amount} {token}{usd}</code>\n• Sender: <code>{sender}</code>\n\nHash <code>{tx}</code>",
   "tplRewards": "💸 <b>Creator Rewards Received</b>\n\n• Date: <code>{date}</code>\n• Amount: <code>+{amount}{usd}</code>\n• Batch: <code>{batch}</code>\n\nHash <pre>{tx}</pre>",
   "tplPurchase": "🛒 <b>Food Purchase</b>\n\n• Date: <code>{date}</code>\n• Amount: <code>−{amount}</code>\n• Store: <code>{store}</code>\n• Item: <code>{item}</code>\n• Receipt: <code>{receipt}</code>\n• Batch: <code>{batch}</code>\n\nHash <pre>{tx}</pre>",
-  "tplBatch": "📦 <b>Current Batch</b>\n\n• Batch: <code>{name}</code>\n• Status: <code>{status}</code>\n• Period: <code>{period}</code>\n• Rewards: <code>{rewards}</code>\n• Bowls: <code>{bowls}</code>"
+  "tplBatch": "📦 <b>Current Batch</b>\n\n• Batch: <code>{name}</code>\n• Status: <code>{status}</code>\n• Period: <code>{period}</code>\n• Rewards: <code>{rewards}</code>\n• Bowls: <code>{bowls}</code>",
+  "tplFeedingProof": "📸<b> FEEDING PROOF — {name}</b>\n\nStore: <code>{store}</code>\nItem: <code>{item}</code>\nTotal: <code>{total}</code>\nDate: <code>{date}</code>\n\nCats: <code>{cats}</code>\nFood: <code>{food}</code>\nRewards: <code>{fees}</code>\n\nHash\n{tx}\n\nReceipt: {receiptUrl}"
 }

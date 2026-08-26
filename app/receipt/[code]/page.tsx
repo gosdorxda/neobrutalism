@@ -45,6 +45,7 @@ export default async function InvoicePage({
     receiptItem: batch.receiptItem,
     receiptTotal: batch.receiptTotal,
     notes: batch.notes,
+    essentials: Array.isArray(batch.essentials) ? batch.essentials : [],
   };
 
   const invoiceSettings: InvoiceSettings = {

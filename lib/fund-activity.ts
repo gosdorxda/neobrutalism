@@ -8,6 +8,9 @@ import {
   isTelegramConfigured,
   sendFundMessage,
   sendBatchMessage,
+  sendFeedingProofMessage,
+  sendMediaGroupTo,
+  sendPhotoTo,
 } from "@/lib/telegram";
 
 const STATE_FILE = path.join(process.cwd(), "data", "fund-activity.json");
@@ -22,7 +25,7 @@ const ALLOWED_TOKENS = new Set(["SOL", "USDC", "USDT", "CATBOWL"]);
 export type FundLogEntry = {
   id: number;
   ts: number;
-  type: "donation" | "batch" | "error";
+  type: "donation" | "batch" | "feeding-proof" | "error";
   status: "posted" | "skipped_dust" | "skipped_internal" | "error";
   txHash: string | null;
   sender: string | null;
@@ -166,6 +169,95 @@ export async function postManualPurchase(input: {
     message: send.ok ? text : `error: ${send.error}`,
   });
   return { ok: send.ok, error: send.error, messageId: send.messageId };
+}
+
+export async function postFeedingProof(
+  batchId: number,
+  siteUrl?: string
+): Promise<ManualResult> {
+  if (!isTelegramConfigured())
+    return { ok: false, error: "telegram-not-configured" };
+
+  const batches = getBatches();
+  const batch = batches.find((b) => b.id === batchId);
+  if (!batch) return { ok: false, error: "batch-not-found" };
+
+  const hasPhotos = batch.photos.length > 0;
+  const hasTx = batch.txHash && batch.txHash !== "-";
+  if (!hasPhotos && !hasTx) {
+    return { ok: false, error: "no-feeding-proof-data" };
+  }
+
+  const settings = getSettings();
+  const dateStr = batch.targetDate || fmtDate(nowTs());
+  const txStr = hasTx ? linkOrSolscan(batch.txHash) : "-";
+  const invoiceCode = `RCP-${String(batch.id).padStart(3, "0")}`;
+  const receiptPath = `/receipt/${invoiceCode}`;
+  const receiptUrl = siteUrl ? `${siteUrl}${receiptPath}` : receiptPath;
+
+  const text = applyTemplate(settings.tplFeedingProof, {
+    name: batch.name || `Batch #${batch.id}`,
+    store: batch.receiptStore || "-",
+    item: batch.receiptItem || "-",
+    total: batch.receiptTotal || "-",
+    date: dateStr,
+    cats: batch.cats || "-",
+    food: batch.food || "-",
+    fees: batch.fees || "-",
+    tx: txStr,
+    receiptUrl,
+  });
+
+  const feedTopicId = process.env.TELEGRAM_FEEDING_PROOF_TOPIC_ID;
+
+  // Single message: text + feeding photos (caption on photos)
+  let mainOk = false;
+  let mainMessageId: number | null = null;
+  let mainError: string | undefined;
+
+  if (hasPhotos) {
+    const photosResult =
+      batch.photos.length === 1
+        ? await sendPhotoTo(feedTopicId, batch.photos[0], text)
+        : await sendMediaGroupTo(feedTopicId, batch.photos, text);
+
+    if (photosResult.ok) {
+      mainOk = true;
+      mainMessageId = photosResult.messageId;
+    } else {
+      // Fallback: send text only if photos fail
+      const textResult = await sendFeedingProofMessage(text);
+      mainOk = textResult.ok;
+      mainMessageId = textResult.messageId;
+      if (!mainOk) mainError = textResult.error;
+    }
+  } else {
+    // No feeding photos — text only
+    const textResult = await sendFeedingProofMessage(text);
+    mainOk = textResult.ok;
+    mainMessageId = textResult.messageId;
+    if (!mainOk) mainError = textResult.error;
+  }
+
+  pushLog({
+    ts: nowTs(),
+    type: "feeding-proof",
+    status: mainOk ? "posted" : "error",
+    txHash: hasTx ? batch.txHash : null,
+    sender: null,
+    token: "-",
+    amount: null,
+    usdValue: null,
+    message: mainOk
+      ? `${text} | batch #${batch.id}`
+      : `error: ${mainError}`,
+  });
+
+  return {
+    ok: mainOk,
+    error: mainError,
+    messageId: mainMessageId,
+  };
 }
 
 function appendLog(state: FundState, entry: Omit<FundLogEntry, "id">): FundLogEntry {

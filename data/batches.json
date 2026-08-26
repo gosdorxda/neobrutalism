@@ -1,7 +1,7 @@
 [
   {
-    "fees": "$0",
-    "cats": "0",
+    "fees": "$166",
+    "cats": "166",
     "food": "0kg",
     "txHash": "-",
     "isActive": true,
@@ -10,6 +10,7 @@
     "receiptItem": "",
     "receiptTotal": "$0",
     "notes": "",
+    "essentials": [],
     "photos": [
       "/uploads/batch-1/1787306223305-afasdfad.jpg",
       "/uploads/batch-1/1787306223377-asdasdas.jpg",
@@ -48,6 +49,13 @@
     "receiptItem": "Nutrition Cat Food",
     "receiptTotal": "$15",
     "notes": "Donation funds from @0xfjrnn",
+    "essentials": [
+      {
+        "name": "Feeding bowl 5 Packs",
+        "price": "$3",
+        "tx": "AfqkmLk9hRuRwQcxjcoj7AJ4rMhsXf7XMNGNYHyetRmYEGpF6XDwX8VgpUM1KZ1W4ttyBfd3BSeo7qtvA1TfJFe"
+      }
+    ],
     "photos": [
       "/uploads/batch-0/1786363392283-photo_2026-08-10_14-29-58.jpg",
       "/uploads/batch-0/1786363402204-PXL_20250925_200934844.jpg",

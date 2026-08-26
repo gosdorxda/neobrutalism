@@ -16,7 +16,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { getThumbPath, formatTxHash } from "@/lib/utils";
-import { InvoiceCompactView, getInvoiceCode, type InvoiceBatch, type InvoiceSettings } from "./invoice";
+import { InvoiceCompactView, getInvoiceCode, type InvoiceBatch, type InvoiceSettings, type BatchEssentials } from "./invoice";
 
 type Batch = {
   id: number;
@@ -35,6 +35,7 @@ type Batch = {
   receiptTotal: string;
   notes: string;
   photos: string[];
+  essentials: BatchEssentials[];
 };
 
 function getReceiptImages(batch: Batch): string[] {
@@ -233,6 +234,7 @@ function ReceiptDialog({ batch, settings }: { batch: Batch; settings: InvoiceSet
               receiptItem: batch.receiptItem,
               receiptTotal: batch.receiptTotal,
               notes: batch.notes,
+              essentials: batch.essentials || [],
             }}
             actionLink={
               <a

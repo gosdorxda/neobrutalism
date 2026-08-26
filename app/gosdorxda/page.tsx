@@ -12,6 +12,12 @@ import { ChevronDown, Cat, Home, PawPrint, Shield, Heart, Plus, Trash2, Check } 
 import { type Partner, type Font } from "@/lib/settings";
 import { themes, type Theme } from "@/components/theme-provider";
 
+type BatchEssentials = {
+  name: string;
+  price: string;
+  tx: string;
+};
+
 type Batch = {
   id: number;
   name: string;
@@ -29,6 +35,7 @@ type Batch = {
   receiptTotal: string;
   notes: string;
   photos: string[];
+  essentials: BatchEssentials[];
 };
 
 function formatDateInput(date: Date): string {
@@ -90,7 +97,7 @@ function BatchEditor({
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-base text-foreground/60 block">Creator Rewards (USD)</label>
+            <label className="text-xs font-base text-foreground/60 block">Funds Raised (USD)</label>
             <Input
               value={batch.fees}
               onChange={(e) =>
@@ -101,14 +108,6 @@ function BatchEditor({
                 })
               }
               placeholder="$0"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-base text-foreground/60 block">Food Bought</label>
-            <Input
-              value={batch.food}
-              onChange={(e) => onChange({ ...batch, food: e.target.value })}
-              placeholder="0kg"
             />
           </div>
         </div>
@@ -163,13 +162,14 @@ export default function AdminPage() {
   const [tplRewards, setTplRewards] = useState("");
   const [tplPurchase, setTplPurchase] = useState("");
   const [tplBatch, setTplBatch] = useState("");
+  const [tplFeedingProof, setTplFeedingProof] = useState("");
   const [fundLog, setFundLog] = useState<Array<{
     id: number; ts: number; type: string; status: string;
     token: string; amount: number | null; usdValue: number | null;
     sender: string | null; txHash: string | null; message: string;
   }>>([]);
   const [fundTelegram, setFundTelegram] = useState<{
-    configured: boolean; bot: boolean; chat: boolean; fundTopic: boolean; batchTopic: boolean;
+    configured: boolean; bot: boolean; chat: boolean; fundTopic: boolean; batchTopic: boolean; feedingProofTopic: boolean;
   } | null>(null);
   const [rwSol, setRwSol] = useState("");
   const [rwUsd, setRwUsd] = useState("");
@@ -256,6 +256,7 @@ export default function AdminPage() {
       setTplRewards(data.tplRewards || "");
       setTplPurchase(data.tplPurchase || "");
       setTplBatch(data.tplBatch || "");
+      setTplFeedingProof(data.tplFeedingProof || "");
     } catch {
       setMessage("Failed to load settings");
     }
@@ -312,9 +313,10 @@ export default function AdminPage() {
           fundActivityPollSeconds,
           tplDonation,
           tplRewards,
-          tplPurchase,
-          tplBatch,
-        }),
+        tplPurchase,
+        tplBatch,
+        tplFeedingProof,
+      }),
       });
       if (res.ok) {
         setMessage("Settings saved successfully");
@@ -562,6 +564,39 @@ export default function AdminPage() {
     );
   }
 
+  function updateEssentials(id: number, essentials: BatchEssentials[]) {
+    setBatches((prev) =>
+      prev.map((b) => (b.id === id ? { ...b, essentials } : b))
+    );
+  }
+
+  function addEssential(id: number) {
+    const batch = batches.find((b) => b.id === id);
+    if (!batch) return;
+    const next: BatchEssentials = { name: "", price: "$0", tx: "" };
+    updateEssentials(id, [...(batch.essentials || []), next]);
+  }
+
+  function updateEssentialField(
+    id: number,
+    index: number,
+    field: "name" | "price" | "tx",
+    value: string
+  ) {
+    const batch = batches.find((b) => b.id === id);
+    if (!batch) return;
+    const essentials = (batch.essentials || []).map((e, i) =>
+      i === index ? { ...e, [field]: value } : e
+    );
+    updateEssentials(id, essentials);
+  }
+
+  function removeEssential(id: number, index: number) {
+    const batch = batches.find((b) => b.id === id);
+    if (!batch) return;
+    updateEssentials(id, (batch.essentials || []).filter((_, i) => i !== index));
+  }
+
   function createNewBatch() {
     const today = new Date();
     const nextWeek = new Date(today);
@@ -584,6 +619,7 @@ export default function AdminPage() {
       receiptTotal: "$0",
       notes: "",
       photos: [],
+      essentials: [],
     };
     setEditingBatch(newBatch);
   }
@@ -770,6 +806,15 @@ export default function AdminPage() {
                         />
                       </div>
                       <div className="space-y-1">
+                        <label className="text-xs font-base text-foreground/50 block">Food Bought</label>
+                        <Input
+                          value={batch.food || ""}
+                          onChange={(e) => updateBatchField(batch.id, "food", e.target.value)}
+                          placeholder="4kg"
+                          className="text-sm"
+                        />
+                      </div>
+                      <div className="space-y-1">
                         <label className="text-xs font-base text-foreground/50 block">Total</label>
                         <Input
                           value={batch.receiptTotal || ""}
@@ -797,15 +842,46 @@ export default function AdminPage() {
                         className="text-sm min-h-[72px]"
                       />
                     </div>
-                    <Button
-                      variant="noShadow"
-                      size="sm"
-                      className="bg-zinc-100 text-foreground hover:bg-zinc-200 border"
-                      onClick={() => saveBatch(batch)}
-                      disabled={loading}
-                    >
-                      Save Receipt Details
-                    </Button>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        variant="noShadow"
+                        size="sm"
+                        className="bg-zinc-100 text-foreground hover:bg-zinc-200 border"
+                        onClick={() => saveBatch(batch)}
+                        disabled={loading}
+                      >
+                        Save Receipt Details
+                      </Button>
+                      <Button
+                        variant="noShadow"
+                        size="sm"
+                        className="bg-main/10 text-main-foreground hover:bg-main/20 border"
+                        disabled={loading}
+                        onClick={async () => {
+                          setLoading(true);
+                          setMessage(`Posting feeding proof for ${batch.name}...`);
+                          try {
+                            const res = await fetch("/api/fund-activity/post", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json", authorization: `Bearer ${password}` },
+                              body: JSON.stringify({ type: "feeding-proof", batchId: batch.id }),
+                            });
+                            const data = await res.json();
+                            setMessage(
+                              res.ok && data.ok
+                                ? `Feeding proof posted to #feeding-proof for ${batch.name}${data.error ? ` (${data.error})` : ""}`
+                                : `Failed: ${data.error || "error"}`
+                            );
+                            await fetchFundLog();
+                          } catch {
+                            setMessage("Error posting feeding proof");
+                          }
+                          setLoading(false);
+                        }}
+                      >
+                        Post Feeding Proof
+                      </Button>
+                    </div>
                   </div>
 
                   <div className="space-y-4">
@@ -863,6 +939,88 @@ export default function AdminPage() {
                       </div>
                     )}
                   </div>
+                </div>
+
+                {/* Essentials — additional expenses (bowls, supplies, etc.) */}
+                <div className="border-t-2 border-border pt-5 mt-2 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-base text-foreground/60 block">
+                      Essentials ({batch.essentials?.length || 0}) - additional expenses
+                    </label>
+                    <Button
+                      variant="noShadow"
+                      size="sm"
+                      className="bg-zinc-100 text-foreground hover:bg-zinc-200 border"
+                      onClick={() => addEssential(batch.id)}
+                      disabled={loading}
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      Add Item
+                    </Button>
+                  </div>
+
+                  {(batch.essentials || []).length === 0 && (
+                    <p className="text-xs font-base text-foreground/40">
+                      No additional expenses recorded. Optional: add bowls, containers, or other feeding necessities.
+                    </p>
+                  )}
+
+                  {(batch.essentials || []).map((essential, idx) => (
+                    <div key={idx} className="border-2 border-border rounded-base p-3 space-y-3 bg-secondary-background/30">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-heading text-foreground/70">Item {idx + 1}</span>
+                        <Button
+                          variant="noShadow"
+                          size="sm"
+                          className="bg-zinc-100 text-foreground hover:bg-zinc-200 border"
+                          onClick={() => removeEssential(batch.id, idx)}
+                          disabled={loading}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <div className="space-y-1 sm:col-span-2">
+                          <label className="text-[10px] font-base text-foreground/50 block">Name</label>
+                          <Input
+                            value={essential.name ?? ""}
+                            onChange={(e) => updateEssentialField(batch.id, idx, "name", e.target.value)}
+                            placeholder="Feeding bowls x5"
+                            className="text-sm h-9"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-base text-foreground/50 block">Price</label>
+                          <Input
+                            value={essential.price ?? ""}
+                            onChange={(e) => updateEssentialField(batch.id, idx, "price", e.target.value)}
+                            placeholder="$8"
+                            className="text-sm h-9"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-base text-foreground/50 block">Tx hash / link</label>
+                        <Input
+                          value={essential.tx ?? ""}
+                          onChange={(e) => updateEssentialField(batch.id, idx, "tx", e.target.value)}
+                          placeholder="0x... or https://solscan.io/tx/..."
+                          className="text-sm h-9"
+                        />
+                      </div>
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        <Button
+                          variant="noShadow"
+                          size="sm"
+                          className="bg-zinc-100 text-foreground hover:bg-zinc-200 border"
+                          onClick={() => saveBatch(batch)}
+                          disabled={loading}
+                        >
+                          Save Essentials
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             )}
@@ -1521,6 +1679,9 @@ export default function AdminPage() {
                       <span className={`px-2 py-0.5 rounded-base border ${fundTelegram?.batchTopic ? "bg-chart-4/20 border-chart-4 text-foreground" : "bg-secondary-background border-border text-foreground/50"}`}>
                         BATCH_TOPIC {fundTelegram?.batchTopic ? "✓" : "✕"}
                       </span>
+                      <span className={`px-2 py-0.5 rounded-base border ${fundTelegram?.feedingProofTopic ? "bg-chart-4/20 border-chart-4 text-foreground" : "bg-secondary-background border-border text-foreground/50"}`}>
+                        FEEDING_PROOF_TOPIC {fundTelegram?.feedingProofTopic ? "✓" : "✕"}
+                      </span>
                     </div>
 
                     <Button
@@ -1922,6 +2083,16 @@ export default function AdminPage() {
                       />
                       <p className="text-[10px] font-base text-foreground/40">placeholders: name, id, status, period, rewards, bowls</p>
                     </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-heading text-foreground">Feeding Proof</label>
+                      <textarea
+                        value={tplFeedingProof}
+                        onChange={(e) => setTplFeedingProof(e.target.value)}
+                        rows={8}
+                        className="w-full rounded-base border-2 border-border bg-secondary-background p-2 text-[11px] font-base text-foreground resize-y"
+                      />
+                      <p className="text-[10px] font-base text-foreground/40">placeholders: name, store, item, total, date, cats, food, fees, tx, receiptUrl</p>
+                    </div>
                   </div>
                   <Button
                     type="button"
@@ -1933,7 +2104,7 @@ export default function AdminPage() {
                         const res = await fetch("/api/settings", {
                           method: "POST",
                           headers: { "Content-Type": "application/json", authorization: `Bearer ${password}` },
-                          body: JSON.stringify({ tplDonation, tplRewards, tplPurchase, tplBatch }),
+                          body: JSON.stringify({ tplDonation, tplRewards, tplPurchase, tplBatch, tplFeedingProof }),
                         });
                         setMessage(res.ok ? "Templates saved" : "Failed to save templates");
                       } catch {

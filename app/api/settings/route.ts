@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const tplFields = ["tplDonation", "tplRewards", "tplPurchase", "tplBatch"] as const;
+    const tplFields = ["tplDonation", "tplRewards", "tplPurchase", "tplBatch", "tplFeedingProof"] as const;
     tplFields.forEach((field) => {
       if (body[field] !== undefined && typeof body[field] === "string") {
         (updates as Record<string, string>)[field] = body[field];

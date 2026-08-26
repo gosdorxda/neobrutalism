@@ -1,6 +1,12 @@
 import fs from "fs";
 import path from "path";
 
+export type BatchEssentials = {
+  name: string;
+  price: string;
+  tx: string;
+};
+
 export type Batch = {
   id: number;
   name: string;
@@ -18,6 +24,7 @@ export type Batch = {
   receiptTotal: string;
   notes: string;
   photos: string[];
+  essentials: BatchEssentials[];
 };
 
 const dataFilePath = path.join(process.cwd(), "data", "batches.json");
@@ -27,10 +34,24 @@ export function getBatches(): Batch[] {
     const data = fs.readFileSync(dataFilePath, "utf8");
     const batches = JSON.parse(data) as (Batch & { receiptImage?: string })[];
     return batches.map((b) => {
-      if (b.receiptImage && (!b.receiptImages || b.receiptImages.length === 0)) {
-        return { ...b, receiptImages: [b.receiptImage] };
-      }
-      return b;
+      const normalized: Batch = {
+        ...b,
+        receiptImages:
+          Array.isArray(b.receiptImages) && b.receiptImages.length > 0
+            ? b.receiptImages
+            : b.receiptImage
+            ? [b.receiptImage]
+            : [],
+        essentials: (Array.isArray(b.essentials) ? b.essentials : []).map((e) => {
+          const item = e as Record<string, unknown>;
+          return {
+            name: typeof item.name === "string" ? item.name : "",
+            price: typeof item.price === "string" ? item.price : "",
+            tx: typeof item.tx === "string" ? item.tx : "",
+          };
+        }),
+      };
+      return normalized;
     });
   } catch {
     return [];

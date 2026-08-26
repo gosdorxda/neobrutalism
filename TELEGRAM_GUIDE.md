@@ -382,6 +382,7 @@ Bot built-in memposting 2 hal otomatis ke Telegram. Tinggal set env + toggle di 
 ### Yang manual (tim posting)
 - **Tipe A — Creator rewards**: transfer rewards creator→foundation (tim kirim + post format Tipe A).
 - **Tipe B — Food purchase**: beli makanan (+ nota + foto).
+- **`#feeding-proof` — Feeding proof**: tombol "Post Feeding Proof" di batch card (tab Batches). Bot fetch data dari batch (store, item, total, tx, cats, food, photos, receipt) → post text + kirim foto sebagai media group + foto nota ke `#feeding-proof`. Bisa di-post ulang kapan saja (no dedup).
 
 ### Yang TIDAK di-auto
 - Outgoing foundation wallet (no auto-post, no "awaiting" flag).
@@ -389,7 +390,7 @@ Bot built-in memposting 2 hal otomatis ke Telegram. Tinggal set env + toggle di 
 
 ### Admin panel (tab Fund)
 - Toggle bot on/off + set min donation USD.
-- Status env Telegram (BOT_TOKEN / CHAT_ID / FUND_TOPIC / BATCH_TOPIC).
+- Status env Telegram (BOT_TOKEN / CHAT_ID / FUND_TOPIC / BATCH_TOPIC / FEEDING_PROOF_TOPIC).
 - Tombol "Run Check Now" (trigger manual) + "Refresh Log".
 - **Tabel log** semua aksi bot: date | type | token | amount | USD | status (`posted`/`skipped_*`/`error`) | tx link.
 - Summary: posted / skipped / errors count.
@@ -400,6 +401,7 @@ TELEGRAM_BOT_TOKEN=...        # dari @BotFather
 TELEGRAM_CHAT_ID=-100...      # group chat id
 TELEGRAM_FUND_TOPIC_ID=...    # message_thread_id #fund-activity
 TELEGRAM_BATCH_TOPIC_ID=...   # message_thread_id #current-batch
+TELEGRAM_FEEDING_PROOF_TOPIC_ID=... # message_thread_id #feeding-proof
 FUND_ACTIVITY_CRON_SECRET=... # secret untuk cron trigger
 ```
 

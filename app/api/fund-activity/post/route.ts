@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { postManualRewards, postManualPurchase } from "@/lib/fund-activity";
+import {
+  postManualRewards,
+  postManualPurchase,
+  postFeedingProof,
+} from "@/lib/fund-activity";
 
 function checkAuth(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
@@ -38,7 +42,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(r);
     }
 
-    return NextResponse.json({ error: "Invalid type (use 'rewards' or 'purchase')" }, { status: 400 });
+    if (type === "feeding-proof") {
+      const batchId = Number(body.batchId);
+      if (!Number.isFinite(batchId)) {
+        return NextResponse.json(
+          { error: "batchId is required" },
+          { status: 400 }
+        );
+      }
+      const siteUrl =
+        request.headers.get("origin") ||
+        (request.headers.get("host")
+          ? `${request.headers.get("x-forwarded-proto") || "https"}://${request.headers.get("host")}`
+          : "");
+      const r = await postFeedingProof(batchId, siteUrl);
+      return NextResponse.json(r);
+    }
+
+    return NextResponse.json({ error: "Invalid type (use 'rewards', 'purchase', or 'feeding-proof')" }, { status: 400 });
   } catch {
     return NextResponse.json({ error: "Failed to post manual entry" }, { status: 500 });
   }

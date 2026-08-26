@@ -15,6 +15,7 @@ const defaultBatch = {
   receiptItem: "",
   receiptTotal: "$0",
   notes: "",
+  essentials: [],
   photos: [],
 };
 
@@ -22,7 +23,15 @@ function readBatches() {
   try {
     const data = fs.readFileSync(dataFilePath, "utf8");
     const batches = JSON.parse(data);
-    return batches.map((b: Record<string, unknown>) => ({ ...defaultBatch, ...b }));
+    return batches.map((b: Record<string, unknown>) => {
+      const essentialsRaw = Array.isArray(b.essentials) ? b.essentials : [];
+      const essentials = essentialsRaw.map((e: Record<string, unknown>) => ({
+        name: typeof e.name === "string" ? e.name : "",
+        price: typeof e.price === "string" ? e.price : "",
+        tx: typeof e.tx === "string" ? e.tx : "",
+      }));
+      return { ...defaultBatch, ...b, essentials };
+    });
   } catch {
     return [];
   }

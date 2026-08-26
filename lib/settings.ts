@@ -49,6 +49,7 @@ export type Settings = {
   tplRewards: string;
   tplPurchase: string;
   tplBatch: string;
+  tplFeedingProof: string;
 };
 
 const defaultSettings: Settings = {
@@ -84,6 +85,8 @@ const defaultSettings: Settings = {
     "🛒 FUND ACTIVITY\n\nFood Purchase\nDate: {date}\nAmount: −{amount}\nStore: {store}\nItem: {item}\nReceipt: {receipt}\nTx: {tx}\nBatch: {batch}",
   tplBatch:
     "📦 CURRENT BATCH\n\n{name} (#{id})\nStatus: {status}\nPeriod: {period}\nEst. Rewards: {rewards}\nEst. Bowls: {bowls}",
+  tplFeedingProof:
+    "📸 FEEDING PROOF — {name}\n\n🏪 Store: {store}\n📦 Item: {item}\n💰 Total: {total}\n🗓️ Date: {date}\n\n🐱 Cats: {cats}\n📦 Food: {food}\n💰 Rewards: {fees}\n\n🔗 Tx: {tx}\n🧾 Receipt: {receiptUrl}\n\n100% rewards → food. No cash. 🐾",
 };
 
 export function getSettings(): Settings {
