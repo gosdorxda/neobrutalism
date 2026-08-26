@@ -130,7 +130,7 @@ function ReceiptDialog({ batch, settings }: { batch: Batch; settings: InvoiceSet
           Receipt
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="sm:max-w-xl max-h-[80vh] overflow-y-auto">
         <DialogHeader className="pr-8">
           <DialogTitle className="text-lg leading-tight">{batch.name}</DialogTitle>
           <DialogDescription>
@@ -606,17 +606,17 @@ export function BatchHistory() {
 
                       {/* Name + status */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="text-base sm:text-lg font-heading text-foreground">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <h3 className="text-base sm:text-lg font-heading text-foreground truncate">
                             {batch.name}
                           </h3>
-                          <span className={"text-xs font-heading px-2 py-0.5 rounded-full inline-flex items-center gap-1 " + (isActive ? "bg-main/10 text-main" : isFeeding ? "bg-chart-3/10 text-chart-3" : "bg-chart-4/10 text-chart-4")}>
+                          <span className={"text-[10px] font-heading px-1.5 py-0.5 rounded-full inline-flex items-center gap-1 shrink-0 " + (isActive ? "bg-main/10 text-main" : isFeeding ? "bg-chart-3/10 text-chart-3" : "bg-chart-4/10 text-chart-4")}>
                             {isActive ? (
-                              <span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                              <span className="w-2.5 h-2.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
                             ) : isFeeding ? (
-                              <Soup className="w-3.5 h-3.5" />
+                              <Soup className="w-3 h-3" />
                             ) : (
-                              <CircleCheck className="w-3.5 h-3.5" />
+                              <CircleCheck className="w-3 h-3" />
                             )}
                             {isActive ? "In Progress" : batch.status}
                           </span>

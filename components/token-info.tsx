@@ -31,7 +31,7 @@ function CopyButton({ text }: { text: string }) {
       variant="reverse"
       size="sm"
       onClick={handleCopy}
-      className="h-10 px-3 text-xs"
+      className="self-stretch min-h-[2.5rem] px-3 text-xs shrink-0"
     >
       {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
       <span className="ml-1">{copied ? "Copied" : "Copy"}</span>
@@ -115,6 +115,16 @@ function formatCa(ca: string) {
   return ca;
 }
 
+function formatCompact(valueStr: string | null): string | null {
+  if (!valueStr) return valueStr;
+  const n = Number(valueStr.replace(/,/g, ""));
+  if (isNaN(n)) return valueStr;
+  return new Intl.NumberFormat("en-US", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(n);
+}
+
 function FoundationWalletCard() {
   const { projectName } = useProjectName();
   const [wallet, setWallet] = useState("");
@@ -188,8 +198,8 @@ function FoundationWalletCard() {
           className="h-9 px-3 text-xs shrink-0"
           onClick={handleCopy}
         >
-          {copied ? <Check className="w-3.5 h-3.5 mr-1.5" /> : <Copy className="w-3.5 h-3.5 mr-1.5" />}
-          {copied ? "Copied" : "Copy"}
+          {copied ? <Check className="w-3.5 h-3.5 sm:mr-1.5" /> : <Copy className="w-3.5 h-3.5 sm:mr-1.5" />}
+          <span className="hidden sm:inline">{copied ? "Copied" : "Copy"}</span>
         </Button>
         <Button
           variant="reverse"
@@ -433,7 +443,7 @@ export function TokenInfo({ initialToken }: { initialToken?: {
                   return (
                     <div
                       key={badge.label}
-                      className="bg-secondary-background border-2 border-border rounded-base h-auto min-h-[2.5rem] py-2 px-2.5 w-full flex items-center whitespace-nowrap text-xs font-base"
+                      className="bg-secondary-background border border-border rounded-base h-auto min-h-[2.5rem] py-2 px-2.5 w-full flex items-center whitespace-nowrap text-xs font-base"
                     >
                       <Icon className="w-3.5 h-3.5 mr-1.5 shrink-0 text-foreground/70" />
                       <span className="text-foreground/60 mr-1">{badge.label}:</span>
@@ -446,10 +456,10 @@ export function TokenInfo({ initialToken }: { initialToken?: {
                   );
                 })}
                 {!loading && token?.buyTx && token?.sellTx && (
-                  <div className="bg-secondary-background border-2 border-border rounded-base h-auto min-h-[2.5rem] py-2 px-2.5 w-full flex items-center whitespace-nowrap text-xs font-base">
+                  <div className="bg-secondary-background border border-border rounded-base h-auto min-h-[2.5rem] py-2 px-2.5 w-full flex items-center whitespace-nowrap text-xs font-base">
                     <TrendingUp className="w-3.5 h-3.5 mr-1.5 shrink-0 text-foreground/70" />
                     <span className="text-foreground/60 mr-1">Buy/Sell:</span>
-                    <AnimatedValue value={token.buyTx} /> / <AnimatedValue value={token.sellTx} />
+                    <AnimatedValue value={formatCompact(token.buyTx)} /> / <AnimatedValue value={formatCompact(token.sellTx)} />
                   </div>
                 )}
               </div>
@@ -461,7 +471,7 @@ export function TokenInfo({ initialToken }: { initialToken?: {
         <FoundationWalletCard />
 
         {/* Foundation Wallet Note */}
-        <div className="mt-4 bg-white border-2 border-border rounded-base p-4">
+        <div className="mt-4 bg-white border border-border rounded-base p-4">
           <p className="text-xs font-base text-foreground/70 leading-relaxed">
             Donations to this wallet fund emergency needs beyond regular feeding: medical care for sick or injured cats, rescues, and other welfare expenses.
           </p>

@@ -329,25 +329,25 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
                           Feeding time!
                         </span>
                       ) : (
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-baseline gap-1">
-                            <span className="text-xl font-heading text-foreground">{timeLeft.days}</span>
-                            <span className="text-xs text-foreground/60">d</span>
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <div className="flex items-baseline gap-0.5 sm:gap-1">
+                            <span className="text-lg sm:text-xl font-heading text-foreground">{timeLeft.days}</span>
+                            <span className="text-[10px] sm:text-xs text-foreground/60">d</span>
                           </div>
                           <span className="text-foreground/40">:</span>
-                          <div className="flex items-baseline gap-1">
-                            <span className="text-xl font-heading text-foreground">{timeLeft.hours}</span>
-                            <span className="text-xs text-foreground/60">h</span>
+                          <div className="flex items-baseline gap-0.5 sm:gap-1">
+                            <span className="text-lg sm:text-xl font-heading text-foreground">{timeLeft.hours}</span>
+                            <span className="text-[10px] sm:text-xs text-foreground/60">h</span>
                           </div>
                           <span className="text-foreground/40">:</span>
-                          <div className="flex items-baseline gap-1">
-                            <span className="text-xl font-heading text-foreground">{timeLeft.minutes}</span>
-                            <span className="text-xs text-foreground/60">m</span>
+                          <div className="flex items-baseline gap-0.5 sm:gap-1">
+                            <span className="text-lg sm:text-xl font-heading text-foreground">{timeLeft.minutes}</span>
+                            <span className="text-[10px] sm:text-xs text-foreground/60">m</span>
                           </div>
                           <span className="text-foreground/40">:</span>
-                          <div className="flex items-baseline gap-1">
-                            <span className="text-xl font-heading text-foreground animate-pulse">{timeLeft.seconds}</span>
-                            <span className="text-xs text-foreground/60">s</span>
+                          <div className="flex items-baseline gap-0.5 sm:gap-1">
+                            <span className="text-lg sm:text-xl font-heading text-foreground animate-pulse">{timeLeft.seconds}</span>
+                            <span className="text-[10px] sm:text-xs text-foreground/60">s</span>
                           </div>
                         </div>
                       )
@@ -533,19 +533,19 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
 
           {/* Trust Indicators - 4 Columns Below */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full max-w-4xl mt-3">
-            <div className="flex items-center justify-center gap-2 bg-background border-2 border-border px-3 py-2 rounded-base">
+            <div className="flex items-center justify-center gap-2 bg-background border border-border px-3 py-2 rounded-base">
               <ShieldCheck className="w-4 h-4 text-foreground flex-shrink-0" />
               <span className="text-xs font-base text-foreground">100% to Food</span>
             </div>
-            <div className="flex items-center justify-center gap-2 bg-background border-2 border-border px-3 py-2 rounded-base">
+            <div className="flex items-center justify-center gap-2 bg-background border border-border px-3 py-2 rounded-base">
               <Camera className="w-4 h-4 text-foreground flex-shrink-0" />
               <span className="text-xs font-base text-foreground">Photo Proof</span>
             </div>
-            <div className="flex items-center justify-center gap-2 bg-background border-2 border-border px-3 py-2 rounded-base">
+            <div className="flex items-center justify-center gap-2 bg-background border border-border px-3 py-2 rounded-base">
               <Receipt className="w-4 h-4 text-foreground flex-shrink-0" />
               <span className="text-xs font-base text-foreground">Receipt Posted</span>
             </div>
-            <div className="flex items-center justify-center gap-2 bg-background border-2 border-border px-3 py-2 rounded-base">
+            <div className="flex items-center justify-center gap-2 bg-background border border-border px-3 py-2 rounded-base">
               <Calendar className="w-4 h-4 text-foreground flex-shrink-0" />
               <span className="text-xs font-base text-foreground">Regular Feeding</span>
             </div>
