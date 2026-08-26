@@ -4,6 +4,7 @@ import { getSettings } from "./settings";
 
 const SOL_PRICE_KEY = "sol:price";
 const STATS_KEY = "stats:summary";
+const STATS_LAST_GOOD_KEY = "stats:last-good";
 const TOKEN_KEY = "token:info";
 
 const SOL_PRICE_TTL = 60; // seconds
@@ -54,6 +55,15 @@ async function setCache<T>(key: string, value: T, ttl: number) {
   if (!isRedisEnabled() || !redis) return;
   try {
     await redis.setex(key, ttl, value);
+  } catch {
+    // ignore
+  }
+}
+
+async function setCachePersistent<T>(key: string, value: T) {
+  if (!isRedisEnabled() || !redis) return;
+  try {
+    await redis.set(key, value);
   } catch {
     // ignore
   }
@@ -142,42 +152,35 @@ async function fetchFreshStats(): Promise<CachedStats | null> {
   const { creatorWallet, tokenCa } = settings;
   const localStats = getLocalStats();
 
-  let result: CachedStats = {
-    ...localStats,
-    totalFeesSol: 0,
-    totalFeesCumulative: localStats.totalFees,
-    estimatedBowls: 0,
-  };
-
   if (creatorWallet && tokenCa) {
     const claimable = await fetchPumpDevClaimable(creatorWallet, tokenCa);
-    if (claimable !== null) {
-      const solPrice = await getSolPrice();
-      const totalFeesUsd = solPrice ? claimable * solPrice : claimable;
-      const bowlsAndCats = Math.floor(totalFeesUsd);
-      result = {
-        ...localStats,
-        totalFees: totalFeesUsd,
-        totalFeesSol: claimable,
-        totalFeesCumulative: localStats.totalFees,
-        feedingRounds: bowlsAndCats,
-        estimatedBowls: bowlsAndCats,
-      };
-    }
-  } else if (creatorWallet) {
-    const balance = await fetchSolBalance(creatorWallet);
-    if (balance !== null) {
-      result = {
-        ...localStats,
-        totalFees: balance,
-        totalFeesSol: balance,
-        totalFeesCumulative: localStats.totalFees,
-        estimatedBowls: 0,
-      };
-    }
+    if (claimable === null) return null;
+    const solPrice = await getSolPrice();
+    const totalFeesUsd = solPrice ? claimable * solPrice : claimable;
+    const bowlsAndCats = Math.floor(totalFeesUsd);
+    return {
+      ...localStats,
+      totalFees: totalFeesUsd,
+      totalFeesSol: claimable,
+      totalFeesCumulative: localStats.totalFees,
+      feedingRounds: bowlsAndCats,
+      estimatedBowls: bowlsAndCats,
+    };
   }
 
-  return result;
+  if (creatorWallet) {
+    const balance = await fetchSolBalance(creatorWallet);
+    if (balance === null) return null;
+    return {
+      ...localStats,
+      totalFees: balance,
+      totalFeesSol: balance,
+      totalFeesCumulative: localStats.totalFees,
+      estimatedBowls: 0,
+    };
+  }
+
+  return null;
 }
 
 export async function getStats(): Promise<CachedStats> {
@@ -185,14 +188,27 @@ export async function getStats(): Promise<CachedStats> {
   if (cached !== null) return cached;
 
   const fresh = await fetchFreshStats();
-  const result = fresh ?? {
-    ...getLocalStats(),
+  if (fresh !== null) {
+    await setCache(STATS_KEY, fresh, STATS_TTL);
+    await setCachePersistent(STATS_LAST_GOOD_KEY, fresh);
+    return fresh;
+  }
+
+  const lastGood = await getFromCache<CachedStats>(STATS_LAST_GOOD_KEY);
+  if (lastGood !== null) {
+    await setCache(STATS_KEY, lastGood, STATS_TTL);
+    return lastGood;
+  }
+
+  const localStats = getLocalStats();
+  const baseline: CachedStats = {
+    ...localStats,
     totalFeesSol: 0,
-    totalFeesCumulative: getLocalStats().totalFees,
+    totalFeesCumulative: localStats.totalFees,
     estimatedBowls: 0,
   };
-  await setCache(STATS_KEY, result, STATS_TTL);
-  return result;
+  await setCache(STATS_KEY, baseline, STATS_TTL);
+  return baseline;
 }
 
 function formatNumber(value: number | null): string | null {

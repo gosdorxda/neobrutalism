@@ -477,6 +477,30 @@ export default function AdminPage() {
     setLoading(false);
   }
 
+  async function clearAllData() {
+    const ok = confirm(
+      "This will permanently delete ALL batches, receipts, the fund-activity log, and EVERY uploaded photo (batch, logo, favicon, partners). Settings are kept. This cannot be undone. Continue?"
+    );
+    if (!ok) return;
+    if (!confirm("Really sure? This wipes the project back to empty. There is no undo.")) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/clear-data", {
+        method: "POST",
+        headers: { authorization: `Bearer ${password}` },
+      });
+      if (res.ok) {
+        setMessage("All data cleared. Project is now empty.");
+        fetchBatches();
+      } else {
+        setMessage("Failed to clear data");
+      }
+    } catch {
+      setMessage("Error clearing data");
+    }
+    setLoading(false);
+  }
+
   async function uploadSingleFile(file: File, folder: string, type: string = "photo"): Promise<string | null> {
     const formData = new FormData();
     formData.append("file", file);
@@ -1037,6 +1061,25 @@ export default function AdminPage() {
             </div>
           );})}
         </div>
+
+        <Card className="border-2 border-border bg-white">
+          <CardContent className="p-4 space-y-3">
+            <div>
+              <h3 className="text-sm font-heading text-foreground">Danger Zone</h3>
+              <p className="text-xs font-base text-foreground/60 mt-1">
+                Wipe all batches, receipts, fund-activity log, and every uploaded photo (batch, logo, favicon, partners). Settings are kept. Cannot be undone.
+              </p>
+            </div>
+            <Button
+              variant="noShadow"
+              className="bg-red-600 text-white hover:bg-red-700 border-2 border-border"
+              onClick={clearAllData}
+              disabled={loading}
+            >
+              Clear All Data
+            </Button>
+          </CardContent>
+        </Card>
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-6">

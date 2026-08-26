@@ -15,7 +15,7 @@ import { Heart, ShieldCheck, Camera, Receipt, Package, Wallet, Soup, Activity, C
 import { useProjectName } from "@/components/project-name-provider";
 import { formatUsd } from "@/lib/utils";
 import { useCountUpNumber } from "@/hooks/use-count-up";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type ApiBatch = {
   id: number;
@@ -71,36 +71,57 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
   const animatedTotalFeesSol = useCountUpNumber(stats.totalFeesSol);
   const animatedEstimatedBowls = useCountUpNumber(stats.estimatedBowls);
 
-  useEffect(() => {
-    async function loadHeroData() {
-      try {
-        const [statsRes, tokenRes, batchesRes] = await Promise.all([
-          fetch("/api/stats", { cache: "no-store" }),
-          fetch("/api/token", { cache: "no-store" }),
-          fetch("/api/batches", { cache: "no-store" }),
-        ]);
+  const loadHeroData = useCallback(async () => {
+    try {
+      const [statsRes, tokenRes, batchesRes] = await Promise.all([
+        fetch("/api/stats", { cache: "no-store" }),
+        fetch("/api/token", { cache: "no-store" }),
+        fetch("/api/batches", { cache: "no-store" }),
+      ]);
 
-        const statsData = await statsRes.json().catch(() => ({}));
-        const tokenData = await tokenRes.json().catch(() => ({}));
-        const batchesData: ApiBatch[] = await batchesRes.json().catch(() => []);
+      const statsData = await statsRes.json().catch(() => ({}));
+      const tokenData = await tokenRes.json().catch(() => ({}));
+      const batchesData: ApiBatch[] = await batchesRes.json().catch(() => []);
 
-        setStats(statsData);
-        setBuyUrl(tokenData.buyUrl || "https://pump.fun");
+      setStats(statsData);
+      setBuyUrl(tokenData.buyUrl || "https://pump.fun");
 
-        const active = batchesData.find(
-          (b) => b.isActive || b.status === "In Progress" || b.status === "Feeding"
-        );
-        setActiveBatch(active || null);
-      } catch {
-        // keep defaults on any error
-      } finally {
-        setIsLoading(false);
-        setBatchLoading(false);
-      }
+      const active =
+        batchesData.find((b) => b.status === "In Progress" || b.status === "Feeding") ??
+        batchesData.find((b) => b.isActive);
+      setActiveBatch(active || null);
+    } catch {
+      // keep defaults on any error
+    } finally {
+      setIsLoading(false);
+      setBatchLoading(false);
     }
-
-    loadHeroData();
   }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadHeroData();
+  }, [loadHeroData]);
+
+  useEffect(() => {
+    function reload() {
+      loadHeroData();
+    }
+    function onVisibility() {
+      if (document.visibilityState === "visible") reload();
+    }
+    function onPageshow(event: PageTransitionEvent) {
+      if (event.persisted) reload();
+    }
+    window.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("focus", reload);
+    window.addEventListener("pageshow", onPageshow);
+    return () => {
+      window.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("focus", reload);
+      window.removeEventListener("pageshow", onPageshow);
+    };
+  }, [loadHeroData]);
 
   useEffect(() => {
     if (!activeBatch) {
