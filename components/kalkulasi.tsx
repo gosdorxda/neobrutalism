@@ -166,7 +166,7 @@ function KalkulasiContent() {
         An estimate of creator rewards for {projectName} collected from daily
         trading volume. For full details, see the{" "}
         <a
-          href="https://docs.pump.fun"
+          href="https://pump.fun/docs/fees"
           target="_blank"
           rel="noopener noreferrer"
           className="text-main underline underline-offset-2 hover:opacity-80"
@@ -197,10 +197,9 @@ export function KalkulasiDrawer() {
       <Drawer open={open} onOpenChange={setOpen} direction="bottom">
         <DrawerContent>
           <DrawerHeader className="text-center sm:text-center">
-            <DrawerTitle className="text-2xl">From Volume to Meals</DrawerTitle>
+            <DrawerTitle className="text-2xl">Volume & Rewards</DrawerTitle>
             <DrawerDescription className="text-foreground/60">
-              How daily trading volume translates into creator rewards, and
-              the meals they become.
+              Estimate the creator reward fees generated from daily trading volume.
             </DrawerDescription>
           </DrawerHeader>
           <div className="overflow-y-auto w-full max-w-md mx-auto">
