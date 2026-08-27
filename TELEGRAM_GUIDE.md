@@ -1,4 +1,4 @@
-# CatBowl — Telegram Community Guide
+# CatBowl - Telegram Community Guide
 
 Panduan setup & operasional grup komunitas CatBowl di Telegram. Semua template posting di sini siap copy-paste (ganti bagian dalam `[...]`).
 
@@ -16,7 +16,7 @@ Panduan setup & operasional grup komunitas CatBowl di Telegram. Semua template p
 
 ### Bio (short, untuk profil grup)
 ```
-Bowl Brigade — the CatBowl community.
+Bowl Brigade. The CatBowl community.
 Every swap fills a bowl for a street cat. Creator rewards → real cat food. No cash, just meals. 🐾
 ```
 
@@ -31,57 +31,57 @@ Every swap fills a bowl. Creator rewards → real cat food. No cash, just meals.
 
 Telegram Topics = group jadi kayak forum. Aktifkan "Topics" di Group Settings.
 
-### Tier 1 — Wajib ada dari awal
+### Tier 1 - Wajib ada dari awal
 | Topic | Fungsi |
 |---|---|
 | `#welcome` | Perkenalan, cara kerja, link penting (read-only / pinned) |
 | `#rules` | Aturan komunitas (read-only) |
 | `#announcements` | Pengumuman resmi: batch baru, feeding day, update proyek |
-| `#feeding-proof` | Foto + nota tiap feeding — **signature CatBowl** |
+| `#feeding-proof` | Foto + nota tiap feeding. **Signature CatBowl** |
 | `#general-chat` | Obrolan bebas |
 
-### Tier 2 — Transparansi (inti misi)
+### Tier 2 - Transparansi (inti misi)
 | Topic | Fungsi |
 |---|---|
 | `#fund-activity` | Log otomatis: donasi masuk (SOL/USDT/USDC/CATBOWL) + saldo periodik |
-| `#current-batch` | Auto info batch saat ini (seperti status card di hero page) — di-update otomatis |
+| `#current-batch` | Auto info batch saat ini (seperti status card di hero page). Di-update otomatis |
 | `#batch-tracker` | Status batch (In Progress / Feeding / Completed) |
 | `#on-chain-receipts` | Tx hash & link verifikasi on-chain |
 
-### Tier 3 — Diskusi token
+### Tier 3 - Diskusi token
 | Topic | Fungsi |
 |---|---|
 | `#trading-talk` | Diskusi volume, harga, chart (NOT financial advice) |
 | `#price-alerts` | Alert harga/volume (opsional, bot) |
 
-### Tier 4 — Misi & impact
+### Tier 4 - Misi & impact
 | Topic | Fungsi |
 |---|---|
 | `#cat-rescue-partners` | Info partner shelter/rescue yang dibantu |
 | `#feeding-requests` | Usulan area/kucing yang butuh bantuan |
 | `#impact-stories` | Cerita/foto kucing yang sudah diberi makan |
 
-### Tier 5 — Komunitas & fun
+### Tier 5 - Komunitas & fun
 | Topic | Fungsi |
 |---|---|
 | `#cat-pics` | Foto kucing (street cats, kucing member) |
 | `#memes` | Meme CatBowl |
 | `#introductions` | Member perkenalkan diri |
 
-### Tier 6 — Support
+### Tier 6 - Support
 | Topic | Fungsi |
 |---|---|
 | `#support-help` | Pertanyaan teknis (beli, wallet) |
 | `#bug-reports` | Lapor bug website |
 | `#suggestions` | Usulan ide proyek |
 
-### Tier 7 — Staff only (private)
+### Tier 7 - Staff only (private)
 | Topic | Fungsi |
 |---|---|
 | `#staff-only` | Diskusi internal tim |
 | `#partner-coordination` | Koordinasi dengan rescue partner |
 
-> **Mulai dari 5 topic Tier 1** dulu. Tumbuh seiring komunitas. Yang wajib menonjol: `#feeding-proof` & `#fund-activity` — itu nilai jual transparansi.
+> **Mulai dari 5 topic Tier 1** dulu. Tumbuh seiring komunitas. Yang wajib menonjol: `#feeding-proof` & `#fund-activity`: itu nilai jual transparansi.
 
 ---
 
@@ -90,12 +90,12 @@ Telegram Topics = group jadi kayak forum. Aktifkan "Topics" di Group Settings.
 ```
 🐾 WELCOME TO BOWL BRIGADE
 
-We're not just a token. We're a community that feeds street cats — transparently.
+We're not just a token. We're a community that feeds street cats, transparently.
 
 HOW IT WORKS
 1. Trade $CATBOWL on pump.fun
 2. Creator rewards are collected each batch
-3. 100% converted to cat food — never cash
+3. 100% converted to cat food. Never cash.
 4. Receipts + photos posted for every feeding
 
 You don't have to trust us. You only have to look.
@@ -105,7 +105,7 @@ You don't have to trust us. You only have to look.
 📊 Batches: [link to #batch-tracker]
 📸 Feeding proof: [link to #feeding-proof]
 
-RULES: be kind, no shilling other tokens, no FUD without proof, and remember why we're here — the cats. 🐱
+RULES: be kind, no shilling other tokens, no FUD without proof, and remember why we're here: the cats. 🐱
 ```
 
 ---
@@ -116,7 +116,7 @@ RULES: be kind, no shilling other tokens, no FUD without proof, and remember why
 📋 BOWL BRIGADE RULES
 
 1. Cats first. Every decision circles back to feeding.
-2. No cash, just food. Don't suggest cash donations — we only do meals.
+2. No cash, just food. Don't suggest cash donations. We only do meals.
 3. Proof over hype. Receipts, photos, on-chain. No false claims.
 4. Be kind. No hate, no spam, no shilling other tokens.
 5. DYOR. This is not financial advice. Trade responsibly.
@@ -134,7 +134,7 @@ Breaking rules = warning → mute → ban. Feeders look out for each other (and 
 ```
 🚀 NEW BATCH STARTED
 
-Batch: #[N] — [Batch Name]
+Batch: #[N] - [Batch Name]
 Status: In Progress
 Period: [start date] → [target date]
 Target rewards: [est. $X / Y SOL]
@@ -146,7 +146,7 @@ Every swap this batch fills another bowl. Let's feed some cats. 🐱
 
 **Feeding day:**
 ```
-🍽️ FEEDING DAY — Batch #[N]
+🍽️ FEEDING DAY - Batch #[N]
 
 Rewards collected. Buying cat food now.
 Store: [store name]
@@ -174,7 +174,7 @@ Another batch, another bowl filled. Thanks, Feeders. 🐱💚
 
 **Tiap feeding wajib format ini:**
 ```
-📸 FEEDING PROOF — Batch #[N]
+📸 FEEDING PROOF - Batch #[N]
 
 📍 Location: [city/area]
 🏪 Store: [store name]
@@ -197,7 +197,7 @@ Status: Delivered & documented. 100% rewards → food. No cash.
 
 ### 5.3 `#fund-activity`  ⭐ (buku kas publik)
 
-**Tipe A — Rewards diterima (creator rewards masuk):**
+**Tipe A - Rewards diterima (creator rewards masuk):**
 ```
 📊 FUND ACTIVITY
 
@@ -206,12 +206,12 @@ Status: Delivered & documented. 100% rewards → food. No cash.
 💰 +[Y] SOL (≈ $[X])
 🏦 Wallet: creator wallet
 🔗 Tx: [solscan link]
-📝 Batch #[N] — rewards accumulated
+📝 Batch #[N] - rewards accumulated
 
 Status: Collected → pending conversion to food
 ```
 
-**Tipe B — Pembelian makanan (dana keluar):**
+**Tipe B - Pembelian makanan (dana keluar):**
 ```
 📊 FUND ACTIVITY
 
@@ -223,12 +223,12 @@ Status: Collected → pending conversion to food
 🏦 Wallet: foundation wallet
 🔗 Tx: [solcan link]
 🧾 Receipt: [link foto nota]
-📝 Batch #[N] — feeding day
+📝 Batch #[N] - feeding day
 
 Status: Purchased → feeding in progress
 ```
 
-**Tipe C — Update saldo (per batch / berkala):**
+**Tipe C - Update saldo (per batch / berkala):**
 ```
 📊 FUND ACTIVITY
 
@@ -256,7 +256,7 @@ Status: [ready for next batch / pending feeding]
 
 **Status update:**
 ```
-📋 BATCH TRACKER — #[N]
+📋 BATCH TRACKER - #[N]
 
 Name: [Batch Name]
 Status: [In Progress / Feeding / Completed]
@@ -372,17 +372,17 @@ Status: [under review / approved / scheduled]
 Bot built-in memposting 2 hal otomatis ke Telegram. Tinggal set env + toggle di admin panel (tab **Fund**).
 
 ### Yang otomatis (bot)
-- **`#fund-activity` — Donation received**: incoming tx ke **foundation wallet** dari sender **external**. Filter:
+- **`#fund-activity` - Donation received**: incoming tx ke **foundation wallet** dari sender **external**. Filter:
   1. Sender = creator wallet → **skip** (transfer internal, manual Tipe A).
   2. USD value < `fundActivityMinUsd` (configurable, default $1) → **skip** (dust/spam).
   3. Token diklasifikasi: SOL / USDC / USDT / $CATBOWL / `⚠ unknown`.
   4. Lainnya → post penuh dengan USD value.
-- **`#current-batch` — batch status**: baca batch aktif dari `data/batches.json`, post/edit pesan status (nama, status, period, rewards, cats, food). Post baru kalau ganti batch, edit kalau data berubah (no spam).
+- **`#current-batch` - batch status**: baca batch aktif dari `data/batches.json`, post/edit pesan status (nama, status, period, rewards, cats, food). Post baru kalau ganti batch, edit kalau data berubah (no spam).
 
 ### Yang manual (tim posting)
-- **Tipe A — Creator rewards**: transfer rewards creator→foundation (tim kirim + post format Tipe A).
-- **Tipe B — Food purchase**: beli makanan (+ nota + foto).
-- **`#feeding-proof` — Feeding proof**: tombol "Post Feeding Proof" di batch card (tab Batches). Bot fetch data dari batch (store, item, total, tx, cats, food, photos, receipt) → post text + kirim foto sebagai media group + foto nota ke `#feeding-proof`. Bisa di-post ulang kapan saja (no dedup).
+- **Tipe A - Creator rewards**: transfer rewards creator→foundation (tim kirim + post format Tipe A).
+- **Tipe B - Food purchase**: beli makanan (+ nota + foto).
+- **`#feeding-proof` - Feeding proof**: tombol "Post Feeding Proof" di batch card (tab Batches). Bot fetch data dari batch (store, item, total, tx, cats, food, photos, receipt) → post text + kirim foto sebagai media group + foto nota ke `#feeding-proof`. Bisa di-post ulang kapan saja (no dedup).
 
 ### Yang TIDAK di-auto
 - Outgoing foundation wallet (no auto-post, no "awaiting" flag).
@@ -409,5 +409,68 @@ FUND_ACTIVITY_CRON_SECRET=... # secret untuk cron trigger
 Hit `POST /api/fund-activity/check?secret=<FUND_ACTIVITY_CRON_SECRET>` tiap 30–60s (cron-job.org / PM2 cron / Vercel Cron). Bisa juga di-trigger manual dari admin (Run Check Now).
 
 ### Log & storage
-- `data/fund-activity.json` — log entries (cap ~200) + `lastSignature` (dedupe) + `currentBatchId`/`currentBatchMessageId`.
+- `data/fund-activity.json` - log entries (cap ~200) + `lastSignature` (dedupe) + `currentBatchId`/`currentBatchMessageId`.
 - Baca via `GET /api/fund-activity/log` (admin, Bearer).
+
+---
+
+## 9. Step-by-step Setup (operasional)
+
+### A. Buat group + aktifkan Topics
+1. Di Telegram → **New Group** → tambah minimal 1 member (atau diri sendiri) → nama **"Bowl Brigade"**.
+2. Group Settings → aktifkan **Topics** (supaya jadi forum).
+3. Buat 5 topic Tier 1 (section 2): `welcome`, `rules`, `announcements`, `feeding-proof`, `general-chat`.
+4. Untuk bot, buat 3 topic tambahan (nama bebas, yang penting TOPIC_ID-nya diisi ke env): `fund-activity`, `current-batch`, `feeding-proof`. Catat: `feeding-proof` ini topic-nya sama dengan Tier 1.
+
+### B. Buat bot via @BotFather
+1. Buka **@BotFather** → `/newbot`.
+2. Name: `CatBowl Bot` (bebas). Username: `catbowl_bot` (harus unik, akhiran `_bot`).
+3. Copy **BOT TOKEN** (format `123456789:ABC-DEF1234ghI78-uvw...`).
+4. (Opsional) `/setprivacy` → **Disable** biar bot bisa baca pesan (membantu debug, tapi tidak wajib).
+
+### C. Tambahkan bot ke group sebagai admin
+1. Di group Bowl Brigade → Add member → cari username bot → tambah.
+2. Klik bot → **Promote to Admin** → centang: **Post Messages** + **Edit Messages** + **Manage Topics** + **Delete Messages**. Save.
+
+### D. Ambil CHAT_ID
+- Klik kanan / tap nama group → **Copy Link**. URL: `https://t.me/c/1234567890/...`
+- **CHAT_ID** = `-100` + angka setelah `/c/` = `-1001234567890`.
+- Alternatif: invite **@RawDataBot** ke group, balas dengan `Current chat ID: -1001234567890`, lalu kick.
+
+### E. Ambil TOPIC_ID (message_thread_id) tiap topic
+- Untuk tiap topic (`fund-activity`, `current-batch`, `feeding-proof`): klik kanan topic → **Copy Link**.
+- URL `https://t.me/c/<group>/5` → **angka terakhir** (5) = message_thread_id topic itu.
+- Isi ke env:
+  - `TELEGRAM_FUND_TOPIC_ID` = id topic `#fund-activity`
+  - `TELEGRAM_BATCH_TOPIC_ID` = id topic `#current-batch`
+  - `TELEGRAM_FEEDING_PROOF_TOPIC_ID` = id topic `#feeding-proof`
+
+### F. Set env di `.env.local` (lokal dev + VPS)
+```
+TELEGRAM_BOT_TOKEN=123456789:ABC-DEF1234ghI78-uvw...
+TELEGRAM_CHAT_ID=-1001234567890
+TELEGRAM_FUND_TOPIC_ID=5
+TELEGRAM_BATCH_TOPIC_ID=7
+TELEGRAM_FEEDING_PROOF_TOPIC_ID=9
+FUND_ACTIVITY_CRON_SECRET=<buat-string-acak>
+ADMIN_PASSWORD=<password-kuat>
+```
+Restart app: `pm2 restart neobrutalism` (VPS) atau restart `npm run dev` (lokal).
+
+### G. Test dari admin panel
+1. Buka `/gosdorxda` → login → tab **Fund**.
+2. Pastikan status "Telegram env" semua hijau (configured). Kalau ada merah, env-nya salah/missing.
+3. Toggle **Fund Activity Bot = ON**. Set `Min donation USD` (mis. `1`).
+4. Klik **Run Check Now** → lihat tabel log. Kalau ada tx masuk ke foundation wallet, bot harusnya post ke `#fund-activity`.
+5. Cek group → topic `#fund-activity` → harus muncul pesan bot.
+6. Untuk test batch: di tab Batches, edit/buat batch aktif → bot update `#current-batch` (post baru atau edit existing).
+7. Untuk feeding proof: di batch card → tombol **Post Feeding Proof** → bot post text + foto ke `#feeding-proof`.
+
+### H. Setup cron (auto-check tiap 1 menit)
+Bot gak jalan terus sendiri. Harus di-trigger. Pilih salah satu:
+- **cron-job.org** (gratis, paling gampang): buat job → method POST → URL `https://[domain]/api/fund-activity/check?secret=[FUND_ACTIVITY_CRON_SECRET]` → schedule tiap 1 menit.
+- **VPS crontab**: `* * * * * curl -fsS 'https://[domain]/api/fund-activity/check?secret=[SECRET]' >/dev/null 2>&1`
+- **PM2 cron** / **Vercel Cron**.
+- Selalu bisa trigger manual dari admin → **Run Check Now**.
+
+> Setelah cron jalan, tiap menit bot cek tx baru ke foundation wallet + cek perubahan batch aktif, lalu post/edit otomatis. Dedup lewat `lastSignature` (gak double-post).
