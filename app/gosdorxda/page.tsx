@@ -137,6 +137,7 @@ export default function AdminPage() {
   const [tokenCa, setTokenCa] = useState("");
   const [projectName, setProjectName] = useState("");
   const [projectLogo, setProjectLogo] = useState("");
+  const [heroBackground, setHeroBackground] = useState("");
   const [creatorWallet, setCreatorWallet] = useState("");
   const [foundationWallet, setFoundationWallet] = useState("");
   const [telegram, setTelegram] = useState("");
@@ -227,6 +228,7 @@ export default function AdminPage() {
       setTokenCa(data.tokenCa || "");
       setProjectName(data.projectName || "");
       setProjectLogo(data.projectLogo || "");
+      setHeroBackground(data.heroBackground || "");
       setCreatorWallet(data.creatorWallet || "");
       setFoundationWallet(data.foundationWallet || "");
       setTelegram(data.telegram || "");
@@ -290,6 +292,7 @@ export default function AdminPage() {
           tokenCa,
           projectName,
           projectLogo,
+          heroBackground,
           creatorWallet,
           foundationWallet,
           telegram,
@@ -395,6 +398,16 @@ export default function AdminPage() {
       setMessage("Favicon uploaded");
     } else {
       setMessage("Favicon upload failed");
+    }
+  }
+
+  async function uploadHeroBackground(file: File) {
+    const path = await uploadSingleFile(file, "hero", "background");
+    if (path) {
+      setHeroBackground(path);
+      setMessage("Hero background uploaded");
+    } else {
+      setMessage("Hero background upload failed");
     }
   }
 
@@ -1246,6 +1259,52 @@ export default function AdminPage() {
                         </div>
                         <p className="text-[10px] font-base text-foreground/50">
                           If set, logo will replace project name text in navbar.
+                        </p>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-base text-foreground/60 block">Hero Background Image</label>
+                        <div className="flex flex-wrap items-center gap-3">
+                          {heroBackground && (
+                            <div className="relative w-20 h-12 border-2 border-border rounded-base overflow-hidden bg-secondary-background shrink-0">
+                              <Image
+                                src={heroBackground}
+                                alt="Hero background preview"
+                                fill
+                                sizes="80px"
+                                className="object-cover"
+                                unoptimized
+                              />
+                            </div>
+                          )}
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) uploadHeroBackground(file);
+                            }}
+                            className="text-sm w-auto flex-1 min-w-[200px]"
+                          />
+                          <Input
+                            value={heroBackground}
+                            onChange={(e) => setHeroBackground(e.target.value)}
+                            placeholder="Or paste image URL"
+                            className="text-sm flex-[2] min-w-[200px]"
+                          />
+                          {heroBackground && (
+                            <Button
+                              type="button"
+                              variant="noShadow"
+                              size="sm"
+                              className="bg-red-600 text-white hover:bg-red-700 border-2 border-border"
+                              onClick={() => setHeroBackground("")}
+                            >
+                              Remove
+                            </Button>
+                          )}
+                        </div>
+                        <p className="text-[10px] font-base text-foreground/50">
+                          If set, hero section shows this photo with a dark overlay. If empty, uses the default background.
                         </p>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

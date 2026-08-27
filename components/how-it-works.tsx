@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Wallet, DollarSign, ShoppingCart, Camera } from "lucide-react";
+import { Wallet, DollarSign, PaperBag, Camera } from "lucide-react";
 import { useProjectName } from "@/components/project-name-provider";
 const STEP_DURATION = 5000;
 
@@ -31,7 +31,7 @@ export function HowItWorks() {
       title: "Buy Cat Food",
       description: "100% of the collected rewards are used to purchase cat food from local stores. No hidden fees, no middlemen.",
       color: "bg-chart-2",
-      icon: ShoppingCart,
+      icon: PaperBag,
     },
     {
       number: "4",

@@ -360,8 +360,8 @@ export function TokenInfo({ initialToken }: { initialToken?: {
                 className="w-full sm:w-auto"
               >
                 <Button variant="reverse" className="w-full sm:w-auto text-sm">
+                  <img src="/pump-fun.svg" alt="" className="w-4 h-4" />
                   Buy Token
-                  <ExternalLink className="w-3 h-3 ml-1.5" />
                 </Button>
               </a>
             </div>

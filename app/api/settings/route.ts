@@ -51,6 +51,13 @@ export async function POST(request: NextRequest) {
       updates.creatorWallet = body.creatorWallet.trim();
     }
 
+    if (body.heroBackground !== undefined) {
+      if (typeof body.heroBackground !== "string") {
+        return NextResponse.json({ error: "Invalid hero background" }, { status: 400 });
+      }
+      updates.heroBackground = body.heroBackground.trim();
+    }
+
     if (body.foundationWallet !== undefined) {
       if (typeof body.foundationWallet !== "string") {
         return NextResponse.json({ error: "Invalid foundation wallet" }, { status: 400 });

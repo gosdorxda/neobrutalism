@@ -48,24 +48,24 @@ function InvoiceRows({ batch }: { batch: InvoiceBatch }) {
 
   return (
     <div className="border border-border overflow-hidden">
-      <table className="w-full border-collapse text-sm">
+      <table className="w-full border-collapse text-xs sm:text-sm">
         <tbody>
           <tr className="border-b border-border">
-            <td className="py-2 px-3 font-base text-foreground/60 border-r border-border w-2/5">Item</td>
-            <td className="py-2 px-3 text-right font-heading text-foreground">{batch.receiptItem || "~"}</td>
+            <td className="py-1.5 px-2 sm:py-2 sm:px-3 font-base text-foreground/60 border-r border-border w-2/5">Item</td>
+            <td className="py-1.5 px-2 sm:py-2 sm:px-3 text-right font-heading text-foreground">{batch.receiptItem || "~"}</td>
           </tr>
           <tr className="border-b border-border">
-            <td className="py-2 px-3 font-base text-foreground/60 border-r border-border">Store</td>
-            <td className="py-2 px-3 text-right font-heading text-foreground">{batch.receiptStore || "~"}</td>
+            <td className="py-1.5 px-2 sm:py-2 sm:px-3 font-base text-foreground/60 border-r border-border">Store</td>
+            <td className="py-1.5 px-2 sm:py-2 sm:px-3 text-right font-heading text-foreground">{batch.receiptStore || "~"}</td>
           </tr>
           <tr className="border-b border-border">
-            <td className="py-2 px-3 font-base text-foreground/60 border-r border-border">Food Bought</td>
-            <td className="py-2 px-3 text-right font-heading text-foreground">{batch.status === "In Progress" || batch.status === "Feeding" ? "~" : batch.food}</td>
+            <td className="py-1.5 px-2 sm:py-2 sm:px-3 font-base text-foreground/60 border-r border-border">Food Bought</td>
+            <td className="py-1.5 px-2 sm:py-2 sm:px-3 text-right font-heading text-foreground">{batch.status === "In Progress" || batch.status === "Feeding" ? "~" : batch.food}</td>
           </tr>
           {batch.txHash && batch.txHash !== "-" && (
             <tr className="border-b border-border">
-              <td className="py-2 px-3 font-base text-foreground/60 border-r border-border">Tx</td>
-              <td className="py-2 px-3 text-right">
+              <td className="py-1.5 px-2 sm:py-2 sm:px-3 font-base text-foreground/60 border-r border-border">Tx</td>
+              <td className="py-1.5 px-2 sm:py-2 sm:px-3 text-right">
                 <a
                   href={`https://web3.okx.com/explorer/solana/tx/${batch.txHash}`}
                   target="_blank"
@@ -79,8 +79,8 @@ function InvoiceRows({ batch }: { batch: InvoiceBatch }) {
             </tr>
           )}
           <tr className={hasEssentials ? "border-b border-border" : "bg-zinc-100"}>
-            <td className="py-2 px-3 font-base text-foreground/60 border-r border-border">Food purchase</td>
-            <td className="py-2 px-3 text-right font-heading text-foreground">{fmtUsd(foodCost)}</td>
+            <td className="py-1.5 px-2 sm:py-2 sm:px-3 font-base text-foreground/60 border-r border-border">Food purchase</td>
+            <td className="py-1.5 px-2 sm:py-2 sm:px-3 text-right font-heading text-foreground">{fmtUsd(foodCost)}</td>
           </tr>
           {hasEssentials && (
             <>
@@ -93,7 +93,7 @@ function InvoiceRows({ batch }: { batch: InvoiceBatch }) {
                     : "";
                 return (
                   <tr key={`ess-${i}`} className="border-b border-border">
-                    <td className="py-1.5 px-3 font-base text-foreground/40 border-r border-border text-xs align-top">
+                    <td className="py-1 px-2 sm:py-1.5 sm:px-3 font-base text-foreground/40 border-r border-border text-xs align-top">
                       <span className="inline-flex flex-wrap items-center gap-1.5">
                         <span>#{i + 1}</span>
                         <span>{e.name || "~"}</span>
@@ -110,15 +110,15 @@ function InvoiceRows({ batch }: { batch: InvoiceBatch }) {
                         )}
                       </span>
                     </td>
-                    <td className="py-1.5 px-3 text-right font-base text-foreground/60 text-xs align-top">
+                    <td className="py-1 px-2 sm:py-1.5 sm:px-3 text-right font-base text-foreground/60 text-xs align-top">
                       {e.price && e.price !== "$0" ? e.price : "-"}
                     </td>
                   </tr>
                 );
               })}
               <tr className="bg-zinc-100">
-                <td className="py-2 px-3 font-heading text-foreground border-r border-border">Total</td>
-                <td className="py-2 px-3 text-right font-heading text-foreground">{fmtUsd(grandTotal)}</td>
+                <td className="py-1.5 px-2 sm:py-2 sm:px-3 font-heading text-foreground border-r border-border">Total</td>
+                <td className="py-1.5 px-2 sm:py-2 sm:px-3 text-right font-heading text-foreground">{fmtUsd(grandTotal)}</td>
               </tr>
             </>
           )}

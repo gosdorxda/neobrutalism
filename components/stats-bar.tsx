@@ -7,23 +7,38 @@ export function StatsBar() {
   const stats = getStats();
   const settings = getSettings();
   const partners = settings.partners || [];
+  const heroBackground = settings.heroBackground?.trim() || "";
+  const onPhoto = Boolean(heroBackground);
 
   return (
     <section className="relative w-full bg-gradient-to-b from-background to-secondary-background border-y-2 border-border py-8 mt-14">
-      {/* Sleeping cat resting on the top border */}
-      <img
-        src="/cat-sleeping-a.svg"
-        alt=""
-        className="absolute -top-40 sm:-top-48 left-1/2 -translate-x-1/2 w-64 h-64 sm:w-80 sm:h-80 rotate-3 pointer-events-none select-none"
-      />
+      {heroBackground && (
+        <div className="absolute inset-0 z-0">
+          <img
+            src={heroBackground}
+            alt=""
+            decoding="async"
+            fetchPriority="high"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/70" />
+        </div>
+      )}
+      {!heroBackground && (
+        <img
+          src="/cat-sleeping-a.svg"
+          alt=""
+          className="absolute -top-40 sm:-top-48 left-1/2 -translate-x-1/2 w-64 h-64 sm:w-80 sm:h-80 rotate-3 pointer-events-none select-none"
+        />
+      )}
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="text-center mb-6">
-          <h2 className="text-3xl font-heading text-foreground mb-3">
+          <h2 className={`text-3xl font-heading mb-3 ${onPhoto ? "text-white" : "text-foreground"}`}>
             Our Impact So Far
           </h2>
-          <p className="text-sm font-base text-foreground/60">
+          <p className={`text-sm font-base ${onPhoto ? "text-white/80" : "text-foreground/60"}`}>
             Every swap fills a bowl for a street cat. Every number is backed by receipts and photos.
           </p>
         </div>

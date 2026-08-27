@@ -64,7 +64,7 @@ function DialogContent({
         {...props}
       >
         {children}
-        <DialogPrimitive.Close className="absolute right-3 top-3 size-7 inline-flex items-center justify-center rounded-base border-2 border-border bg-secondary-background text-foreground shadow-shadow opacity-100 transition-all hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none hover:bg-main hover:text-main-foreground focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:size-3.5">
+        <DialogPrimitive.Close className="absolute right-3 top-3 size-7 inline-flex items-center justify-center rounded-base border-2 border-border bg-secondary-background text-foreground opacity-100 transition-colors hover:bg-main hover:text-main-foreground focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:size-3.5">
           <X />
           <span className="sr-only">Close</span>
         </DialogPrimitive.Close>

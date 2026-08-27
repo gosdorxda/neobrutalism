@@ -67,6 +67,12 @@ export async function POST(request: NextRequest) {
         .resize({ width: 1200, withoutEnlargement: true })
         .jpeg({ quality: 80, progressive: true })
         .toFile(fullPath);
+    } else if (type === "background") {
+      // Hero background: large, high quality, no thumbnail
+      await sharp(buffer)
+        .resize({ width: 1920, withoutEnlargement: true })
+        .jpeg({ quality: 82, progressive: true })
+        .toFile(fullPath);
     } else {
       // Photo: compress full size + create thumbnail
       await sharp(buffer)

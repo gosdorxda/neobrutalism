@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DataTable } from "@/components/ui/data-table";
-import { Receipt, Camera, ExternalLink, Package, Wallet, ShoppingCart, Link2, FileCheck, Clock, CircleCheck, Cat, Soup, Info, PartyPopper, DollarSign, ChevronLeft, ChevronRight } from "lucide-react";
+import { Receipt, Camera, ExternalLink, Package, PaperBag, Link2, FileCheck, Clock, CircleCheck, Cat, Soup, Info, PartyPopper, DollarSign, ChevronLeft, ChevronRight } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -392,7 +392,7 @@ function getColumns(settings: InvoiceSettings): ColumnDef<Batch>[] {
     accessorKey: "fees",
     header: () => (
       <div className="flex items-center gap-1.5">
-        <Wallet className="w-3.5 h-3.5" />
+        <DollarSign className="w-3.5 h-3.5" />
         <span>Rewards</span>
       </div>
     ),
@@ -428,7 +428,7 @@ function getColumns(settings: InvoiceSettings): ColumnDef<Batch>[] {
     accessorKey: "food",
     header: () => (
       <div className="flex items-center gap-1.5">
-        <ShoppingCart className="w-3.5 h-3.5" />
+        <PaperBag className="w-3.5 h-3.5" />
         <span>Food</span>
       </div>
     ),
@@ -658,7 +658,7 @@ export function BatchHistory() {
                       </div>
                       <div className="flex flex-col items-center justify-center gap-1 py-3">
                         <span className="text-[9px] font-base text-foreground/40 uppercase tracking-wider flex items-center gap-1">
-                          <ShoppingCart className="w-3 h-3" />
+                          <PaperBag className="w-3 h-3" />
                           Food
                         </span>
                         <span className="text-sm font-heading text-foreground">

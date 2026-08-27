@@ -24,6 +24,7 @@ export type Settings = {
   tokenCa: string;
   projectName: string;
   projectLogo: string;
+  heroBackground: string;
   creatorWallet: string;
   foundationWallet: string;
   telegram: string;
@@ -56,6 +57,7 @@ const defaultSettings: Settings = {
   tokenCa: "CATFUNDeio111111111111111111111111111111111",
   projectName: "CATFUND",
   projectLogo: "",
+  heroBackground: "",
   creatorWallet: "",
   foundationWallet: "",
   telegram: "",

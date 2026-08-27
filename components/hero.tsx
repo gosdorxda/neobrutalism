@@ -10,9 +10,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Heart, ShieldCheck, Camera, Receipt, Package, Wallet, Soup, Activity, Cat, Info, Calendar } from "lucide-react";
+import { Heart, ShieldCheck, Camera, Receipt, Package, DollarSign, Soup, Activity, Info, Calendar, PaperBag } from "lucide-react";
 
 import { useProjectName } from "@/components/project-name-provider";
+import { useSettings } from "@/components/settings-provider";
 import { formatUsd } from "@/lib/utils";
 import { useCountUpNumber } from "@/hooks/use-count-up";
 import { useCallback, useEffect, useState } from "react";
@@ -45,6 +46,8 @@ function formatDisplayDate(dateStr: string): string {
 
 export function Hero({ initialStats }: { initialStats?: { totalCats: number; totalFees: number; totalFeesSol: number; totalFeesCumulative: number; totalFood: number; feedingRounds: number; estimatedBowls: number } }) {
   const { projectName, tokenSymbol } = useProjectName();
+  const { settings } = useSettings();
+  const creatorWallet = settings?.creatorWallet?.trim() || "";
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -283,6 +286,7 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
           <div className="flex flex-row gap-4">
             <Button variant="default" size="lg" asChild>
                 <a href={buyUrl} target="_blank" rel="noopener noreferrer">
+                  <img src="/pump-fun.svg" alt="" className="w-5 h-5" />
                   Buy {tokenSymbol}
                 </a>
             </Button>
@@ -310,7 +314,7 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
                   <div className="flex items-center justify-between gap-2">
                     {/* Batch Label - Same size as countdown */}
                     <div className="flex items-center gap-2">
-                      <Package className="w-4 h-4 text-foreground" />
+                      <Package className="w-5 h-5 sm:w-6 sm:h-6 shrink-0 text-foreground" />
                       {batchLoading ? (
                         <Skeleton width={128} height={24} borderRadius={4} />
                       ) : (
@@ -403,8 +407,10 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
                     <div className="flex items-center justify-between pt-1">
                       <p className="text-[10px] font-base text-foreground/50">
                         100% of creator rewards become cat food. See{" "}
-                        <a 
-                          href="#token" 
+                        <a
+                          href={creatorWallet ? `https://pump.fun/profile/${creatorWallet}?tab=creator-rewards` : "#token"}
+                          target={creatorWallet ? "_blank" : undefined}
+                          rel={creatorWallet ? "noopener noreferrer" : undefined}
                           className="text-foreground/70 font-heading underline hover:text-main transition-colors"
                         >
                           the proof
@@ -471,7 +477,7 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
                           </div>
                         )}
                         <div className="text-[10px] sm:text-xs font-base text-foreground/60 flex items-center justify-center gap-1 whitespace-nowrap h-5 sm:h-6">
-                          <Wallet className="w-3 h-3" />
+                          <DollarSign className="w-3 h-3" />
                           <span>Rewards</span>
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -514,15 +520,19 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
                       </div>
                     </div>
 
-                    {/* CTA Button */}
-                    <div className="shrink-0">
-                      <Button variant="reverse" size="default" asChild className="px-2.5 sm:px-4 text-xs sm:text-sm">
-                        <a href={buyUrl} target="_blank" rel="noopener noreferrer">
-                          <Cat className="w-4 h-4 mr-1" />
-                          <span className="hidden sm:inline">Feed a Cat</span>
-                          <span className="sm:hidden">Feed</span>
-                        </a>
-                      </Button>
+                    {/* Estimated Food */}
+                    <div className="shrink-0 text-center">
+                      {isLoading ? (
+                        <Skeleton className="w-16 h-7 sm:w-20 sm:h-8 mb-0.5 mx-auto" borderRadius={4} />
+                      ) : (
+                        <div className="text-lg sm:text-2xl font-heading text-foreground mb-0.5 transition-all duration-300">
+                          {(animatedTotalFees / 5).toFixed(1)}kg
+                        </div>
+                      )}
+                      <div className="text-[10px] sm:text-xs font-base text-foreground/60 flex items-center justify-center gap-1 whitespace-nowrap h-5 sm:h-6">
+                        <PaperBag className="w-3 h-3" />
+                        <span>Est. Food</span>
+                      </div>
                     </div>
                   </div>
 
