@@ -175,7 +175,7 @@ function FoundationWalletCard() {
         <div className="text-right hidden sm:block">
           <p className="text-[10px] font-base text-foreground/50 uppercase tracking-wider">Balance</p>
           <p className="text-xl font-heading text-foreground inline-flex items-center gap-1.5">
-            {balanceSol !== null ? `${balanceSol.toFixed(4)}` : "—"}
+            {balanceSol !== null ? `${balanceSol.toFixed(4)}` : "-"}
             <span className="text-sm font-base text-foreground/60">SOL</span>
             <NetworkSolana variant="branded" className="w-5 h-5" />
           </p>
@@ -316,7 +316,7 @@ export function TokenInfo({ initialToken }: { initialToken?: {
             Token Info
           </h2>
           <p className="text-sm font-base text-foreground/60 max-w-lg mx-auto">
-            Live data from SolanaTracker.
+            Live market data and on-chain stats for {tokenSymbol}.
           </p>
         </div>
 
@@ -471,7 +471,7 @@ export function TokenInfo({ initialToken }: { initialToken?: {
         {/* Foundation Wallet Note */}
         <div className="mt-4 bg-white border border-border rounded-base p-4">
           <p className="text-xs font-base text-foreground/70 leading-relaxed">
-            Donations to this wallet fund emergency needs beyond regular feeding: medical care for sick or injured cats, rescues, and other welfare expenses.
+            Donations to this wallet become cat food for the next feeding batch. Nothing is ever withdrawn as cash.
           </p>
         </div>
       </div>

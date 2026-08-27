@@ -23,6 +23,11 @@ export function FAQ() {
         `Every time ${tokenSymbol} is traded on pump.fun, creator rewards are generated. We collect these rewards throughout each batch. On feeding day, we convert them into funds and buy cat food.`,
     },
     {
+      question: "What happens to leftover rewards after a feeding?",
+      answer:
+        `Any surplus stays in the ${projectName} foundation wallet and funds the next feeding batch. It is never withdrawn as cash. 100% stays for cat food.`,
+    },
+    {
       question: "How do you ensure transparency?",
       answer:
         "We publish the wallet address so anyone can verify the rewards collected on-chain. We also upload purchase receipts and photos of every feeding session.",
@@ -45,7 +50,7 @@ export function FAQ() {
     {
       question: `How can I support ${projectName}?`,
       answer:
-        `The easiest way is to buy ${tokenSymbol}. Every trade contributes to the creator rewards. You can also follow us on social media and share our mission.`,
+        `The easiest way is to buy ${tokenSymbol}. Every trade contributes to the creator rewards. You can also follow us and help spread the word.`,
     },
     {
       question: `Where can I buy ${tokenSymbol}?`,

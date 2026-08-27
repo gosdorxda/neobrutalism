@@ -83,7 +83,7 @@ export function DonateDrawer({
               )}
 
               <p className="text-[11px] font-base text-foreground/50">
-                Supports SOL &amp; SPL tokens via Solana Pay
+                Supports SOL &amp; SPL tokens
               </p>
 
               <div className="w-full flex items-center gap-2 rounded-base border border-border bg-secondary-background/30 p-1.5">

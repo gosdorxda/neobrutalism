@@ -21,7 +21,7 @@ export function AreaCover() {
             Areas We Cover
           </h2>
           <p className="text-sm font-base text-foreground/60 max-w-lg mx-auto">
-            We are starting in Central Java, Indonesia. More regions will be added as our community grows.
+            We are starting in Central Java, Indonesia. We plan to expand to more regions as we grow.
           </p>
         </div>
 

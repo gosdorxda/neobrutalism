@@ -481,7 +481,7 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
                           <span>Rewards</span>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Info className="w-3 h-3 cursor-help align-middle text-foreground/40 hover:text-foreground transition-colors hidden sm:inline" />
+                              <Info className="w-3 h-3 cursor-help align-middle text-foreground/40 hover:text-foreground transition-colors" />
                             </TooltipTrigger>
                             <TooltipContent>
                               <p>Creator rewards accumulated in this batch</p>
@@ -510,7 +510,7 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
                           <span>Bowls</span>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Info className="w-3 h-3 cursor-help align-middle text-foreground/40 hover:text-foreground transition-colors hidden sm:inline" />
+                              <Info className="w-3 h-3 cursor-help align-middle text-foreground/40 hover:text-foreground transition-colors" />
                             </TooltipTrigger>
                             <TooltipContent>
                               <p>Estimated bowls based on rewards (1 USD = 1 bowl)</p>
@@ -532,6 +532,14 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
                       <div className="text-[10px] sm:text-xs font-base text-foreground/60 flex items-center justify-center gap-1 whitespace-nowrap h-5 sm:h-6">
                         <PaperBag className="w-3 h-3" />
                         <span>Est. Food</span>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="w-3 h-3 cursor-help align-middle text-foreground/40 hover:text-foreground transition-colors" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Estimated cat food from rewards. Assumes $5 per kg. Actual amount depends on store and current price.</p>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                     </div>
                   </div>
@@ -564,9 +572,9 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
           {/* Disclaimer/Note */}
           <div className="w-full max-w-4xl mt-4 px-2">
             <p className="text-xs font-base text-foreground/50 text-center leading-relaxed">
-              We&apos;re a volunteer team of cat lovers who believe every street cat deserves a meal.
-              For every batch, we buy food, snap photos, and post receipts. No team allocation, no hidden fees.
-              That&apos;s the {projectName} promise.
+              We are a volunteer team of cat lovers who believe every street cat deserves a meal.
+              For every batch, we buy food, photograph every feeding, and post the receipts. No team allocation. No hidden fees.
+              That is the {projectName} promise.
             </p>
           </div>
           </div>

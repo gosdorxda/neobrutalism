@@ -15,14 +15,14 @@ export function HowItWorks() {
     {
       number: "1",
       title: `Buy ${tokenSymbol}`,
-      description: `Purchase ${tokenSymbol} on pump.fun. Every swap adds to the creator rewards pool, fueling the next batch.`,
+      description: `Purchase ${tokenSymbol} on pump.fun. Every swap adds to the creator rewards for the next batch.`,
       color: "bg-chart-1",
       icon: Wallet,
     },
     {
       number: "2",
       title: "Rewards Pool",
-      description: "All creator rewards from pump.fun are accumulated during each batch period, ready to be converted into meals.",
+      description: "Creator rewards accumulate throughout each batch, then become meals.",
       color: "bg-chart-4",
       icon: DollarSign,
     },
@@ -36,7 +36,7 @@ export function HowItWorks() {
     {
       number: "4",
       title: "Photo Proof",
-      description: "Every street cat that gets fed is photographed and shared. Proof of impact, one cat at a time.",
+      description: "Every street cat we feed is photographed and shared. Proof of every meal, not promises.",
       color: "bg-chart-3",
       icon: Camera,
     },
