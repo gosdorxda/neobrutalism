@@ -33,6 +33,15 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# app data (test/cache — settings.json stays tracked as brand config)
+/data/batches.json
+/data/fund-activity.json
+/data/stats-cache.json
+
+# uploaded media (user photos/logos)
+/public/uploads/*
+!/public/uploads/.gitkeep
+
 # vercel
 .vercel
 

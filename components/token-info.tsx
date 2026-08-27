@@ -11,8 +11,6 @@ import { NetworkSolana, WalletPhantom } from "@web3icons/react";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
-const TOKEN_CA = process.env.NEXT_PUBLIC_TOKEN_CA || "CATFUNDeio111111111111111111111111111111111";
-
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
 

@@ -69,7 +69,7 @@ Hero → StatsBar → BatchHistory → Gallery → HowItWorks → Partners → T
 ### Kalkulasi (calculator) — `components/kalkulasi.tsx`
 - **Not a page section.** It's a **global floating button → Drawer** (neobrutalism `Drawer`, `vaul`), mounted in `app/layout.tsx` so it appears on all pages.
 - Floating button: bottom-right, `PawPrint` icon, `bg-main`. No badge.
-- Drawer title: **"From Volume to Meals"**. Drawer body constrained to `max-w-md mx-auto`.
+- Drawer title: **"Volume & Rewards"**. Caption links to `https://pump.fun/docs/fees`. Drawer body constrained to `max-w-md mx-auto`.
 - Logic: volume slider `$1K–$1M` (step `$1K`, gradient track orange→red, tick marks), fee **fixed 0.3%**, monthly = dailyFee × 30, **1 USD = 1 cat** (`Math.floor(monthly / USD_PER_CAT)`).
 
 ### Admin (`app/gosdorxda/`)
@@ -83,6 +83,10 @@ Hero → StatsBar → BatchHistory → Gallery → HowItWorks → Partners → T
 - Settings: `data/settings.json` (read/written via `lib/settings.ts` `getSettings()`/`saveSettings()`).
 - Batches: `data/batches.json` (read/written in `app/api/batches/route.ts`).
 - `1 USD = 1 cat` is the project-wide assumption (see `lib/cache.ts` `Math.floor(totalFeesUsd)` and the calculator). Keep consistent.
+- Estimated food: **$5 = 1 kg** (hero "Est. Food" stat = `stats.totalFees / 5`). Replaces the former "Feed a Cat" in-card CTA. See `components/hero.tsx`.
+- `settings.heroBackground` (image path) — optional background photo for the "Our Impact So Far" section (`components/stats-bar.tsx`) with a dark overlay (`bg-black/70`); empty = default gradient + sleeping cat. Heading text goes light when a photo is set. NOT the hero section.
+- Hero "the proof" link → `https://pump.fun/profile/{settings.creatorWallet}?tab=creator-rewards`; falls back to `#token` if wallet unset. See `components/hero.tsx`.
+- Rewards/bowls stats use a **last-known-good** Redis pattern: every successful live fetch (`fetchFreshStats`) writes `stats:summary` (60s TTL) + persistent `stats:last-good`. On fetch failure, serve `stats:last-good` instead of the misleading batches.json cumulative. See `lib/cache.ts` `getStats`.
 - Auth pattern: `checkAuth(request)` compares `Authorization: Bearer <ADMIN_PASSWORD>` against `process.env.ADMIN_PASSWORD`. Applied to all mutating endpoints (POST/DELETE). **GET `/api/batches` and `/api/settings` are intentionally PUBLIC** — the homepage reads them. Do not add auth to those GETs or you'll break the homepage.
 - Secrets in `.env.local` (`ADMIN_PASSWORD`, Redis, SolanaTracker, RPC). Never commit secrets.
 
@@ -98,6 +102,12 @@ Hero → StatsBar → BatchHistory → Gallery → HowItWorks → Partners → T
 8. All user-facing copy in English.
 9. Maintenance mode via settings + `(site)/layout.tsx`.
 10. Slider/hero cards: no shadow where removed.
+11. Hero "Est. Food" stat = `rewards_USD / 5` ($5 per kg). Replaces former "Feed a Cat" in-card CTA.
+12. `settings.heroBackground` → background image on StatsBar ("Our Impact So Far"), dark overlay — NOT the hero section.
+13. Drawer title "Volume & Rewards" (was "From Volume to Meals"); caption links to `https://pump.fun/docs/fees`.
+14. "the proof" link → `https://pump.fun/profile/{creatorWallet}?tab=creator-rewards` (fallback `#token`).
+15. Rewards/bowls use last-known-good Redis pattern (`stats:last-good` persistent) on fetch failure.
+16. `data/batches.json`, `data/fund-activity.json`, `data/stats-cache.json`, `public/uploads/*` are gitignored (test data/photos don't leak to GitHub). `data/settings.json` stays tracked (brand config). Admin "Clear All Data" wipes batches + fund-activity + stats-cache + all uploads, keeps settings.
 
 ## 9. Ongoing Direction
 

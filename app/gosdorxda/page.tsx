@@ -737,7 +737,7 @@ export default function AdminPage() {
         <div className="space-y-4">
           {batches.length === 0 && !loading && (
             <div className="text-center py-10 border-2 border-dashed border-border rounded-base">
-              <p className="text-sm font-base text-foreground/50">No batches yet. Click "New Batch" to create one.</p>
+              <p className="text-sm font-base text-foreground/50">No batches yet. Click &quot;New Batch&quot; to create one.</p>
             </div>
           )}
 

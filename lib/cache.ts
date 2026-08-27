@@ -291,9 +291,7 @@ export async function getTokenInfo(): Promise<CachedTokenInfo> {
   const settings = getSettings();
   const tokenCa = settings.tokenCa || process.env.NEXT_PUBLIC_TOKEN_CA || "CATFUNDeio111111111111111111111111111111111";
   const cacheKey = `${TOKEN_KEY}:${tokenCa}`;
-  
-  console.log("[getTokenInfo] tokenCa:", tokenCa, "cacheKey:", cacheKey);
-  
+
   const cached = await getFromCache<CachedTokenInfo>(cacheKey);
   if (cached !== null) return cached;
 
