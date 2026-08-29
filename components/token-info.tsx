@@ -359,7 +359,7 @@ export function TokenInfo({ initialToken }: { initialToken?: {
               >
                 <Button variant="reverse" className="w-full sm:w-auto text-sm">
                   <img src="/pump-fun.svg" alt="" className="w-4 h-4" />
-                  Buy Token
+                  Buy on pump.fun
                 </Button>
               </a>
             </div>
