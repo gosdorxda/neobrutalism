@@ -41,6 +41,7 @@ export type Settings = {
   seoKeywords: string;
   ogImage: string;
   favicon: string;
+  histatsCode: string;
   maintenanceMode: boolean;
   maintenanceMessage: string;
   fundActivityEnabled: boolean;
@@ -74,6 +75,7 @@ const defaultSettings: Settings = {
   seoKeywords: "",
   ogImage: "",
   favicon: "",
+  histatsCode: "",
   maintenanceMode: false,
   maintenanceMessage: "",
   fundActivityEnabled: false,

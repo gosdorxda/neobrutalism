@@ -154,6 +154,7 @@ export default function AdminPage() {
   const [seoKeywords, setSeoKeywords] = useState("");
   const [ogImage, setOgImage] = useState("");
   const [favicon, setFavicon] = useState("");
+  const [histatsCode, setHistatsCode] = useState("");
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [maintenanceMessage, setMaintenanceMessage] = useState("");
   const [fundActivityEnabled, setFundActivityEnabled] = useState(false);
@@ -245,6 +246,7 @@ export default function AdminPage() {
       setSeoKeywords(data.seoKeywords || "");
       setOgImage(data.ogImage || "");
       setFavicon(data.favicon || "");
+      setHistatsCode(data.histatsCode || "");
       setMaintenanceMode(Boolean(data.maintenanceMode));
       setMaintenanceMessage(data.maintenanceMessage || "");
       setFundActivityEnabled(Boolean(data.fundActivityEnabled));
@@ -309,6 +311,7 @@ export default function AdminPage() {
           seoKeywords,
           ogImage,
           favicon,
+          histatsCode,
           maintenanceMode,
           maintenanceMessage,
           fundActivityEnabled,
@@ -1621,6 +1624,19 @@ export default function AdminPage() {
                         </div>
                         <p className="text-[10px] font-base text-foreground/50">
                           Browser tab icon. PNG with transparent background recommended. Recommended: 32x32px or 64x64px.
+                        </p>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-base text-foreground/60 block">Histats Embed Code (analytics)</label>
+                        <Textarea
+                          value={histatsCode}
+                          onChange={(e) => setHistatsCode(e.target.value)}
+                          placeholder="Paste full embed code from histats.com here"
+                          className="text-sm font-mono"
+                          rows={6}
+                        />
+                        <p className="text-[10px] font-base text-foreground/50">
+                          From histats.com counter code (the full &lt;script&gt;...&lt;/script&gt; block). Leave empty to disable.
                         </p>
                       </div>
                     </div>

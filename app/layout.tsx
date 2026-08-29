@@ -49,6 +49,16 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const settings = getSettings();
   const { projectName, projectLogo } = settings;
 
+  const histatsCode = settings.histatsCode?.trim() || "";
+  let histatsScript = "";
+  let histatsNoscript = "";
+  if (histatsCode) {
+    const scriptMatch = histatsCode.match(/<script[\s\S]*?>([\s\S]*?)<\/script>/i);
+    if (scriptMatch) histatsScript = scriptMatch[1];
+    const noscriptMatch = histatsCode.match(/<noscript[^>]*>([\s\S]*?)<\/noscript>/i);
+    if (noscriptMatch) histatsNoscript = noscriptMatch[1];
+  }
+
   return (
     <html
       lang="en"
@@ -64,6 +74,12 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
             </SettingsProvider>
           </ProjectNameProvider>
         </ThemeProvider>
+        {histatsScript && (
+          <script dangerouslySetInnerHTML={{ __html: histatsScript }} />
+        )}
+        {histatsNoscript && (
+          <noscript dangerouslySetInnerHTML={{ __html: histatsNoscript }} />
+        )}
       </body>
     </html>
   );
