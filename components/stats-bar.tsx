@@ -2,7 +2,7 @@ import { getStats } from "@/lib/data";
 import { getSettings } from "@/lib/settings";
 import { PartnerMarquee } from "@/components/partner-marquee";
 import { RewardsCounter } from "@/components/rewards-counter";
-import { ChevronDown } from "lucide-react";
+import { ArrowDown } from "lucide-react";
 
 export function StatsBar() {
   const stats = getStats();
@@ -45,9 +45,8 @@ export function StatsBar() {
         </div>
 
         {/* connector: subtitle → value */}
-        <div className="flex flex-col items-center mb-1">
-          <div className={`w-px h-2 ${onPhoto ? "bg-white/25" : "bg-foreground/20"}`} />
-          <ChevronDown className={`w-2.5 h-2.5 -mt-0.5 ${onPhoto ? "text-white/40" : "text-foreground/30"}`} />
+        <div className="flex justify-center mb-1">
+          <ArrowDown className={`w-4 h-4 ${onPhoto ? "text-white/40" : "text-foreground/30"}`} />
         </div>
 
         {/* Rewards Collected - all-time headline */}
