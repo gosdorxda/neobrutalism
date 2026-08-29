@@ -227,6 +227,16 @@ server {
     # Upload limit untuk foto (maks 10MB)
     client_max_body_size 10M;
 
+    # Serve uploaded media langsung dari disk (lewatin Next.js).
+    # Next.js production hanya serve file public/ yang ada saat build time;
+    # file yang di-upload saat runtime akan 404 kalau lewat Next.
+    location /uploads/ {
+        alias /home/<user>/neobrutalism/public/uploads/;
+        expires 7d;
+        add_header Cache-Control "public, max-age=604800";
+        access_log off;
+    }
+
     location / {
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;

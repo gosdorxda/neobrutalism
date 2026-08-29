@@ -91,28 +91,26 @@ export function Partners() {
                 key={partner.name}
                 className="w-40 flex flex-col items-center text-center gap-3 bg-secondary-background border-2 border-border rounded-base p-4 shadow-shadow"
               >
-                <div className="flex flex-col items-center text-center gap-3">
-                  <div className="w-20 h-20 rounded-full bg-main/10 border-2 border-border flex items-center justify-center overflow-hidden">
-                    {partner.logo ? (
-                      <img
-                        src={partner.logo}
-                        alt={`${partner.name} logo`}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <Icon className="w-10 h-10 text-main" />
-                    )}
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-heading text-foreground leading-tight">
-                      {partner.name}
-                    </h3>
-                    <p className="text-[10px] font-base text-foreground/50 mt-1 line-clamp-2">
-                      {partner.description}
-                    </p>
-                  </div>
+                <div className="w-20 h-20 rounded-full bg-main/10 border-2 border-border flex items-center justify-center overflow-hidden shrink-0">
+                  {partner.logo ? (
+                    <img
+                      src={partner.logo}
+                      alt={`${partner.name} logo`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <Icon className="w-10 h-10 text-main" />
+                  )}
                 </div>
-                <div className="flex items-center gap-1.5">
+                <div className="flex-1 flex flex-col items-center gap-1 min-h-0">
+                  <h3 className="text-sm font-heading text-foreground leading-tight min-h-[2.5rem] flex items-center text-center">
+                    {partner.name}
+                  </h3>
+                  <p className="text-[10px] font-base text-foreground/50 line-clamp-2">
+                    {partner.description}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
                   {socialLinks.map(({ key, label, Icon, buttonClass }) => {
                     const url = partner.socials[key]?.trim();
                     if (!url) return null;

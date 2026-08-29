@@ -1,7 +1,8 @@
 import { getStats } from "@/lib/data";
 import { getSettings } from "@/lib/settings";
-import { formatUsd } from "@/lib/utils";
 import { PartnerMarquee } from "@/components/partner-marquee";
+import { RewardsCounter } from "@/components/rewards-counter";
+import { ChevronDown } from "lucide-react";
 
 export function StatsBar() {
   const stats = getStats();
@@ -34,7 +35,7 @@ export function StatsBar() {
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Heading */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-2">
           <h2 className={`text-3xl font-heading mb-3 ${onPhoto ? "text-white" : "text-foreground"}`}>
             Our Impact So Far
           </h2>
@@ -43,17 +44,19 @@ export function StatsBar() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {/* Creator Rewards */}
-          <div className="flex flex-col items-center text-center bg-secondary-background border-2 border-border rounded-base p-4">
-            <div className="text-xs font-heading text-foreground/50 uppercase tracking-wider mb-2">
-              Rewards Collected
-            </div>
-            <div className="text-2xl sm:text-3xl font-heading text-foreground">
-              {formatUsd(stats.totalFees)}
-            </div>
-          </div>
+        {/* connector: subtitle → value */}
+        <div className="flex flex-col items-center mb-1">
+          <div className={`w-px h-2 ${onPhoto ? "bg-white/25" : "bg-foreground/20"}`} />
+          <ChevronDown className={`w-2.5 h-2.5 -mt-0.5 ${onPhoto ? "text-white/40" : "text-foreground/30"}`} />
+        </div>
 
+        {/* Rewards Collected - all-time headline */}
+        <div className="text-center mb-8">
+          <RewardsCounter value={stats.totalFees} />
+          <p className={`text-sm font-base mt-1 ${onPhoto ? "text-white/60" : "text-foreground/50"}`}>All-time creator rewards collected.</p>
+        </div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {/* Total Cats Fed */}
           <div className="flex flex-col items-center text-center bg-secondary-background border-2 border-border rounded-base p-4">
             <div className="text-xs font-heading text-foreground/50 uppercase tracking-wider mb-2">
@@ -71,6 +74,16 @@ export function StatsBar() {
             </div>
             <div className="text-2xl sm:text-3xl font-heading text-foreground">
               {stats.totalFood} kg
+            </div>
+          </div>
+
+          {/* Partners Helped */}
+          <div className="flex flex-col items-center text-center bg-secondary-background border-2 border-border rounded-base p-4">
+            <div className="text-xs font-heading text-foreground/50 uppercase tracking-wider mb-2">
+              Partners Helped
+            </div>
+            <div className="text-2xl sm:text-3xl font-heading text-foreground">
+              {partners.length}
             </div>
           </div>
 
