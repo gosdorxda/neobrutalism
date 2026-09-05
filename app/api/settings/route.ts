@@ -110,6 +110,10 @@ export async function POST(request: NextRequest) {
       updates.maintenanceMode = Boolean(body.maintenanceMode);
     }
 
+    if (body.showImpactSection !== undefined) {
+      updates.showImpactSection = Boolean(body.showImpactSection);
+    }
+
     if (body.maintenanceMessage !== undefined) {
       if (typeof body.maintenanceMessage !== "string") {
         return NextResponse.json({ error: "Invalid maintenance message" }, { status: 400 });

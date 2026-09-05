@@ -85,6 +85,12 @@ ADMIN_PASSWORD=your-strong-admin-password-here
 # Untuk production, pakai RPC provider seperti Helius, QuickNode, atau Triton
 SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
 
+# --- HELIUS API (untuk live tx tracking di /live) ---
+# Daftar di https://helius.dev (free tier tersedia)
+# Dipakai oleh /api/live/tx untuk getSignaturesForAddress + batch parse transactions
+# Tanpa ini, halaman /live akan tampil tapi tx feed kosong
+HELIUS_API_KEY=your-helius-api-key
+
 # --- SOLSCAN API (untuk transaction history) ---
 # Daftar di https://solscan.io/apis
 SOLSCAN_API_KEY=your-solscan-api-key
@@ -302,7 +308,9 @@ Ini akan memicu refresh Redis cache setiap 2 menit.
 5. ✅ Cek SOL price di navbar — harus muncul setelah beberapa detik
 6. ✅ Cek Token Info — data harus muncul
 7. ✅ Cek Redis: login ke console Upstash, cek ada data di key `sol:price`, `stats:summary`, dll
-8. ✅ Cek log cron setelah scheduled run pertama:
+8. ✅ Buka `https://your-domain.com/live` — halaman live harus load. Jika `HELIUS_API_KEY` sudah diset, tx feed akan menampilkan transaksi real. Jika belum diset, feed kosong tapi halaman tetap berfungsi.
+9. ✅ Upload `public/logo.png` manual jika belum tracked di git (dipakai sebagai icon di `/live`)
+10. ✅ Cek log cron setelah scheduled run pertama:
 
 ```bash
 tail -f /home/<user>/neobrutalism/logs/cron.log
@@ -348,10 +356,10 @@ pm2 restart neobrutalism
 
 | File / Directory | Notes |
 |---|---|
-| `.env.local` | Harus dibuat manual dengan production secrets |
+| `.env.local` | Harus dibuat manual dengan production secrets (termasuk `HELIUS_API_KEY` untuk `/live`) |
 | `data/` | Harus writable oleh Node process |
 | `logs/` | Optional; dipakai PM2 ecosystem |
-| `public/` | Static files (foto, logo, dll) |
+| `public/` | Static files (foto, logo, dll). `public/logo.png` dipakai di `/live` — upload manual jika belum tracked di git |
 | `vercel.json` | Aman di-keep, tapi di-ignore di VPS |
 
 ---
@@ -362,10 +370,10 @@ pm2 restart neobrutalism
 |---------|--------|
 | `next` | Framework (v16.3) |
 | `react` / `react-dom` | UI library (v19) |
-| `framer-motion` | Animasi (flywheel, notif banner) |
+| `framer-motion` | Animasi (flywheel, notif banner, live burst/drop) |
 | `@upstash/redis` | Caching Redis |
 | `react-loading-skeleton` | Loading skeleton |
-| `@web3icons/react` | Icon crypto (Solana, Phantom) |
+| `@web3icons/react` | Icon crypto (Solana, Phantom) — dipakai di `/live` & token info |
 | `lucide-react` | Icon UI |
 | `@radix-ui/*` | Aksesibel UI primitives |
 | `sharp` | Image optimization |
@@ -415,3 +423,11 @@ sudo swapon /swapfile
 - Cek `ADMIN_PASSWORD` di `.env.local`
 - Password case-sensitive
 - Restart app setelah ubah `.env.local`: `pm2 restart neobrutalism`
+
+### Live page (`/live`) tx feed kosong
+
+- Pastikan `HELIUS_API_KEY` di `.env.local` sudah diset
+- Daftar key gratis di https://helius.dev
+- Cek manual: `curl -s "https://mainnet.helius-rpc.com/?api-key=YOUR_KEY" -X POST -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"getSignaturesForAddress","params":["YOUR_TOKEN_CA",{"limit":3}]}'`
+- Jika response kosong atau error, cek token CA di admin panel Settings
+- Halaman tetap berfungsi tanpa Helius (stats + gallery load), hanya tx feed kosong
