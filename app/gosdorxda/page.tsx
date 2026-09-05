@@ -155,8 +155,10 @@ export default function AdminPage() {
   const [ogImage, setOgImage] = useState("");
   const [favicon, setFavicon] = useState("");
   const [histatsCode, setHistatsCode] = useState("");
+  const [swapFeeBps, setSwapFeeBps] = useState(100);
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [maintenanceMessage, setMaintenanceMessage] = useState("");
+  const [showImpactSection, setShowImpactSection] = useState(true);
   const [fundActivityEnabled, setFundActivityEnabled] = useState(false);
   const [fundActivityMinUsd, setFundActivityMinUsd] = useState(1);
   const [fundActivityPollSeconds, setFundActivityPollSeconds] = useState(60);
@@ -247,8 +249,10 @@ export default function AdminPage() {
       setOgImage(data.ogImage || "");
       setFavicon(data.favicon || "");
       setHistatsCode(data.histatsCode || "");
+      setSwapFeeBps(typeof data.swapFeeBps === "number" ? data.swapFeeBps : 100);
       setMaintenanceMode(Boolean(data.maintenanceMode));
       setMaintenanceMessage(data.maintenanceMessage || "");
+      setShowImpactSection(data.showImpactSection !== false);
       setFundActivityEnabled(Boolean(data.fundActivityEnabled));
       setFundActivityMinUsd(
         typeof data.fundActivityMinUsd === "number" ? data.fundActivityMinUsd : 1
@@ -312,8 +316,10 @@ export default function AdminPage() {
           ogImage,
           favicon,
           histatsCode,
+          swapFeeBps,
           maintenanceMode,
           maintenanceMessage,
+          showImpactSection,
           fundActivityEnabled,
           fundActivityMinUsd,
           fundActivityPollSeconds,
@@ -1106,12 +1112,13 @@ export default function AdminPage() {
           )}
 
           <Tabs defaultValue="project" className="w-full">
-            <TabsList className="grid w-full max-w-lg grid-cols-5">
+            <TabsList className="grid w-full max-w-lg grid-cols-6">
               <TabsTrigger value="project">Project</TabsTrigger>
               <TabsTrigger value="partners">Partners</TabsTrigger>
               <TabsTrigger value="seo">SEO</TabsTrigger>
               <TabsTrigger value="appearance">Appearance</TabsTrigger>
               <TabsTrigger value="fund">Fund</TabsTrigger>
+              <TabsTrigger value="swap">Swap</TabsTrigger>
             </TabsList>
 
             <TabsContent value="project" className="space-y-6">
@@ -1199,6 +1206,55 @@ export default function AdminPage() {
                     }}
                   >
                     Save Maintenance
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* See Your Impact section toggle */}
+              <Card className="border-2 border-border shadow-shadow bg-white">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h3 className="text-sm font-heading text-foreground">See Your Impact Section</h3>
+                      <p className="text-[10px] font-base text-foreground/50 mt-0.5">
+                        Show the &quot;See Your Impact&quot; wallet checker on the homepage.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowImpactSection((v) => !v)}
+                      className={`relative h-7 w-12 rounded-full border-2 border-border transition-colors ${showImpactSection ? "bg-main" : "bg-secondary-background"}`}
+                      aria-pressed={showImpactSection}
+                      aria-label="Toggle See Your Impact section"
+                    >
+                      <span
+                        className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white border-2 border-border transition-transform duration-200 ${showImpactSection ? "translate-x-[18px]" : "translate-x-0"}`}
+                      />
+                    </button>
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    disabled={loading}
+                    onClick={async () => {
+                      setLoading(true);
+                      try {
+                        const res = await fetch("/api/settings", {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                            authorization: `Bearer ${password}`,
+                          },
+                          body: JSON.stringify({ showImpactSection }),
+                        });
+                        setMessage(res.ok ? "Impact section setting saved" : "Failed to save");
+                      } catch {
+                        setMessage("Error saving impact section setting");
+                      }
+                      setLoading(false);
+                    }}
+                  >
+                    Save Impact Section
                   </Button>
                 </CardContent>
               </Card>
@@ -2233,6 +2289,45 @@ export default function AdminPage() {
                   >
                     Save Templates
                   </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="swap" className="space-y-6">
+              <Card className="border-2 border-border shadow-shadow bg-white">
+                <CardContent className="p-4">
+                  <form onSubmit={saveSettings} className="space-y-4">
+                    <div>
+                      <h3 className="text-sm font-heading text-foreground">Swap Fee</h3>
+                      <p className="text-xs font-base text-foreground/60 mt-1">
+                        Fee charged on every swap at /swap. It goes to the foundation wallet and becomes cat food. Default 1% (100 bps).
+                      </p>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-base text-foreground/60 block">Swap Fee (%)</label>
+                      <Input
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                        value={(swapFeeBps / 100).toString()}
+                        onChange={(e) => {
+                          const v = Number(e.target.value);
+                          if (!isNaN(v)) setSwapFeeBps(Math.min(10000, Math.max(0, Math.round(v * 100))));
+                        }}
+                        className="text-sm"
+                      />
+                      <p className="text-[10px] font-base text-foreground/50">
+                        {swapFeeBps} bps = {swapFeeBps / 100}%. 0% disables the fee. Max 100%.
+                      </p>
+                    </div>
+                    <p className="text-[10px] font-base text-foreground/50">
+                      Token contract and fee wallet are set in the Project tab (Token CA + Foundation Wallet).
+                    </p>
+                    <Button type="submit" size="sm" disabled={loading}>
+                      Save Settings
+                    </Button>
+                  </form>
                 </CardContent>
               </Card>
             </TabsContent>

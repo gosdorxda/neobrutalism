@@ -1,5 +1,24 @@
 [
   {
+    "fees": "$0",
+    "cats": "0",
+    "food": "0kg",
+    "txHash": "-",
+    "isActive": true,
+    "receiptImages": [],
+    "receiptStore": "",
+    "receiptItem": "",
+    "receiptTotal": "$0",
+    "notes": "",
+    "essentials": [],
+    "photos": [],
+    "id": 2,
+    "name": "Batch #3",
+    "status": "In Progress",
+    "startDate": "2026-09-04",
+    "targetDate": "2026-09-11"
+  },
+  {
     "fees": "$166",
     "cats": "166",
     "food": "0kg",

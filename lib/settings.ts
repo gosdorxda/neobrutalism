@@ -44,6 +44,7 @@ export type Settings = {
   histatsCode: string;
   maintenanceMode: boolean;
   maintenanceMessage: string;
+  showImpactSection: boolean;
   fundActivityEnabled: boolean;
   fundActivityMinUsd: number;
   fundActivityPollSeconds: number;
@@ -52,6 +53,7 @@ export type Settings = {
   tplPurchase: string;
   tplBatch: string;
   tplFeedingProof: string;
+  swapFeeBps: number;
 };
 
 const defaultSettings: Settings = {
@@ -78,6 +80,7 @@ const defaultSettings: Settings = {
   histatsCode: "",
   maintenanceMode: false,
   maintenanceMessage: "",
+  showImpactSection: true,
   fundActivityEnabled: false,
   fundActivityMinUsd: 1,
   fundActivityPollSeconds: 60,
@@ -91,6 +94,7 @@ const defaultSettings: Settings = {
     "📦 CURRENT BATCH\n\n{name} (#{id})\nStatus: {status}\nPeriod: {period}\nEst. Rewards: {rewards}\nEst. Bowls: {bowls}",
   tplFeedingProof:
     "📸 FEEDING PROOF — {name}\n\n🏪 Store: {store}\n📦 Item: {item}\n💰 Total: {total}\n🗓️ Date: {date}\n\n🐱 Cats: {cats}\n📦 Food: {food}\n💰 Rewards: {fees}\n\n🔗 Tx: {tx}\n🧾 Receipt: {receiptUrl}\n\n100% rewards → food. No cash. 🐾",
+  swapFeeBps: 100,
 };
 
 export function getSettings(): Settings {

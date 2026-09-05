@@ -135,6 +135,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    if (body.swapFeeBps !== undefined) {
+      const v = Number(body.swapFeeBps);
+      if (!isNaN(v) && v >= 0 && v <= 10000) {
+        updates.swapFeeBps = v;
+      }
+    }
+
     const tplFields = ["tplDonation", "tplRewards", "tplPurchase", "tplBatch", "tplFeedingProof"] as const;
     tplFields.forEach((field) => {
       if (body[field] !== undefined && typeof body[field] === "string") {
