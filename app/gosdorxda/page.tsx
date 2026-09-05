@@ -159,6 +159,7 @@ export default function AdminPage() {
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [maintenanceMessage, setMaintenanceMessage] = useState("");
   const [showImpactSection, setShowImpactSection] = useState(true);
+  const [liveSoundUrl, setLiveSoundUrl] = useState("");
   const [fundActivityEnabled, setFundActivityEnabled] = useState(false);
   const [fundActivityMinUsd, setFundActivityMinUsd] = useState(1);
   const [fundActivityPollSeconds, setFundActivityPollSeconds] = useState(60);
@@ -253,6 +254,7 @@ export default function AdminPage() {
       setMaintenanceMode(Boolean(data.maintenanceMode));
       setMaintenanceMessage(data.maintenanceMessage || "");
       setShowImpactSection(data.showImpactSection !== false);
+      setLiveSoundUrl(data.liveSoundUrl || "");
       setFundActivityEnabled(Boolean(data.fundActivityEnabled));
       setFundActivityMinUsd(
         typeof data.fundActivityMinUsd === "number" ? data.fundActivityMinUsd : 1
@@ -320,6 +322,7 @@ export default function AdminPage() {
           maintenanceMode,
           maintenanceMessage,
           showImpactSection,
+          liveSoundUrl,
           fundActivityEnabled,
           fundActivityMinUsd,
           fundActivityPollSeconds,
@@ -1256,6 +1259,80 @@ export default function AdminPage() {
                   >
                     Save Impact Section
                   </Button>
+                </CardContent>
+              </Card>
+
+              {/* Live Page Sound */}
+              <Card className="border-2 border-border shadow-shadow bg-white">
+                <CardContent className="p-4">
+                  <div className="mb-3">
+                    <h3 className="text-sm font-heading text-foreground">Live Page Sound</h3>
+                    <p className="text-[10px] font-base text-foreground/50 mt-0.5">
+                      Custom sound played on each tx in /live. Leave empty to use default beep.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="file"
+                        accept="audio/mpeg,audio/mp3"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const formData = new FormData();
+                          formData.append("file", file);
+                          formData.append("type", "live-sound");
+                          formData.append("folder", "sounds");
+                          try {
+                            const res = await fetch("/api/upload", {
+                              method: "POST",
+                              headers: { authorization: `Bearer ${password}` },
+                              body: formData,
+                            });
+                            const data = await res.json();
+                            if (data.url) setLiveSoundUrl(data.url);
+                            else setMessage(data.error || "Upload failed");
+                          } catch {
+                            setMessage("Error uploading sound");
+                          }
+                        }}
+                        className="text-xs"
+                      />
+                      {liveSoundUrl && (
+                        <>
+                          <audio src={liveSoundUrl} controls className="h-7" />
+                          <button
+                            type="button"
+                            onClick={() => setLiveSoundUrl("")}
+                            className="text-xs text-red-500 hover:text-red-700"
+                          >
+                            Remove
+                          </button>
+                        </>
+                      )}
+                    </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      disabled={loading}
+                      onClick={async () => {
+                        setLoading(true);
+                        try {
+                          const res = await fetch("/api/settings", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json", authorization: `Bearer ${password}` },
+                            body: JSON.stringify({ liveSoundUrl }),
+                          });
+                          setMessage(res.ok ? "Live sound saved" : "Failed to save");
+                        } catch {
+                          setMessage("Error saving live sound");
+                        }
+                        setLoading(false);
+                      }}
+                    >
+                      Save Sound
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
 

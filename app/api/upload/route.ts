@@ -35,6 +35,15 @@ export async function POST(request: NextRequest) {
     const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
     const baseName = `${Date.now()}-${sanitizedName.replace(/\.[^/.]+$/, "")}`;
 
+    if (type === "live-sound") {
+      const ext = path.extname(file.name) || ".mp3";
+      const fullName = `${baseName}${ext}`;
+      const fullPath = path.join(uploadDir, fullName);
+      fs.writeFileSync(fullPath, buffer);
+      const publicPath = `/uploads/${folder}/${fullName}`;
+      return NextResponse.json({ success: true, path: publicPath, url: publicPath, filename: fullName });
+    }
+
     if (type === "logo") {
       // Logo: preserve PNG for transparency, no thumbnail
       const fullName = `${baseName}.png`;

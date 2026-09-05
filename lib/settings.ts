@@ -45,6 +45,7 @@ export type Settings = {
   maintenanceMode: boolean;
   maintenanceMessage: string;
   showImpactSection: boolean;
+  liveSoundUrl: string;
   fundActivityEnabled: boolean;
   fundActivityMinUsd: number;
   fundActivityPollSeconds: number;
@@ -81,6 +82,7 @@ const defaultSettings: Settings = {
   maintenanceMode: false,
   maintenanceMessage: "",
   showImpactSection: true,
+  liveSoundUrl: "",
   fundActivityEnabled: false,
   fundActivityMinUsd: 1,
   fundActivityPollSeconds: 60,

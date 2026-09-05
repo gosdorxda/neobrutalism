@@ -18,6 +18,7 @@ export function LiveStreamV3() {
   const { settings } = useSettings();
   const buyUrl = settings?.tokenCa ? "https://pump.fun/coin/" + settings.tokenCa : "#";
   const tokenSymbol = settings?.projectName || "CATBOWL";
+  const liveSoundUrl = settings?.liveSoundUrl || "";
 
   const [mounted, setMounted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -71,13 +72,17 @@ export function LiveStreamV3() {
 
   const playTing = useCallback(() => {
     if (mutedRef.current) return;
+    if (liveSoundUrl) {
+      new Audio(liveSoundUrl).play().catch(() => {});
+      return;
+    }
     const ctx = audioRef.current; if (!ctx) return;
     const o = ctx.createOscillator(); const g = ctx.createGain();
     o.type = "sine"; o.frequency.value = 880 + Math.random() * 120;
     const t = ctx.currentTime;
     g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.16, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
     o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + 0.23);
-  }, []);
+  }, [liveSoundUrl]);
 
   function formatDate(d: string) {
     if (!d) return "-";

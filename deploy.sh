@@ -34,12 +34,15 @@ LOCK_AFTER="$(sha1sum package-lock.json 2>/dev/null | cut -d' ' -f1)"
 if [ "$LOCK_BEFORE" != "$LOCK_AFTER" ]; then
   echo "==> package-lock.json changed. Running npm install..."
   npm install
+elif [ ! -d "node_modules" ]; then
+  echo "==> node_modules missing. Running npm install..."
+  npm install
 else
   echo "==> No dependency changes. Skipping npm install."
 fi
 
 echo "==> Building (npm run build)..."
-npm run build
+NODE_OPTIONS="--max-old-space-size=4096" npm run build
 
 echo "==> Restarting PM2 app: $APP_NAME..."
 pm2 restart "$APP_NAME" --update-env

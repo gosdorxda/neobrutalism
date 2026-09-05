@@ -114,6 +114,10 @@ export async function POST(request: NextRequest) {
       updates.showImpactSection = Boolean(body.showImpactSection);
     }
 
+    if (body.liveSoundUrl !== undefined) {
+      updates.liveSoundUrl = typeof body.liveSoundUrl === "string" ? body.liveSoundUrl.trim() : "";
+    }
+
     if (body.maintenanceMessage !== undefined) {
       if (typeof body.maintenanceMessage !== "string") {
         return NextResponse.json({ error: "Invalid maintenance message" }, { status: 400 });
