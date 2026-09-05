@@ -381,7 +381,7 @@ export function LiveStreamV3() {
                   </AnimatePresence>
                 </div>
               </div>
-            <div className="space-y-1 border-t border-border/30 pt-2">
+            <div className="space-y-1 border-t border-border/30 pt-3">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-base text-foreground/40">Last tx</span>
                 <span className="text-xs font-heading text-foreground/70">{timeAgo}</span>
