@@ -2,9 +2,17 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Maximize2, Minimize2, Package, DollarSign, Soup, PaperBag, TrendingUp, Volume2, VolumeX, Activity } from "lucide-react";
+import { Maximize2, Minimize2, Package, DollarSign, Soup, PaperBag, TrendingUp, Volume2, VolumeX, Activity, AlertTriangle, ArrowBigUp, ArrowBigDown } from "lucide-react";
 import { NetworkSolana } from "@web3icons/react";
 import { useSettings } from "@/components/settings-provider";
+
+const ROTATING_MESSAGES = [
+  "All creator rewards go straight to food for street cats.",
+  "Track every batch with receipts, photos, and on-chain records.",
+  "No team allocation. No hidden fees.",
+  "Fill bowls, not wallets.",
+  "For full transparency, receipts, and feeding proof, visit catbowl.xyz",
+];
 
 type Batch = { id: number; name: string; status: string; isActive: boolean; startDate: string; targetDate: string; fees: string; cats: string; food: string; photos: string[] };
 type Stats = { totalCats: number; totalFees: number; totalFood: number; estimatedBowls: number; feedingRounds: number };
@@ -35,6 +43,7 @@ export function LiveStreamV3() {
   const [activity, setActivity] = useState({ lastTxTime: null as number | null, lastRewardUsd: 0, lastRewardSol: 0, txCount: 0, totalRewardsUsd: 0, totalRewardsSol: 0 });
   const [burstKey, setBurstKey] = useState(0);
   const [timeAgo, setTimeAgo] = useState("\u2014");
+  const [bannerIndex, setBannerIndex] = useState(0);
 
   const mutedRef = useRef(true);
   const audioRef = useRef<AudioContext | null>(null);
@@ -60,6 +69,13 @@ export function LiveStreamV3() {
   }
 
   useEffect(() => { mutedRef.current = muted; }, [muted]);
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setBannerIndex(i => (i + 1) % ROTATING_MESSAGES.length);
+    }, 4000);
+    return () => clearInterval(t);
+  }, []);
 
   const initAudio = useCallback(() => {
     if (typeof window === "undefined") return;
@@ -220,7 +236,7 @@ export function LiveStreamV3() {
 
       <div className="mx-auto max-w-screen-2xl px-4 pt-8 pb-4 text-center sm:px-6">
         <h1 className="text-3xl font-heading tracking-tight text-foreground drop-shadow-[0_3px_0_rgba(0,0,0,0.08)] sm:text-5xl">The Bowl Meter</h1>
-        <p className="mt-1.5 text-sm font-base text-foreground/50">Every trade funds a meal.</p>
+        <p className="mt-1.5 text-sm font-base text-foreground/50">Every Swap Fills a Bowl</p>
       </div>
 
       <div className="mx-auto flex max-w-screen-2xl gap-4 px-4 py-4 sm:px-6">
@@ -288,7 +304,7 @@ export function LiveStreamV3() {
               </div>
               <div className="flex items-center justify-between pt-1">
                 <p className="text-[10px] font-base text-foreground/50">
-                  100% of creator rewards become cat food. No cash, just bowls.
+                  100% of creator rewards become cat food.
                 </p>
                 <div className="flex items-center gap-1">
                   <div className="relative h-2 w-2">
@@ -306,7 +322,7 @@ export function LiveStreamV3() {
               <div className="flex gap-2 sm:gap-6 min-w-0">
                 <div className="text-center">
                   <div className="text-lg font-heading mb-0.5 transition-all duration-300 sm:text-2xl" style={{ background: "linear-gradient(90deg,#5a9a0c 34.62%,#009970)", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                    ${totalFees.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+                    ${totalFees.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                   <div className="flex items-center justify-center gap-1 whitespace-nowrap text-[10px] font-base text-foreground/60 sm:text-xs">
                     <DollarSign className="h-3 w-3" />
@@ -370,7 +386,7 @@ export function LiveStreamV3() {
               <Activity className="h-4 w-4 text-main" />
               <h3 className="text-xs font-heading uppercase tracking-wider text-foreground/60">Activity</h3>
             </div>
-            <p className="mb-2 text-center text-[10px] font-base text-foreground/50">Creator fee</p>
+            <p className="mb-2 text-center text-[10px] font-base text-foreground/50">Est. creator reward</p>
             <div className="relative mb-2 flex justify-center overflow-hidden py-1">
               <div className="relative">
                 <motion.span key={burstKey} initial={{ scale: 1.3 }} animate={{ scale: 1 }} transition={{ duration: 0.3 }} className="inline-block text-4xl font-heading tabular-nums sm:text-5xl" style={rewardsGradient}>{showSol ? "+" + formatFee(activity.lastRewardSol) + " SOL" : "+$" + formatFee(activity.lastRewardUsd)}</motion.span>
@@ -392,22 +408,23 @@ export function LiveStreamV3() {
                 <span className="text-xs font-heading text-foreground/70">{timeAgo}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-base text-foreground/40">Avg fee</span>
+                <span className="text-[10px] font-base text-foreground/40">Avg reward</span>
                 <span className="text-xs font-heading tabular-nums text-foreground/70">{activity.txCount > 0 ? (showSol ? "+" + formatFee(activity.totalRewardsSol / activity.txCount) + " SOL" : "+$" + formatFee(activity.totalRewardsUsd / activity.txCount)) : "\u2014"}</span>
               </div>
             </div>
           </div>
 
             <div className="mt-2 mb-3 flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-main" />
-              <h3 className="px-1 text-xs font-heading uppercase tracking-wider text-foreground/50">Last Tx</h3>
+              <h3 className="mt-2 mb-2 px-1 text-xs font-heading uppercase tracking-wider text-foreground/50">Last Tx</h3>
               <button type="button" onClick={() => setShowSol(s => !s)} className="ml-auto rounded-base border border-border bg-secondary-background px-1.5 py-0.5 text-[9px] font-heading text-foreground/70 transition-colors hover:bg-background">{showSol ? "SOL" : "USD"}</button>
             </div>
             <div className="space-y-2 overflow-hidden">
               {mounted && txFeed.map((tx) => (
                 <motion.div key={tx.id} layout initial={{ opacity: 0, y: -60, scale: 0.85 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.3 } }} transition={{ type: "spring", stiffness: 350, damping: 28 }} className="flex items-center gap-2.5 rounded-base border-2 border-border bg-secondary-background px-3 py-3.5">
                   <span className="inline-flex shrink-0 items-stretch overflow-hidden rounded-base">
-                    <span className={"border-r border-black/15 px-2 py-1.5 text-[9px] font-heading text-white " + (tx.side === "buy" ? "bg-green-500" : "bg-red-500")}>{tx.side === "buy" ? "BUY" : "SELL"}</span>
+                    <span className={"flex items-center border-r border-black/15 px-2.5 py-1.5 text-white " + (tx.side === "buy" ? "bg-green-500" : "bg-red-500")}>
+                      {tx.side === "buy" ? <ArrowBigUp className="h-4 w-4" /> : <ArrowBigDown className="h-4 w-4" />}
+                    </span>
                     <span className="bg-gray-100 px-2 py-1.5 font-mono text-[10px] text-foreground/50">{tx.wallet}</span>
                   </span>
                   <span className="text-base font-heading tabular-nums text-foreground">{formatCompact(tx.tokenAmount)}</span>
@@ -428,20 +445,36 @@ export function LiveStreamV3() {
         </div>
       </div>
 
-      <motion.a
-        href="https://catbowl.xyz"
-        target="_blank"
-        rel="noopener noreferrer"
+      <motion.div
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5, type: "spring", stiffness: 60, damping: 14 }}
-        className="fixed bottom-0 left-0 right-0 z-20 border-t-2 border-border bg-white/95 px-4 py-3 backdrop-blur"
+        className="fixed bottom-0 left-0 right-0 z-20 border-t-2 border-border bg-white/95 px-4 py-4 backdrop-blur"
       >
-        <div className="mx-auto flex max-w-screen-2xl items-center justify-center gap-3 text-center">
-          <span className="text-sm font-heading text-foreground sm:text-base">For full transparency, receipts, and feeding proof, visit</span>
-          <span className="text-sm font-heading text-main underline underline-offset-2 sm:text-base">catbowl.xyz</span>
+        <div className="mx-auto flex max-w-screen-2xl items-center justify-center gap-2 text-center">
+          <div className="relative h-8 overflow-hidden sm:h-9">
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={bannerIndex}
+                initial={{ y: 35, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -35, opacity: 0 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                className="flex items-center gap-2 text-lg font-heading text-foreground/70 sm:text-xl"
+              >
+                {ROTATING_MESSAGES[bannerIndex].includes("catbowl.xyz") && (
+                  <AlertTriangle className="h-5 w-5 shrink-0 fill-amber-400 text-amber-600" />
+                )}
+                {ROTATING_MESSAGES[bannerIndex].includes("catbowl.xyz") ? (
+                  <>For full transparency, receipts, and feeding proof, visit <a href="https://catbowl.xyz" target="_blank" rel="noopener noreferrer" className="text-main underline underline-offset-2">catbowl.xyz</a></>
+                ) : (
+                  ROTATING_MESSAGES[bannerIndex]
+                )}
+              </motion.p>
+            </AnimatePresence>
+          </div>
         </div>
-      </motion.a>
+      </motion.div>
     </div>
   );
 }
