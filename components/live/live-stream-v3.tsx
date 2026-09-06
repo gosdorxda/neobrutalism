@@ -398,7 +398,7 @@ export function LiveStreamV3() {
             </div>
           </div>
 
-            <div className="mt-1 mb-3 flex items-center gap-2">
+            <div className="mt-2 mb-3 flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-main" />
               <h3 className="px-1 text-xs font-heading uppercase tracking-wider text-foreground/50">Last Tx</h3>
               <button type="button" onClick={() => setShowSol(s => !s)} className="ml-auto rounded-base border border-border bg-secondary-background px-1.5 py-0.5 text-[9px] font-heading text-foreground/70 transition-colors hover:bg-background">{showSol ? "SOL" : "USD"}</button>
@@ -427,6 +427,21 @@ export function LiveStreamV3() {
             </div>
         </div>
       </div>
+
+      <motion.a
+        href="https://catbowl.xyz"
+        target="_blank"
+        rel="noopener noreferrer"
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.5, type: "spring", stiffness: 60, damping: 14 }}
+        className="fixed bottom-0 left-0 right-0 z-20 border-t-2 border-border bg-white/95 px-4 py-3 backdrop-blur"
+      >
+        <div className="mx-auto flex max-w-screen-2xl items-center justify-center gap-3 text-center">
+          <span className="text-sm font-heading text-foreground sm:text-base">For full transparency, receipts, and feeding proof, visit</span>
+          <span className="text-sm font-heading text-main underline underline-offset-2 sm:text-base">catbowl.xyz</span>
+        </div>
+      </motion.a>
     </div>
   );
 }
