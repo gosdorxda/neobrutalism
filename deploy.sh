@@ -27,7 +27,17 @@ echo "==> $BEHIND new commit(s) found. Deploying..."
 LOCK_BEFORE="$(sha1sum package-lock.json 2>/dev/null | cut -d' ' -f1)"
 
 echo "==> git pull..."
+# Backup runtime files that conflict with git (settings.json is modified by admin panel at runtime)
+if [ -f "data/settings.json" ]; then
+  cp data/settings.json data/settings.json.bak
+fi
+git checkout -- data/settings.json deploy.sh 2>/dev/null || true
 git pull --ff-only
+# Restore runtime settings (keep VPS production config, don't overwrite with git version)
+if [ -f "data/settings.json.bak" ]; then
+  cp data/settings.json.bak data/settings.json
+  rm data/settings.json.bak
+fi
 
 LOCK_AFTER="$(sha1sum package-lock.json 2>/dev/null | cut -d' ' -f1)"
 

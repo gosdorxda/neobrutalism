@@ -220,7 +220,7 @@ export function LiveStreamV3() {
 
       <div className="mx-auto max-w-screen-2xl px-4 pt-8 pb-4 text-center sm:px-6">
         <h1 className="text-3xl font-heading tracking-tight text-foreground drop-shadow-[0_3px_0_rgba(0,0,0,0.08)] sm:text-5xl">The Bowl Meter</h1>
-        <p className="mt-1.5 text-sm font-base text-foreground/50">Watch trades become meals.</p>
+        <p className="mt-1.5 text-sm font-base text-foreground/50">Every trade funds a meal.</p>
       </div>
 
       <div className="mx-auto flex max-w-screen-2xl gap-4 px-4 py-4 sm:px-6">
@@ -370,7 +370,7 @@ export function LiveStreamV3() {
               <Activity className="h-4 w-4 text-main" />
               <h3 className="text-xs font-heading uppercase tracking-wider text-foreground/60">Activity</h3>
             </div>
-            <p className="mb-2 text-center text-[10px] font-base text-foreground/50">Last creator reward</p>
+            <p className="mb-2 text-center text-[10px] font-base text-foreground/50">Creator fee</p>
             <div className="relative mb-2 flex justify-center overflow-hidden py-1">
               <div className="relative">
                 <motion.span key={burstKey} initial={{ scale: 1.3 }} animate={{ scale: 1 }} transition={{ duration: 0.3 }} className="inline-block text-4xl font-heading tabular-nums sm:text-5xl" style={rewardsGradient}>{showSol ? "+" + formatFee(activity.lastRewardSol) + " SOL" : "+$" + formatFee(activity.lastRewardUsd)}</motion.span>
@@ -388,11 +388,11 @@ export function LiveStreamV3() {
               </div>
             <div className="space-y-1 border-t border-border/30 pt-3.5">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-base text-foreground/40">Last tx</span>
+                <span className="text-[10px] font-base text-foreground/40">Last trade</span>
                 <span className="text-xs font-heading text-foreground/70">{timeAgo}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-base text-foreground/40">Avg reward</span>
+                <span className="text-[10px] font-base text-foreground/40">Avg fee</span>
                 <span className="text-xs font-heading tabular-nums text-foreground/70">{activity.txCount > 0 ? (showSol ? "+" + formatFee(activity.totalRewardsSol / activity.txCount) + " SOL" : "+$" + formatFee(activity.totalRewardsUsd / activity.txCount)) : "\u2014"}</span>
               </div>
             </div>

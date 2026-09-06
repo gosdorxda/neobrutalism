@@ -12,7 +12,7 @@ type ParsedTx = {
   feePayer?: string;
   events?: { swap?: { tokenInputs?: { mint?: string; amount?: string | number; decimals?: number }[]; tokenOutputs?: { mint?: string; amount?: string | number; decimals?: number }[] } | null } | null;
   nativeTransfers?: { fromUserAccount?: string; toUserAccount?: string; amount?: number }[];
-  tokenTransfers?: { mint?: string; tokenAmount?: number; decimals?: number }[];
+  tokenTransfers?: { mint?: string; tokenAmount?: number; decimals?: number; fromUserAccount?: string; toUserAccount?: string }[];
 };
 
 export async function GET() {
@@ -84,6 +84,7 @@ export async function GET() {
     let side: "buy" | "sell" | null = null;
     let solAmount = 0;
 
+    // 1. Try swap event (standard DEX swaps via Jupiter etc.)
     const swap = tx.events?.swap;
     if (swap) {
       const tokenIn = (swap.tokenInputs || []).find((t) => t.mint === tokenMint);
@@ -92,16 +93,29 @@ export async function GET() {
       else if (tokenIn && !tokenOut) side = "sell";
     }
 
+    // 2. Try token transfers (most reliable for pump.fun)
+    if (!side && tx.tokenTransfers) {
+      for (const tt of tx.tokenTransfers) {
+        if (tt.mint === tokenMint && tt.tokenAmount != null) {
+          if (tt.toUserAccount === fp) { side = "buy"; break; }
+          if (tt.fromUserAccount === fp) { side = "sell"; break; }
+        }
+      }
+    }
+
+    // 3. Fallback: native SOL transfers (with dust filter)
     if (!side && tx.nativeTransfers) {
       let outSol = 0;
       let inSol = 0;
+      const MIN_SOL = 0.001;
       for (const nt of tx.nativeTransfers) {
         const amt = (nt.amount || 0) / LAMPORTS_PER_SOL;
+        if (amt < MIN_SOL) continue;
         if (nt.fromUserAccount === fp && amt > outSol) outSol = amt;
         else if (nt.toUserAccount === fp && amt > inSol) inSol = amt;
       }
       if (outSol > inSol && outSol > 0) { side = "buy"; solAmount = outSol; }
-      else if (inSol > 0) { side = "sell"; solAmount = inSol; }
+      else if (inSol > outSol && inSol > 0) { side = "sell"; solAmount = inSol; }
     }
 
     if (!side) continue;
