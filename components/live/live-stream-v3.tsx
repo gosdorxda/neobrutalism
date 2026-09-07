@@ -57,12 +57,12 @@ export function LiveStreamV3() {
 
   function formatFee(v: number): string {
     if (v === 0) return "0";
-    return v.toFixed(4);
+    return v.toFixed(6);
   }
 
   function formatReward(v: number): string {
     if (v === 0) return "0";
-    return v.toFixed(6);
+    return v.toFixed(4);
   }
 
   function formatTxSol(n: number): string {
@@ -273,7 +273,7 @@ export function LiveStreamV3() {
           <div className="rounded-base border border-border/40 bg-white/70 px-3 py-2.5 backdrop-blur sm:px-4 sm:py-3">
             <p className="text-[10px] font-base text-foreground/40 sm:text-xs">Current batch rewards</p>
             <div className="mt-0.5 flex items-baseline gap-1.5">
-              <p className="text-xl font-heading tabular-nums text-foreground sm:text-2xl" style={rewardsGradient}>{showSol ? formatFee(animatedFeesSol) : "$" + animatedFees.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+              <p className="text-xl font-heading tabular-nums text-foreground sm:text-2xl" style={rewardsGradient}>{showSol ? formatReward(animatedFeesSol) : "$" + animatedFees.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
               <span className="text-[10px] font-base text-foreground/40">{showSol ? "SOL" : ""}</span>
             </div>
           </div>
@@ -377,7 +377,7 @@ export function LiveStreamV3() {
               <div className="flex gap-2 sm:gap-6 min-w-0">
                 <div className="text-center">
                   <div className="text-lg font-heading mb-0.5 transition-all duration-300 sm:text-2xl" style={{ background: "linear-gradient(90deg,#5a9a0c 34.62%,#009970)", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                    {showSol ? formatFee(animatedFeesSol) + " SOL" : "$" + animatedFees.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {showSol ? formatReward(animatedFeesSol) + " SOL" : "$" + animatedFees.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                   <div className="flex items-center justify-center gap-1 whitespace-nowrap text-[10px] font-base text-foreground/60 sm:text-xs">
                     <DollarSign className="h-3 w-3" />
