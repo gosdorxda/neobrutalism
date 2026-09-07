@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Maximize2, Minimize2, Package, DollarSign, Soup, PaperBag, TrendingUp, Volume2, VolumeX, Activity, AlertTriangle, ArrowBigUp, ArrowBigDown } from "lucide-react";
+import { Maximize2, Minimize2, Package, DollarSign, Soup, PaperBag, Volume2, VolumeX, Activity, AlertTriangle, ArrowBigUp, ArrowBigDown } from "lucide-react";
 import { NetworkSolana } from "@web3icons/react";
 import { useSettings } from "@/components/settings-provider";
+import { useCountUpNumber } from "@/hooks/use-count-up";
 
 const ROTATING_MESSAGES = [
   "All creator rewards go straight to food for street cats.",
@@ -15,7 +16,7 @@ const ROTATING_MESSAGES = [
 ];
 
 type Batch = { id: number; name: string; status: string; isActive: boolean; startDate: string; targetDate: string; fees: string; cats: string; food: string; photos: string[] };
-type Stats = { totalCats: number; totalFees: number; totalFood: number; estimatedBowls: number; feedingRounds: number };
+type Stats = { totalCats: number; totalFees: number; totalFeesCumulative: number; totalFeesSol: number; totalFood: number; estimatedBowls: number; feedingRounds: number };
 type Photo = { src: string; batch: string; cats: string; food: string };
 type Particle = { angle: number; dist: number; emoji: string; delay: number };
 type TxCard = { id: number; side: "buy" | "sell"; wallet: string; usd: number; sol: number; tokenAmount: number; particles: Particle[] };
@@ -33,6 +34,7 @@ export function LiveStreamV3() {
   const [muted, setMuted] = useState(true);
   const [stats, setStats] = useState<Stats | null>(null);
   const [activeBatch, setActiveBatch] = useState<Batch | null>(null);
+  const [batchCount, setBatchCount] = useState(0);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [progress, setProgress] = useState(0);
@@ -55,10 +57,16 @@ export function LiveStreamV3() {
 
   function formatFee(v: number): string {
     if (v === 0) return "0";
-    if (v < 0.001) return v.toFixed(8);
-    if (v < 0.01) return v.toFixed(6);
-    if (v < 1) return v.toFixed(4);
-    return v.toFixed(2);
+    return v.toFixed(4);
+  }
+
+  function formatReward(v: number): string {
+    if (v === 0) return "0";
+    return v.toFixed(6);
+  }
+
+  function formatTxSol(n: number): string {
+    return n.toFixed(4);
   }
 
   function formatCompact(n: number): string {
@@ -132,6 +140,7 @@ export function LiveStreamV3() {
       fetch("/api/batches", { cache: "no-store" }).then(r => r.json()).then((bs: Batch[]) => {
         const active = bs.find(b => b.isActive) || bs[0] || null;
         setActiveBatch(active);
+        setBatchCount(bs.filter(b => b.status === "Completed").length);
         const all: Photo[] = bs.flatMap(b => (b.photos || []).map(p => ({ src: p, batch: b.name || "Batch #" + b.id, cats: b.cats || "0", food: b.food || "0kg" })));
         const shuffled = [...all].sort(() => Math.random() - 0.5);
         setPhotos(shuffled);
@@ -220,7 +229,20 @@ export function LiveStreamV3() {
   };
 
   const totalFees = stats?.totalFees ?? 0;
+  const totalFeesSol = stats?.totalFeesSol ?? 0;
   const estimatedBowls = stats?.estimatedBowls ?? 0;
+  const totalFeesCumulative = stats?.totalFeesCumulative ?? 0;
+  const solPrice = totalFeesSol > 0 ? totalFees / totalFeesSol : 0;
+  const totalFeesCumulativeSol = solPrice > 0 ? totalFeesCumulative / solPrice : 0;
+  const totalCats = stats?.totalCats ?? 0;
+  const totalFood = stats?.totalFood ?? 0;
+  const feedingRounds = stats?.feedingRounds ?? 0;
+
+  const animatedFeesCumulative = useCountUpNumber(totalFeesCumulative);
+  const animatedFees = useCountUpNumber(totalFees);
+  const animatedFeesSol = useCountUpNumber(totalFeesSol);
+  const animatedFeesCumulativeSol = useCountUpNumber(totalFeesCumulativeSol);
+  const animatedBowls = useCountUpNumber(estimatedBowls);
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-amber-50 via-orange-50 to-orange-100 text-foreground">
@@ -235,8 +257,41 @@ export function LiveStreamV3() {
       </div>
 
       <div className="mx-auto max-w-screen-2xl px-4 pt-8 pb-4 text-center sm:px-6">
-        <h1 className="text-3xl font-heading tracking-tight text-foreground drop-shadow-[0_3px_0_rgba(0,0,0,0.08)] sm:text-5xl">The Bowl Meter</h1>
+        <h1 className="text-3xl font-heading tracking-tight text-foreground sm:text-5xl">The Bowl Meter</h1>
         <p className="mt-1.5 text-sm font-base text-foreground/50">Every Swap Fills a Bowl</p>
+      </div>
+
+      <div className="mx-auto max-w-screen-2xl px-4 sm:px-6">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+          <div className="rounded-base border border-border/40 bg-white/70 px-3 py-2.5 backdrop-blur sm:px-4 sm:py-3">
+            <p className="text-[10px] font-base text-foreground/40 sm:text-xs">All-time rewards</p>
+            <div className="mt-0.5 flex items-baseline gap-1.5">
+              <p className="text-xl font-heading tabular-nums text-foreground sm:text-2xl" style={rewardsGradient}>${totalFeesCumulative.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+              <span className="text-[10px] font-base text-foreground/40">{"\u2248"} {totalFeesCumulativeSol.toFixed(2)} SOL</span>
+            </div>
+          </div>
+          <div className="rounded-base border border-border/40 bg-white/70 px-3 py-2.5 backdrop-blur sm:px-4 sm:py-3">
+            <p className="text-[10px] font-base text-foreground/40 sm:text-xs">Current batch rewards</p>
+            <div className="mt-0.5 flex items-baseline gap-1.5">
+              <p className="text-xl font-heading tabular-nums text-foreground sm:text-2xl" style={rewardsGradient}>{showSol ? formatFee(animatedFeesSol) : "$" + animatedFees.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+              <span className="text-[10px] font-base text-foreground/40">{showSol ? "SOL" : ""}</span>
+            </div>
+          </div>
+          <div className="rounded-base border border-border/40 bg-white/70 px-3 py-2.5 backdrop-blur sm:px-4 sm:py-3">
+            <p className="text-[10px] font-base text-foreground/40 sm:text-xs">Est. cats this batch</p>
+            <div className="mt-0.5 flex items-baseline gap-1.5">
+              <p className="text-xl font-heading tabular-nums text-foreground sm:text-2xl">{Math.round(animatedBowls).toLocaleString("en-US")}</p>
+              <span className="text-[10px] font-base text-foreground/40">cats</span>
+            </div>
+          </div>
+          <div className="rounded-base border border-border/40 bg-white/70 px-3 py-2.5 backdrop-blur sm:px-4 sm:py-3">
+            <p className="text-[10px] font-base text-foreground/40 sm:text-xs">Batches delivered</p>
+            <div className="mt-0.5 flex items-baseline gap-1.5">
+              <p className="text-xl font-heading tabular-nums text-foreground sm:text-2xl">{batchCount}</p>
+              <span className="text-[10px] font-base text-foreground/40">batches</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="mx-auto flex max-w-screen-2xl gap-4 px-4 py-4 sm:px-6">
@@ -322,7 +377,7 @@ export function LiveStreamV3() {
               <div className="flex gap-2 sm:gap-6 min-w-0">
                 <div className="text-center">
                   <div className="text-lg font-heading mb-0.5 transition-all duration-300 sm:text-2xl" style={{ background: "linear-gradient(90deg,#5a9a0c 34.62%,#009970)", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                    ${totalFees.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {showSol ? formatFee(animatedFeesSol) + " SOL" : "$" + animatedFees.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                   <div className="flex items-center justify-center gap-1 whitespace-nowrap text-[10px] font-base text-foreground/60 sm:text-xs">
                     <DollarSign className="h-3 w-3" />
@@ -331,7 +386,7 @@ export function LiveStreamV3() {
                 </div>
                 <div className="h-auto w-px bg-border" />
                 <div className="text-center">
-                  <div className="text-lg font-heading text-foreground mb-0.5 transition-all duration-300 sm:text-2xl">{estimatedBowls.toLocaleString("en-US")}</div>
+                  <div className="text-lg font-heading text-foreground mb-0.5 transition-all duration-300 sm:text-2xl">{Math.round(animatedBowls).toLocaleString("en-US")}</div>
                   <div className="flex items-center justify-center gap-1 whitespace-nowrap text-[10px] font-base text-foreground/60 sm:text-xs">
                     <Soup className="h-3 w-3" />
                     <span>Bowls</span>
@@ -354,7 +409,7 @@ export function LiveStreamV3() {
           {mounted && photos.length > 0 ? (
             <>
               <div className="overflow-hidden">
-                <div className="flex w-max items-start gap-3 py-1" style={{ animation: "marquee 90s linear infinite" }}>
+                <div className="flex w-max items-start gap-3 py-1" style={{ animation: "marquee 120s linear infinite" }}>
                   {[...photos, ...photos].map((p, i) => (
                     <div key={"r0-" + i} className="shrink-0">
                       <img src={p.src} alt={p.batch} className="h-40 w-40 rounded-base object-cover sm:h-48 sm:w-48" loading="lazy" />
@@ -363,7 +418,7 @@ export function LiveStreamV3() {
                 </div>
               </div>
               <div className="overflow-hidden">
-                <div className="flex w-max items-start gap-3 py-1" style={{ animation: "marquee 80s linear infinite reverse" }}>
+                <div className="flex w-max items-start gap-3 py-1" style={{ animation: "marquee 100s linear infinite reverse" }}>
                   {[...photos.slice().reverse(), ...photos.slice().reverse()].map((p, i) => (
                     <div key={"r1-" + i} className="shrink-0">
                       <img src={p.src} alt={p.batch} className="h-36 w-36 rounded-base object-cover sm:h-44 sm:w-44" loading="lazy" />
@@ -427,14 +482,13 @@ export function LiveStreamV3() {
                     </span>
                     <span className="bg-gray-100 px-2 py-1.5 font-mono text-[10px] text-foreground/50">{tx.wallet}</span>
                   </span>
-                  <span className="text-base font-heading tabular-nums text-foreground">{formatCompact(tx.tokenAmount)}</span>
-                  <span className="text-[10px] font-base text-foreground/40">{tokenSymbol}</span>
+                  <span className="w-40 text-base font-heading tabular-nums text-foreground">{formatCompact(tx.tokenAmount)} <span className="text-[10px] font-base text-foreground/40">{tokenSymbol}</span></span>
+                  <span className="w-20 text-[10px] font-base text-foreground/40">{showSol ? formatTxSol(tx.sol) + " SOL" : "$" + formatCompact(tx.usd)}</span>
                   <div className="ml-auto flex items-center gap-1.5">
                     <span className="inline-flex items-center gap-1 rounded-full bg-main/10 px-2 py-0.5">
                       <NetworkSolana variant="branded" className="h-3.5 w-3.5" />
                       <motion.span initial={{ scale: 0 }} animate={{ scale: [0, 1.3, 1] }} transition={{ duration: 0.4, delay: 0.15 }} className="text-xs font-heading tabular-nums" style={rewardsGradient}>{showSol ? "+" + formatFee(tx.sol * 0.003) : "+$" + formatFee(tx.usd * 0.003)}</motion.span>
                     </span>
-                    <span className="text-base font-heading tabular-nums text-foreground/70">{showSol ? formatCompact(tx.sol) + " SOL" : "$" + formatCompact(tx.usd)}</span>
                   </div>
                 </motion.div>
               ))}
