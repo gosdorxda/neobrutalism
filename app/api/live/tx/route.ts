@@ -8,14 +8,25 @@ export const dynamic = "force-dynamic";
 const seenSigs = new Set<string>();
 const MAX_SEEN = 200;
 
+const SOL_MINT = "So11111111111111111111111111111111111111112";
+
+type AccountData = {
+  account?: string;
+  nativeBalanceChange?: number;
+  tokenBalanceChanges?: { userAccount?: string; mint?: string; rawTokenAmount?: { tokenAmount?: string; decimals?: number } }[];
+};
+
 type ParsedTx = {
   feePayer?: string;
   events?: { swap?: { tokenInputs?: { mint?: string; amount?: string | number; decimals?: number }[]; tokenOutputs?: { mint?: string; amount?: string | number; decimals?: number }[] } | null } | null;
   nativeTransfers?: { fromUserAccount?: string; toUserAccount?: string; amount?: number }[];
   tokenTransfers?: { mint?: string; tokenAmount?: number; decimals?: number; fromUserAccount?: string; toUserAccount?: string }[];
+  accountData?: AccountData[];
 };
 
-export async function GET() {
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const raw = url.searchParams.get("raw") === "1";
   const settings = getSettings();
   const tokenMint = settings.tokenCa?.trim();
   if (!tokenMint) return NextResponse.json({ txs: [] });
@@ -46,6 +57,24 @@ export async function GET() {
   const sigs = sigRes?.result || [];
   if (sigs.length === 0) return NextResponse.json({ txs: [] });
 
+  // Raw mode: parse latest sigs directly (skip dedup)
+  if (raw) {
+    const rawSigs: string[] = sigs.slice(0, 3).map((s: { signature?: string }) => s.signature).filter((s: string | undefined): s is string => Boolean(s));
+    let rawParsed: ParsedTx[] = [];
+    try {
+      const r = await fetch(`${HELIUS_TX_API_BASE}${key}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transactions: rawSigs }),
+        cache: "no-store",
+      });
+      if (r.ok) rawParsed = await r.json();
+    } catch {
+      // ignore
+    }
+    return NextResponse.json({ parsed: rawParsed, tokenMint });
+  }
+
   const newSigs: string[] = [];
   for (const s of sigs) {
     const sig: string = s.signature;
@@ -75,6 +104,11 @@ export async function GET() {
   }
 
   const solPrice = (await getSolPrice()) ?? 0;
+
+  if (raw) {
+    return NextResponse.json({ parsed, tokenMint, solPrice });
+  }
+
   const txs: { side: "buy" | "sell"; wallet: string; sol: number; usd: number; tokenAmount: number }[] = [];
 
   for (const tx of parsed) {
@@ -83,8 +117,9 @@ export async function GET() {
 
     let side: "buy" | "sell" | null = null;
     let solAmount = 0;
+    let tokenAmount = 0;
 
-    // 1. Try swap event (standard DEX swaps via Jupiter etc.)
+    // 1. Try swap event (Jupiter/standard DEX)
     const swap = tx.events?.swap;
     if (swap) {
       const tokenIn = (swap.tokenInputs || []).find((t) => t.mint === tokenMint);
@@ -93,57 +128,97 @@ export async function GET() {
       else if (tokenIn && !tokenOut) side = "sell";
     }
 
-    // 2. Try token transfers (most reliable for pump.fun)
-    if (!side && tx.tokenTransfers) {
-      for (const tt of tx.tokenTransfers) {
-        if (tt.mint === tokenMint && tt.tokenAmount != null) {
-          if (tt.toUserAccount === fp) { side = "buy"; break; }
-          if (tt.fromUserAccount === fp) { side = "sell"; break; }
+    // 2. Pump.fun AMM: use accountData (nativeBalanceChange) + tokenTransfers
+    // Buy = fp nativeBalanceChange negative (SOL out) + token mint in
+    // Sell = fp nativeBalanceChange positive (SOL in) + token mint out
+    if (!side && tx.accountData) {
+      const fpData = tx.accountData.find((a) => a.account === fp);
+      if (fpData) {
+        const nativeChange = fpData.nativeBalanceChange || 0;
+        let tokenOut = 0;
+        let tokenIn = 0;
+
+        for (const tt of tx.tokenTransfers || []) {
+          if (tt.mint !== tokenMint || tt.tokenAmount == null) continue;
+          const amt = tt.tokenAmount / Math.pow(10, tt.decimals || 0);
+          if (tt.fromUserAccount === fp && amt > tokenOut) tokenOut = amt;
+          if (tt.toUserAccount === fp && amt > tokenIn) tokenIn = amt;
+        }
+
+        if (nativeChange < 0 && tokenIn > 0) {
+          side = "buy";
+          solAmount = Math.abs(nativeChange) / LAMPORTS_PER_SOL;
+          tokenAmount = tokenIn;
+        } else if (nativeChange > 0 && tokenOut > 0) {
+          side = "sell";
+          solAmount = nativeChange / LAMPORTS_PER_SOL;
+          tokenAmount = tokenOut;
         }
       }
     }
 
-    // 3. Fallback: native SOL transfers (with dust filter)
-    if (!side && tx.nativeTransfers) {
-      let outSol = 0;
-      let inSol = 0;
-      const MIN_SOL = 0.001;
-      for (const nt of tx.nativeTransfers) {
-        const amt = (nt.amount || 0) / LAMPORTS_PER_SOL;
-        if (amt < MIN_SOL) continue;
-        if (nt.fromUserAccount === fp && amt > outSol) outSol = amt;
-        else if (nt.toUserAccount === fp && amt > inSol) inSol = amt;
+    // 3. Fallback: nativeTransfers + tokenTransfers direction
+    if (!side) {
+      let tokenOut = 0;
+      let tokenIn = 0;
+      let solOut = 0;
+      let solIn = 0;
+
+      for (const tt of tx.tokenTransfers || []) {
+        if (tt.mint === SOL_MINT && tt.tokenAmount != null) {
+          const amt = tt.tokenAmount / Math.pow(10, tt.decimals || 9);
+          if (tt.fromUserAccount === fp && amt > solOut) solOut = amt;
+          if (tt.toUserAccount === fp && amt > solIn) solIn = amt;
+        }
+        if (tt.mint !== tokenMint || tt.tokenAmount == null) continue;
+        const amt = tt.tokenAmount / Math.pow(10, tt.decimals || 0);
+        if (tt.fromUserAccount === fp && amt > tokenOut) tokenOut = amt;
+        if (tt.toUserAccount === fp && amt > tokenIn) tokenIn = amt;
       }
-      if (outSol > inSol && outSol > 0) { side = "buy"; solAmount = outSol; }
-      else if (inSol > outSol && inSol > 0) { side = "sell"; solAmount = inSol; }
+
+      for (const nt of tx.nativeTransfers || []) {
+        const amt = (nt.amount || 0) / LAMPORTS_PER_SOL;
+        if (nt.fromUserAccount === fp && amt > solOut) solOut = amt;
+        if (nt.toUserAccount === fp && amt > solIn) solIn = amt;
+      }
+
+      if (tokenOut > tokenIn && (solIn > 0 || solOut === 0)) {
+        side = "sell";
+        solAmount = solIn || solOut;
+        tokenAmount = tokenOut;
+      } else if (tokenIn > tokenOut && (solOut > 0 || solIn === 0)) {
+        side = "buy";
+        solAmount = solOut || solIn;
+        tokenAmount = tokenIn;
+      }
     }
 
     if (!side) continue;
 
-    if (solAmount === 0) {
-      for (const nt of tx.nativeTransfers || []) {
-        const amt = (nt.amount || 0) / LAMPORTS_PER_SOL;
-        if (side === "buy" && nt.fromUserAccount === fp && amt > solAmount) solAmount = amt;
-        if (side === "sell" && nt.toUserAccount === fp && amt > solAmount) solAmount = amt;
+    // Get token amount from tokenTransfers if not set
+    if (tokenAmount === 0) {
+      for (const tt of tx.tokenTransfers || []) {
+        if (tt.mint !== tokenMint || tt.tokenAmount == null) continue;
+        const amt = tt.tokenAmount / Math.pow(10, tt.decimals || 0);
+        if (side === "buy" && tt.toUserAccount === fp && amt > tokenAmount) tokenAmount = amt;
+        if (side === "sell" && tt.fromUserAccount === fp && amt > tokenAmount) tokenAmount = amt;
       }
     }
 
+    // Get SOL amount from nativeTransfers if still 0
+    if (solAmount === 0 && tx.nativeTransfers) {
+      let maxIn = 0;
+      let maxOut = 0;
+      for (const nt of tx.nativeTransfers) {
+        const amt = (nt.amount || 0) / LAMPORTS_PER_SOL;
+        if (nt.toUserAccount === fp && amt > maxIn) maxIn = amt;
+        if (nt.fromUserAccount === fp && amt > maxOut) maxOut = amt;
+      }
+      if (side === "buy") solAmount = maxOut || maxIn;
+      else if (side === "sell") solAmount = maxIn || maxOut;
+    }
+
     const usd = solAmount * solPrice;
-    let tokenAmount = 0;
-    if (swap) {
-      const entry = (side === "buy" ? (swap.tokenOutputs || []) : (swap.tokenInputs || [])).find((t) => t.mint === tokenMint);
-      if (entry && entry.amount != null && entry.decimals != null) {
-        tokenAmount = Number(entry.amount) / Math.pow(10, entry.decimals);
-      }
-    }
-    if (tokenAmount === 0 && tx.tokenTransfers) {
-      for (const tt of tx.tokenTransfers) {
-        if (tt.mint === tokenMint && tt.tokenAmount != null) {
-          tokenAmount = tt.tokenAmount / Math.pow(10, tt.decimals || 0);
-          break;
-        }
-      }
-    }
     txs.push({
       side,
       wallet: fp.slice(0, 4) + "..." + fp.slice(-4),

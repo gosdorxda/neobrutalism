@@ -7,6 +7,7 @@ import { NetworkSolana } from "@web3icons/react";
 import { useSettings } from "@/components/settings-provider";
 import { useCountUpNumber } from "@/hooks/use-count-up";
 
+const ICON_SRC = "/logo.png";
 const ROTATING_MESSAGES = [
   "All creator rewards go straight to food for street cats.",
   "Track every batch with receipts, photos, and on-chain records.",
@@ -257,7 +258,7 @@ export function LiveStreamV3() {
       </div>
 
       <div className="mx-auto max-w-screen-2xl px-4 pt-8 pb-4 text-center sm:px-6">
-        <h1 className="text-3xl font-heading tracking-tight text-foreground sm:text-5xl">The Bowl Meter</h1>
+        <h1 className="flex items-center justify-center gap-1 text-3xl font-heading tracking-tight text-foreground sm:text-5xl">The B<img src={ICON_SRC} alt="o" className="inline-block h-6 w-6 translate-y-0.5 sm:h-9 sm:w-9 sm:translate-y-1" />wl Meter</h1>
         <p className="mt-1.5 text-sm font-base text-foreground/50">Every Swap Fills a Bowl</p>
       </div>
 
