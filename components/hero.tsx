@@ -381,21 +381,19 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
                         </>
                       )}
                     </div>
-                    <div className="h-4 bg-secondary-background border-2 border-border rounded-base overflow-hidden relative">
+                    <div className="h-4 bg-secondary-background border border-border rounded-base overflow-hidden relative">
                       {batchLoading ? (
                         <Skeleton height="100%" width="100%" borderRadius={0} />
                       ) : (
-                        <div 
+                        <div
                           className="h-full bg-main transition-all duration-1000 ease-linear relative overflow-hidden"
                           style={{ width: `${progress}%` }}
                         >
                           {activeBatch && (
                             <>
-                              {/* Flowing shimmer effect like smoke */}
                               <div className="absolute inset-0 w-full h-full">
                                 <div className="absolute right-0 top-0 h-full w-16 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-[shimmer_2s_ease-in-out_infinite]"></div>
                               </div>
-                              {/* Animated glow at the edge */}
                               <div className="absolute right-0 top-0 h-full w-2 bg-white/60 blur-sm animate-[pulse-glow_1.5s_ease-in-out_infinite]"></div>
                               <div className="absolute right-0 top-0 h-full w-1 bg-white animate-[edge-shine_2s_ease-in-out_infinite]"></div>
                             </>

@@ -345,7 +345,7 @@ export function LiveStreamV3() {
                 <span>{activeBatch ? (isFinished ? "Feeding time!" : "Next Feeding") : "No Active Batch"}</span>
                 <span>{activeBatch ? formatDate(activeBatch.targetDate) : "-"}</span>
               </div>
-              <div className="h-4 border-2 border-border rounded-base bg-secondary-background overflow-hidden relative">
+              <div className="h-4 border border-border rounded-base bg-secondary-background overflow-hidden relative">
                 <div className="h-full bg-main transition-all duration-1000 ease-linear relative overflow-hidden" style={{ width: progress + "%" }}>
                   {activeBatch && (
                     <>
