@@ -1,6 +1,7 @@
 [
   {
     "fees": "$0",
+    "feesUsd": "0",
     "cats": "0",
     "food": "0kg",
     "txHash": "-",
@@ -13,93 +14,97 @@
     "essentials": [],
     "photos": [],
     "id": 2,
-    "name": "Batch #3",
+    "name": "Batch 3",
     "status": "In Progress",
-    "startDate": "2026-09-04",
-    "targetDate": "2026-09-23"
+    "startDate": "2026-09-11",
+    "targetDate": "2026-09-18"
   },
   {
-    "fees": "$166",
-    "cats": "166",
-    "food": "0kg",
-    "txHash": "-",
-    "isActive": true,
-    "receiptImages": [],
-    "receiptStore": "",
-    "receiptItem": "",
-    "receiptTotal": "$0",
-    "notes": "",
-    "essentials": [],
-    "photos": [
-      "/uploads/batch-1/1787306223305-afasdfad.jpg",
-      "/uploads/batch-1/1787306223377-asdasdas.jpg",
-      "/uploads/batch-1/1787306223434-dfsdf.jpg",
-      "/uploads/batch-1/1787306223492-WhatsApp_Image_2026-08-21_at_12.47.07.jpg",
-      "/uploads/batch-1/1787306223555-WhatsApp_Image_2026-08-21_at_12.47.08sdfdff.jpg",
-      "/uploads/batch-1/1787306223615-WhatsApp_Image_2026-08-21_at_12.47.11aad.jpg",
-      "/uploads/batch-1/1787306223690-WhatsApp_Image_2026-08-21_at_12.47.11daas.jpg",
-      "/uploads/batch-1/1787306223770-WhatsApp_Image_2026-08-21_at_12.47.11sdasdas.jpg",
-      "/uploads/batch-1/1787306223853-WhatsApp_Image_2026-08-21_at_12.47.15asdad.jpg",
-      "/uploads/batch-1/1787306223934-WhatsApp_Image_2026-08-21_at_12.47.15asdasd.jpg",
-      "/uploads/batch-1/1787306224005-WhatsApp_Image_2026-08-21_at_12.47.15sadasas.jpg",
-      "/uploads/batch-1/1787306224076-WhatsApp_Image_2026-08-21_at_12.47.15sdaas.jpg",
-      "/uploads/batch-1/1787306224152-WhatsApp_Image_2026-08-21_at_12.47.16asdasd.jpg",
-      "/uploads/batch-1/1787306224231-WhatsApp_Image_2026-08-21_at_12.47.17asdad.jpg",
-      "/uploads/batch-1/1787306224311-WhatsApp_Image_2026-08-21_at_12.47.17asdas.jpg",
-      "/uploads/batch-1/1787306224381-WhatsApp_Image_2026-08-21_at_12.47.17asdsad.jpg"
-    ],
-    "id": 1,
-    "name": "Batch #1",
-    "status": "Completed",
-    "startDate": "2026-08-11",
-    "targetDate": "2026-08-20"
-  },
-  {
-    "fees": "$15",
-    "cats": "15",
-    "food": "4kg",
-    "txHash": "63789tNzBWjHfmgS84WLBzuDFNywpy9Y4wNjt6gX5udfWLaCaHkqMhVciWy3vFRfDNniTUAUdT3eXgD3zrW5V2nn",
+    "fees": "0.2",
+    "feesUsd": "20.24",
+    "cats": "20",
+    "food": "5kg",
+    "txHash": "ERpDpYmuifJUKbaB1Dv9hnJ67RM21Jujmxz18JCeDzbr",
     "isActive": true,
     "receiptImages": [
-      "/uploads/batch-0/1786363387196-photo_2026-08-10_17-53-28.jpg",
-      "/uploads/batch-0/1786697929162-Screenshot_2026-07-29_113738.jpg"
+      "/uploads/batch-1/1789031544499-photo_2026-08-15_12-52-05.jpg",
+      "/uploads/batch-1/1789106642786-photo_2026-08-04_13-50-00.jpg"
     ],
-    "receiptStore": "Omeo PetShop Magelang",
-    "receiptItem": "Nutrition Cat Food",
+    "receiptStore": "One Pet Shop Sleman",
+    "receiptItem": "Cat Choize",
     "receiptTotal": "$15",
-    "notes": "Donation funds from @0xfjrnn",
+    "notes": "",
     "essentials": [
       {
-        "name": "Feeding bowl 5 Packs",
-        "price": "$3",
-        "tx": "AfqkmLk9hRuRwQcxjcoj7AJ4rMhsXf7XMNGNYHyetRmYEGpF6XDwX8VgpUM1KZ1W4ttyBfd3BSeo7qtvA1TfJFe"
+        "name": "Feeding Bowls 15",
+        "price": "$1",
+        "tx": "ERpDpYmuifJUKbaB1Dv9hnJ67RM21Jujmxz18JCeDzbr"
       }
     ],
     "photos": [
-      "/uploads/batch-0/1786363392283-photo_2026-08-10_14-29-58.jpg",
-      "/uploads/batch-0/1786363402204-PXL_20250925_200934844.jpg",
-      "/uploads/batch-0/1786363406467-PXL_20250925_200944118.jpg",
-      "/uploads/batch-0/1786792344852-PXL_20220523_151447072.NIGHT.jpg",
-      "/uploads/batch-0/1786792345138-PXL_20220523_151805151.NIGHT.jpg",
-      "/uploads/batch-0/1786792345414-PXL_20240821_132941446.NIGHT.jpg",
-      "/uploads/batch-0/1786792345786-PXL_20260705_014553713.jpg",
-      "/uploads/batch-0/1786792346168-PXL_20260705_035936164.jpg",
-      "/uploads/batch-0/1786792375445-IMG_0601.jpg",
-      "/uploads/batch-0/1786792375679-PXL_20260705_032204137.jpg",
-      "/uploads/batch-0/1786792375985-PXL_20260719_015532948.jpg",
-      "/uploads/batch-0/1786792376245-PXL_20260802_042935644.jpg",
-      "/uploads/batch-0/1786792376513-PXL_20260808_222243182.jpg",
-      "/uploads/batch-0/1786792376777-PXL_20260808_233924900.jpg",
-      "/uploads/batch-0/1786792376993-PXL_20260808_234139480.jpg",
-      "/uploads/batch-0/1786792377327-PXL_20260808_234151993.jpg",
-      "/uploads/batch-0/1786792377569-PXL_20260808_234345034.jpg",
-      "/uploads/batch-0/1786792377875-Scottish-Fold-Cat.jpg",
-      "/uploads/batch-0/1786792378051-VOIDLESS.jpg"
+      "/uploads/batch-1/1789031263303-afasdfad.jpg",
+      "/uploads/batch-1/1789031263406-asdasdas.jpg",
+      "/uploads/batch-1/1789031263471-dfsdf.jpg",
+      "/uploads/batch-1/1789031263537-WhatsApp_Image_2026-08-21_at_12.47.07.jpg",
+      "/uploads/batch-1/1789031263604-WhatsApp_Image_2026-08-21_at_12.47.08sdfdff.jpg",
+      "/uploads/batch-1/1789031263664-WhatsApp_Image_2026-08-21_at_12.47.11aad.jpg",
+      "/uploads/batch-1/1789031263742-WhatsApp_Image_2026-08-21_at_12.47.11daas.jpg",
+      "/uploads/batch-1/1789031263819-WhatsApp_Image_2026-08-21_at_12.47.11sdasdas.jpg",
+      "/uploads/batch-1/1789031263900-WhatsApp_Image_2026-08-21_at_12.47.15asdad.jpg",
+      "/uploads/batch-1/1789031263983-WhatsApp_Image_2026-08-21_at_12.47.15asdasd.jpg",
+      "/uploads/batch-1/1789031264088-WhatsApp_Image_2026-08-21_at_12.47.15sadasas.jpg",
+      "/uploads/batch-1/1789031264167-WhatsApp_Image_2026-08-21_at_12.47.15sdaas.jpg",
+      "/uploads/batch-1/1789031264242-WhatsApp_Image_2026-08-21_at_12.47.16asdasd.jpg",
+      "/uploads/batch-1/1789031264321-WhatsApp_Image_2026-08-21_at_12.47.17asdad.jpg",
+      "/uploads/batch-1/1789031264397-WhatsApp_Image_2026-08-21_at_12.47.17asdas.jpg"
+    ],
+    "id": 1,
+    "name": "Batch 2",
+    "status": "Completed",
+    "startDate": "2026-09-09",
+    "targetDate": "2026-09-09"
+  },
+  {
+    "fees": "2",
+    "feesUsd": "202.06",
+    "cats": "202",
+    "food": "16kg",
+    "txHash": "4nn138ArH2LPGmrWYuhZtfwG7sGC5Zm595KyfSjK3BdG32PwtFqSJgqtqKm6dnJeCSDPSXsL1M4DY9bUPaj1MCHz",
+    "isActive": true,
+    "receiptImages": [],
+    "receiptStore": "Omeo Pet Shop Magelang",
+    "receiptItem": "Proplan Chicken",
+    "receiptTotal": "$150",
+    "notes": "",
+    "essentials": [
+      {
+        "name": "Feeding bowls x150",
+        "price": "$10",
+        "tx": "4nn138ArH2LPGmrWYuhZtfwG7sGC5Zm595KyfSjK3BdG32PwtFqSJgqtqKm6dnJeCSDPSXsL1M4DY9bUPaj1MCHz"
+      },
+      {
+        "name": "Human Rescue",
+        "price": "$20",
+        "tx": "4nn138ArH2LPGmrWYuhZtfwG7sGC5Zm595KyfSjK3BdG32PwtFqSJgqtqKm6dnJeCSDPSXsL1M4DY9bUPaj1MCHz"
+      }
+    ],
+    "photos": [
+      "/uploads/batch-0/1789025723130-afasdfad.jpg",
+      "/uploads/batch-0/1789025723200-asdasdas.jpg",
+      "/uploads/batch-0/1789025723268-dfsdf.jpg",
+      "/uploads/batch-0/1789025723334-WhatsApp_Image_2026-08-21_at_12.47.07.jpg",
+      "/uploads/batch-0/1789025723398-WhatsApp_Image_2026-08-21_at_12.47.08sdfdff.jpg",
+      "/uploads/batch-0/1789025723460-WhatsApp_Image_2026-08-21_at_12.47.11aad.jpg",
+      "/uploads/batch-0/1789025723542-WhatsApp_Image_2026-08-21_at_12.47.11daas.jpg",
+      "/uploads/batch-0/1789025723626-WhatsApp_Image_2026-08-21_at_12.47.11sdasdas.jpg",
+      "/uploads/batch-0/1789025723715-WhatsApp_Image_2026-08-21_at_12.47.15asdad.jpg",
+      "/uploads/batch-0/1789025723810-WhatsApp_Image_2026-08-21_at_12.47.15asdasd.jpg",
+      "/uploads/batch-0/1789025723887-WhatsApp_Image_2026-08-21_at_12.47.15sadasas.jpg"
     ],
     "id": 0,
-    "name": "Batch #0",
+    "name": "Batch 1",
     "status": "Completed",
-    "startDate": "2026-08-07",
-    "targetDate": "2026-08-09"
+    "startDate": "2026-09-03",
+    "targetDate": "2026-09-09"
   }
 ]

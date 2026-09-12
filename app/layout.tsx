@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans, Roboto_Mono } from "next/font/google";
 import { NotificationBanner } from "@/components/notification-banner";
 import { KalkulasiDrawer } from "@/components/kalkulasi";
 import { ProjectNameProvider } from "@/components/project-name-provider";
@@ -12,6 +12,13 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-sans",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+const robotoMono = Roboto_Mono({
+  variable: "--font-mono-roboto",
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
   display: "swap",
 });
 
@@ -62,7 +69,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${plusJakartaSans.variable} theme-${settings.theme} ${settings.font === "custom" ? "font-custom" : ""} h-full antialiased`}
+      className={`${plusJakartaSans.variable} ${robotoMono.variable} theme-${settings.theme} ${settings.font === "custom" ? "font-custom" : ""} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
         <ThemeProvider initialTheme={settings.theme}>

@@ -11,11 +11,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DataTable } from "@/components/ui/data-table";
-import { Receipt, Camera, ExternalLink, Package, PaperBag, Link2, FileCheck, Clock, CircleCheck, Cat, Soup, Info, PartyPopper, DollarSign, ChevronLeft, ChevronRight } from "lucide-react";
+import { Receipt, Camera, ExternalLink, Package, PaperBag, Link2, FileCheck, Clock, CircleCheck, Cat, Soup, Info, PartyPopper, DollarSign, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { getThumbPath, formatTxHash } from "@/lib/utils";
+import { getThumbPath, formatTxHash, formatFeesDisplay } from "@/lib/utils";
 import { InvoiceCompactView, getInvoiceCode, type InvoiceBatch, type InvoiceSettings, type BatchEssentials } from "./invoice";
 
 type Batch = {
@@ -25,6 +25,7 @@ type Batch = {
   startDate: string;
   targetDate: string;
   fees: string;
+  feesUsd?: string;
   cats: string;
   food: string;
   txHash: string;
@@ -109,19 +110,6 @@ function BatchStatusAlert({ status }: { status: string }) {
 }
 
 function ReceiptDialog({ batch, settings }: { batch: Batch; settings: InvoiceSettings }) {
-  const receiptImages = getReceiptImages(batch);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const hasReceipts = receiptImages.length > 0;
-  const hasMultiple = receiptImages.length > 1;
-
-  function nextImage() {
-    setCurrentIndex((prev) => (prev + 1) % receiptImages.length);
-  }
-
-  function prevImage() {
-    setCurrentIndex((prev) => (prev - 1 + receiptImages.length) % receiptImages.length);
-  }
-
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -130,94 +118,32 @@ function ReceiptDialog({ batch, settings }: { batch: Batch; settings: InvoiceSet
           Receipt
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader className="pr-8">
-          <DialogTitle className="text-lg leading-tight">{batch.name}</DialogTitle>
+      <DialogContent className="sm:max-w-xl max-h-[80vh] overflow-y-auto [&>button:last-of-type]:hidden">
+        <DialogHeader className="text-center">
+          <DialogTitle className="text-lg font-heading text-foreground">{batch.name}</DialogTitle>
           <DialogDescription>
-            {hasReceipts
-              ? `Receipt proof for this batch's cat food purchase. ${receiptImages.length} image${receiptImages.length > 1 ? "s" : ""} available.`
-              : "No receipt uploaded for this batch yet."}
+            Fund allocation and receipt for this batch.
           </DialogDescription>
         </DialogHeader>
 
         <BatchStatusAlert status={batch.status} />
 
-        <div className="space-y-4 mt-2">
-          {/* Receipt Image Carousel */}
-          {hasReceipts ? (
-            <div className="space-y-2">
-              <div className="relative w-full h-[200px] sm:h-[240px] border border-border rounded-base overflow-hidden bg-secondary-background">
-                <Image
-                  src={receiptImages[currentIndex]}
-                  alt={`Receipt ${currentIndex + 1}`}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 500px"
-                  className="object-contain"
-                  unoptimized
-                />
-                {/* Status Watermark */}
-                <div
-                  className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl sm:text-4xl font-heading font-black uppercase tracking-widest rotate-[-12deg] select-none pointer-events-none whitespace-nowrap ${getStatusWatermarkColor(batch.status)}`}
-                >
-                  {batch.status}
-                </div>
-
-                {/* Navigation Arrows */}
-                {hasMultiple && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={prevImage}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 border border-border shadow-sm flex items-center justify-center hover:bg-white transition-colors"
-                      aria-label="Previous receipt"
-                    >
-                      <ChevronLeft className="w-4 h-4 text-foreground" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={nextImage}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 border border-border shadow-sm flex items-center justify-center hover:bg-white transition-colors"
-                      aria-label="Next receipt"
-                    >
-                      <ChevronRight className="w-4 h-4 text-foreground" />
-                    </button>
-                  </>
-                )}
-              </div>
-
-              <div className="flex items-center justify-between">
-                <a
-                  href={receiptImages[currentIndex]}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs font-base text-foreground/60 hover:text-main transition-colors inline-flex items-center gap-1"
-                >
-                  View Full Image
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-                {hasMultiple && (
-                  <span className="text-xs font-base text-foreground/60">
-                    {currentIndex + 1} / {receiptImages.length}
-                  </span>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div className="relative bg-secondary-background border border-border rounded-base p-6 flex items-center justify-center h-[200px] overflow-hidden">
-              {/* Status Watermark */}
-              <div
-                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl sm:text-4xl font-heading font-black uppercase tracking-widest rotate-[-12deg] select-none pointer-events-none whitespace-nowrap ${getStatusWatermarkColor(batch.status)}`}
-              >
-                {batch.status}
-              </div>
-              <div className="text-center relative z-10">
-                <Receipt className="w-12 h-12 text-foreground/30 mx-auto mb-3" />
-                <span className="text-sm font-base text-foreground/50">No receipt uploaded yet</span>
-              </div>
-            </div>
-          )}
-
-          {/* Invoice */}
+        {batch.status === "In Progress" ? (
+          <div className="mt-2 rounded-base border border-border bg-secondary-background p-6 text-center">
+            <Package className="h-8 w-8 text-foreground/20 mx-auto mb-2" />
+            <p className="text-xs font-base text-foreground/40">
+              Receipt and fund allocation will be available once this batch is completed.
+            </p>
+          </div>
+        ) : batch.status === "Feeding" && !batch.receiptTotal && !(batch.essentials && batch.essentials.length > 0) ? (
+          <div className="mt-2 rounded-base border border-border bg-secondary-background p-6 text-center">
+            <Soup className="h-8 w-8 text-foreground/20 mx-auto mb-2" />
+            <p className="text-xs font-base text-foreground/40">
+              Receipt and fund allocation will be available once feeding is completed.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-2">
           <InvoiceCompactView
             batch={{
               id: batch.id,
@@ -226,6 +152,7 @@ function ReceiptDialog({ batch, settings }: { batch: Batch; settings: InvoiceSet
               startDate: batch.startDate,
               targetDate: batch.targetDate,
               fees: batch.fees,
+              feesUsd: batch.feesUsd,
               cats: batch.cats,
               food: batch.food,
               txHash: batch.txHash,
@@ -248,7 +175,8 @@ function ReceiptDialog({ batch, settings }: { batch: Batch; settings: InvoiceSet
               </a>
             }
           />
-        </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
@@ -268,7 +196,7 @@ function PhotosDialog({ batch }: { batch: Batch }) {
           Photos
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-3xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-3xl max-h-[80vh] overflow-y-auto [&>button:last-of-type]:hidden">
         <DialogHeader>
           <DialogTitle>{batch.name} - Cat Photos</DialogTitle>
           <DialogDescription>
@@ -308,7 +236,7 @@ function PhotosDialog({ batch }: { batch: Batch }) {
 
         {batch.photos.length === 0 ? (
           <div className="bg-secondary-background border border-border rounded-base p-8 flex flex-col items-center justify-center mt-4">
-            <Camera className="w-12 h-12 text-foreground/30 mb-3" />
+            <Camera className="w-12 h-0.52 text-foreground/30 mb-3" />
             <p className="text-sm font-base text-foreground/50">No photos uploaded yet</p>
           </div>
         ) : (
@@ -356,7 +284,7 @@ function PhotosDialog({ batch }: { batch: Batch }) {
   );
 }
 
-function getColumns(settings: InvoiceSettings): ColumnDef<Batch>[] {
+function getColumns(settings: InvoiceSettings, solPrice: number): ColumnDef<Batch>[] {
   return [
   {
     accessorKey: "batch",
@@ -399,9 +327,10 @@ function getColumns(settings: InvoiceSettings): ColumnDef<Batch>[] {
     meta: { className: "hidden md:table-cell" },
     cell: ({ row }) => {
       const batch = row.original;
+      const display = formatFeesDisplay(batch.fees, solPrice);
       return (
         <div className="text-base font-heading text-foreground">
-          {batch.status === "In Progress" || batch.status === "Feeding" ? "~" : row.getValue("fees")}
+          {batch.status === "In Progress" || batch.status === "Feeding" ? "~" : display.primary}
         </div>
       );
     },
@@ -495,18 +424,24 @@ export function BatchHistory() {
   const [now, setNow] = useState(0);
   const [viewMode, setViewMode] = useState<"list" | "table">("list");
   const [settings, setSettings] = useState<InvoiceSettings>({ projectName: "CATFUND" });
+  const [solPrice, setSolPrice] = useState(0);
 
   useEffect(() => {
     async function loadBatches() {
       try {
-        const [batchesRes, settingsRes] = await Promise.all([
+        const [batchesRes, settingsRes, statsRes] = await Promise.all([
           fetch("/api/batches", { cache: "no-store" }),
           fetch("/api/settings", { cache: "no-store" }),
+          fetch("/api/stats", { cache: "no-store" }),
         ]);
         const data = await batchesRes.json();
         const settingsData = await settingsRes.json().catch(() => ({}));
+        const statsData = await statsRes.json().catch(() => ({}));
         setBatches(data);
         setSettings({ projectName: settingsData.projectName || "CATFUND" });
+        if (statsData.totalFeesSol > 0 && statsData.totalFees > 0) {
+          setSolPrice(statsData.totalFees / statsData.totalFeesSol);
+        }
       } catch {
         setBatches([]);
       }
@@ -559,7 +494,7 @@ export function BatchHistory() {
             <p className="text-sm font-base text-foreground/50">Loading batches...</p>
           </div>
         ) : viewMode === "table" ? (
-          <DataTable columns={getColumns(settings)} data={batches} />
+          <DataTable columns={getColumns(settings, solPrice)} data={batches} />
         ) : null}
 
         {/* Improved Card List View */}
@@ -604,23 +539,11 @@ export function BatchHistory() {
                       {/* Batch icon */}
                       <Package className="w-5 h-5 sm:w-6 sm:h-6 shrink-0 text-foreground" />
 
-                      {/* Name + status */}
+                      {/* Name */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <h3 className="text-base sm:text-lg font-heading text-foreground truncate">
-                            {batch.name}
-                          </h3>
-                          <span className={"text-[10px] font-heading px-1.5 py-0.5 rounded-full inline-flex items-center gap-1 shrink-0 " + (isActive ? "bg-main/10 text-main" : isFeeding ? "bg-chart-3/10 text-chart-3" : "bg-chart-4/10 text-chart-4")}>
-                            {isActive ? (
-                              <span className="w-2.5 h-2.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                            ) : isFeeding ? (
-                              <Soup className="w-3 h-3" />
-                            ) : (
-                              <CircleCheck className="w-3 h-3" />
-                            )}
-                            {isActive ? "In Progress" : batch.status}
-                          </span>
-                        </div>
+                        <h3 className="text-base sm:text-lg font-heading text-foreground truncate">
+                          {batch.name}
+                        </h3>
                       </div>
 
                       {/* Actions */}
@@ -630,18 +553,51 @@ export function BatchHistory() {
                       </div>
                     </div>
 
-                    {/* Progress bar */}
-                    <div className="px-4 pb-3">
-                      <div className="flex items-center justify-between text-[10px] font-base text-foreground/50 mb-1">
-                        <span>{formatDate(batch.startDate)}</span>
-                        <span>{progress}%</span>
-                        <span>{formatDate(batch.targetDate)}</span>
-                      </div>
-                      <div className="h-2 bg-foreground/10 rounded-full overflow-hidden">
+                    {/* Step progress */}
+                    <div className="px-1 pb-4 pt-2">
+                      <div className="relative">
+                        {/* Connector line behind dots */}
+                        <div className="absolute left-[12.5%] right-[12.5%] top-[calc(1.25rem+0.625rem)] h-1 bg-foreground/10 rounded-full" />
                         <div
-                          className={"h-full rounded-full transition-all duration-500 " + (isActive ? "bg-main" : isFeeding ? "bg-chart-3" : "bg-chart-4")}
-                          style={{ width: progress + "%" }}
+                          className="absolute left-[12.5%] top-[calc(1.25rem+0.625rem)] h-1 bg-chart-4/40 rounded-full transition-all duration-500"
+                          style={{ width: `calc(${isCompleted ? "75" : isFeeding ? "50" : isActive ? "25" : "0"}% - 0px)` }}
                         />
+                        <div className="relative flex items-start justify-between">
+                          {(() => {
+                            const steps = [
+                              { label: "Started", done: true, active: false },
+                              { label: "In Progress", done: isCompleted || isFeeding, active: isActive },
+                              { label: "Feeding", done: isCompleted, active: isFeeding },
+                              { label: "Completed", done: false, active: isCompleted, isComplete: isCompleted },
+                            ];
+                            return steps.map((step, i) => (
+                              <div key={i} className="flex flex-col items-center" style={{ width: "25%" }}>
+                                <span className={"text-[9px] font-base text-center mb-2 whitespace-nowrap " + (step.done || step.isComplete ? "text-chart-4" : step.active ? "text-main" : "text-foreground/30")}>
+                                  {step.label}
+                                </span>
+                                <div className="relative z-10">
+                                  {step.done || step.isComplete ? (
+                                    <div className="flex h-6 w-6 items-center justify-center rounded-base bg-chart-4 ring-4 ring-chart-4/15">
+                                      <CircleCheck className="h-3.5 w-3.5 text-white" />
+                                    </div>
+                                  ) : step.active ? (
+                                    <div className={"flex h-6 w-6 items-center justify-center rounded-base border-2 " + (isFeeding ? "border-chart-3 bg-white ring-4 ring-chart-3/10" : "border-main bg-white ring-4 ring-main/10")}>
+                                      {isFeeding ? (
+                                        <Soup className="h-3.5 w-3.5 text-chart-3" />
+                                      ) : (
+                                        <Loader2 className="h-3.5 w-3.5 text-main animate-spin" />
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <div className="flex h-6 w-6 items-center justify-center rounded-base border-2 border-foreground/20 bg-white" />
+                                  )}
+                                </div>
+                                {i === 0 && <span className="text-[8px] font-base text-foreground/30 mt-1">{formatDate(batch.startDate)}</span>}
+                                {i === 3 && <span className="text-[8px] font-base text-foreground/30 mt-1">{formatDate(batch.targetDate)}</span>}
+                              </div>
+                            ));
+                          })()}
+                        </div>
                       </div>
                     </div>
 
@@ -670,9 +626,14 @@ export function BatchHistory() {
                           <DollarSign className="w-3 h-3" />
                           Rewards
                         </span>
-                        <span className="text-sm font-heading text-foreground">
-                          {isActive || isFeeding ? "~" : batch.fees}
-                        </span>
+                        {(() => {
+                          const display = formatFeesDisplay(batch.fees, solPrice);
+                          return (
+                            <span className="text-sm font-heading text-foreground">
+                              {isActive || isFeeding ? "~" : display.primary}
+                            </span>
+                          );
+                        })()}
                       </div>
                       <div className="flex flex-col items-center justify-center gap-1 py-3">
                         <span className="text-[9px] font-base text-foreground/40 uppercase tracking-wider flex items-center gap-1">

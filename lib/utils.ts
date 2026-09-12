@@ -34,3 +34,26 @@ export function formatUsd(value: number): string {
     maximumFractionDigits: fractionDigits,
   }).format(value);
 }
+
+export function parseFeeNumber(fees: string): number {
+  return Number(fees.replace(/[^0-9.]/g, "")) || 0;
+}
+
+export function isUsdFees(fees: string): boolean {
+  return fees.trim().startsWith("$");
+}
+
+export function formatFeesDisplay(fees: string, solPrice: number): { primary: string; secondary: string } {
+  const num = parseFeeNumber(fees);
+  if (isUsdFees(fees)) {
+    const sol = solPrice > 0 ? num / solPrice : 0;
+    return {
+      primary: sol > 0 ? `${sol.toFixed(4)} SOL` : `${num.toFixed(2)} USD`,
+      secondary: "",
+    };
+  }
+  return {
+    primary: `${num} SOL`,
+    secondary: "",
+  };
+}

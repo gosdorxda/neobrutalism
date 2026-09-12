@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { getThumbPath } from "@/lib/utils";
+import { getThumbPath, isUsdFees } from "@/lib/utils";
 import { ChevronDown, Cat, Home, PawPrint, Shield, Heart, Plus, Trash2, Check } from "lucide-react";
 import { type Partner, type Font } from "@/lib/settings";
 import { themes, type Theme } from "@/components/theme-provider";
@@ -25,6 +25,7 @@ type Batch = {
   startDate: string;
   targetDate: string;
   fees: string;
+  feesUsd?: string;
   cats: string;
   food: string;
   txHash: string;
@@ -46,10 +47,6 @@ function parseFees(fees: string): number {
   return Number(fees.replace(/[^0-9.]/g, "")) || 0;
 }
 
-function calculateCats(fees: string): string {
-  return String(Math.floor(parseFees(fees)));
-}
-
 function BatchEditor({
   batch,
   onChange,
@@ -63,6 +60,27 @@ function BatchEditor({
   onCancel: () => void;
   loading: boolean;
 }) {
+  const [fetchingPrice, setFetchingPrice] = useState(false);
+
+  async function fetchSolPrice() {
+    const solNum = parseFees(batch.fees);
+    if (solNum <= 0) return;
+    setFetchingPrice(true);
+    try {
+      const res = await fetch("/api/stats", { cache: "no-store" });
+      const stats = await res.json();
+      if (stats.totalFeesSol > 0 && stats.totalFees > 0) {
+        const solPrice = stats.totalFees / stats.totalFeesSol;
+        const usd = (solNum * solPrice).toFixed(2);
+        const cats = String(Math.floor(Number(usd)));
+        onChange({ ...batch, feesUsd: usd, cats });
+      }
+    } catch {
+      // ignore
+    }
+    setFetchingPrice(false);
+  }
+
   return (
     <Card className="border-2 border-border shadow-shadow bg-white">
       <CardHeader className="pb-4">
@@ -97,18 +115,34 @@ function BatchEditor({
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-base text-foreground/60 block">Funds Raised (USD)</label>
-            <Input
-              value={batch.fees}
-              onChange={(e) =>
-                onChange({
-                  ...batch,
-                  fees: e.target.value,
-                  cats: calculateCats(e.target.value),
-                })
-              }
-              placeholder="$0"
-            />
+            <label className="text-xs font-base text-foreground/60 block">Fund Raised (SOL)</label>
+            <div className="flex gap-2">
+              <Input
+                value={batch.fees}
+                onChange={(e) =>
+                  onChange({
+                    ...batch,
+                    fees: e.target.value,
+                  })
+                }
+                placeholder="0"
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="neutral"
+                disabled={fetchingPrice || loading || parseFees(batch.fees) <= 0}
+                onClick={fetchSolPrice}
+                className="shrink-0"
+              >
+                {fetchingPrice ? "..." : "Fetch"}
+              </Button>
+            </div>
+            {batch.feesUsd && batch.feesUsd !== "0" && batch.feesUsd !== "$0" && (
+              <p className="text-[10px] font-base text-foreground/40">
+                Snapshot: ${batch.feesUsd} ({batch.cats} cats)
+              </p>
+            )}
           </div>
         </div>
 

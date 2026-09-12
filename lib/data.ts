@@ -14,6 +14,7 @@ export type Batch = {
   startDate: string;
   targetDate: string;
   fees: string;
+  feesUsd?: string;
   cats: string;
   food: string;
   txHash: string;
@@ -63,7 +64,8 @@ export function getStats() {
   const completed = batches.filter((b) => b.status === "Completed");
 
   const totalFees = completed.reduce((sum, b) => {
-    const num = Number(b.fees.replace(/[^0-9.]/g, ""));
+    const usd = b.feesUsd ? Number(b.feesUsd.replace(/[^0-9.]/g, "")) : NaN;
+    const num = isNaN(usd) ? Number(b.fees.replace(/[^0-9.]/g, "")) : usd;
     return sum + (isNaN(num) ? 0 : num);
   }, 0);
 

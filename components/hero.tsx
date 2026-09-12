@@ -63,7 +63,7 @@ export function Hero({ initialStats }: { initialStats?: { totalCats: number; tot
     totalFood: initialStats?.totalFood ?? 0,
     estimatedBowls: initialStats?.estimatedBowls ?? 0,
   });
-  const [showSol, setShowSol] = useState(false);
+  const [showSol, setShowSol] = useState(true);
   const [activeBatch, setActiveBatch] = useState<ApiBatch | null>(null);
   const [isFinished, setIsFinished] = useState(false);
   const [buyUrl, setBuyUrl] = useState("https://pump.fun");

@@ -5,7 +5,8 @@ import path from "path";
 const dataFilePath = path.join(process.cwd(), "data", "batches.json");
 
 const defaultBatch = {
-  fees: "$0",
+  fees: "0",
+  feesUsd: "0",
   cats: "0",
   food: "0kg",
   txHash: "-",

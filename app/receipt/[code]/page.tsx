@@ -37,6 +37,7 @@ export default async function InvoicePage({
     startDate: batch.startDate,
     targetDate: batch.targetDate,
     fees: batch.fees,
+    feesUsd: batch.feesUsd,
     cats: batch.cats,
     food: batch.food,
     txHash: batch.txHash,
@@ -53,7 +54,8 @@ export default async function InvoicePage({
   };
 
   return (
-    <main className="min-h-screen bg-background flex items-center justify-center py-10 px-4 sm:px-6 lg:px-8 print:bg-white print:py-0 print:px-0">
+    <main className="min-h-screen bg-zinc-200 flex items-center justify-center py-10 px-4 sm:px-6 lg:px-8 print:bg-white print:py-0 print:px-0" style={{ printColorAdjust: "exact", WebkitPrintColorAdjust: "exact" } as React.CSSProperties}>
+      <style>{`button.fixed.bottom-5.right-5, button.fixed.sm\\:bottom-6.sm\\:right-6 { display: none !important; }`}</style>
       <div className="w-full max-w-4xl">
         <InvoiceView batch={invoiceBatch} settings={invoiceSettings} showPrintButton />
       </div>
