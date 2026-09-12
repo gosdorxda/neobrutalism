@@ -1,5 +1,27 @@
 [
   {
+    "fees": "1",
+    "feesUsd": "101.70",
+    "cats": "85",
+    "food": "6kg",
+    "txHash": "3z7Wr525J2QeigKDMUjRefMSLcVeMhggaMPAWfccMbxVtQtEaJSdA6eouFxZKmTK8CsvvZsQ3mtyNUseL9GUF9vg",
+    "isActive": true,
+    "receiptImages": [
+      "/uploads/batch-3/1789196917842-Screenshot_2026-07-29_113738.jpg"
+    ],
+    "receiptStore": "Omeo Karang Gading",
+    "receiptItem": "Proplan Chicken",
+    "receiptTotal": "$85",
+    "notes": "",
+    "essentials": [],
+    "photos": [],
+    "id": 3,
+    "name": "Batch 4",
+    "status": "Completed",
+    "startDate": "2026-09-02",
+    "targetDate": "2026-09-11"
+  },
+  {
     "fees": "$0",
     "feesUsd": "0",
     "cats": "0",
@@ -15,7 +37,7 @@
     "photos": [],
     "id": 2,
     "name": "Batch 3",
-    "status": "In Progress",
+    "status": "Completed",
     "startDate": "2026-09-11",
     "targetDate": "2026-09-18"
   },

@@ -72,8 +72,7 @@ function BatchEditor({
       if (stats.totalFeesSol > 0 && stats.totalFees > 0) {
         const solPrice = stats.totalFees / stats.totalFeesSol;
         const usd = (solNum * solPrice).toFixed(2);
-        const cats = String(Math.floor(Number(usd)));
-        onChange({ ...batch, feesUsd: usd, cats });
+        onChange({ ...batch, feesUsd: usd });
       }
     } catch {
       // ignore
@@ -140,7 +139,7 @@ function BatchEditor({
             </div>
             {batch.feesUsd && batch.feesUsd !== "0" && batch.feesUsd !== "$0" && (
               <p className="text-[10px] font-base text-foreground/40">
-                Snapshot: ${batch.feesUsd} ({batch.cats} cats)
+                Snapshot: ${batch.feesUsd} ({batch.cats || "0"} cats from spending)
               </p>
             )}
           </div>
@@ -495,13 +494,15 @@ export default function AdminPage() {
   async function saveBatch(batch: Batch) {
     setLoading(true);
     try {
+      const receiptTotal = batch.receiptTotal ? Number(batch.receiptTotal.replace(/[^0-9.]/g, "")) || 0 : 0;
+      const cats = String(Math.floor(receiptTotal));
       const res = await fetch("/api/batches", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           authorization: `Bearer ${password}`,
         },
-        body: JSON.stringify(batch),
+        body: JSON.stringify({ ...batch, cats }),
       });
       if (res.ok) {
         setMessage("Batch saved successfully");
