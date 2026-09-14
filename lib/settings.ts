@@ -55,6 +55,7 @@ export type Settings = {
   tplBatch: string;
   tplFeedingProof: string;
   swapFeeBps: number;
+  customHeadScripts: string;
 };
 
 const defaultSettings: Settings = {
@@ -97,6 +98,7 @@ const defaultSettings: Settings = {
   tplFeedingProof:
     "📸 FEEDING PROOF — {name}\n\n🏪 Store: {store}\n📦 Item: {item}\n💰 Total: {total}\n🗓️ Date: {date}\n\n🐱 Cats: {cats}\n📦 Food: {food}\n💰 Rewards: {fees}\n\n🔗 Tx: {tx}\n🧾 Receipt: {receiptUrl}\n\n100% rewards → food. No cash. 🐾",
   swapFeeBps: 100,
+  customHeadScripts: "",
 };
 
 export function getSettings(): Settings {

@@ -66,11 +66,14 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     if (noscriptMatch) histatsNoscript = noscriptMatch[1];
   }
 
+  const customHeadScripts = settings.customHeadScripts?.trim() || "";
+
   return (
     <html
       lang="en"
       className={`${plusJakartaSans.variable} ${robotoMono.variable} theme-${settings.theme} ${settings.font === "custom" ? "font-custom" : ""} h-full antialiased`}
     >
+      <head dangerouslySetInnerHTML={customHeadScripts ? { __html: customHeadScripts } : undefined} />
       <body className="min-h-full flex flex-col font-sans">
         <ThemeProvider initialTheme={settings.theme}>
           <ProjectNameProvider initialProjectName={projectName} initialProjectLogo={projectLogo}>

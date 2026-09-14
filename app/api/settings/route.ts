@@ -150,6 +150,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    if (body.customHeadScripts !== undefined) {
+      updates.customHeadScripts = typeof body.customHeadScripts === "string" ? body.customHeadScripts : "";
+    }
+
     const tplFields = ["tplDonation", "tplRewards", "tplPurchase", "tplBatch", "tplFeedingProof"] as const;
     tplFields.forEach((field) => {
       if (body[field] !== undefined && typeof body[field] === "string") {

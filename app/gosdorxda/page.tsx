@@ -188,6 +188,7 @@ export default function AdminPage() {
   const [ogImage, setOgImage] = useState("");
   const [favicon, setFavicon] = useState("");
   const [histatsCode, setHistatsCode] = useState("");
+  const [customHeadScripts, setCustomHeadScripts] = useState("");
   const [swapFeeBps, setSwapFeeBps] = useState(100);
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [maintenanceMessage, setMaintenanceMessage] = useState("");
@@ -283,6 +284,7 @@ export default function AdminPage() {
       setOgImage(data.ogImage || "");
       setFavicon(data.favicon || "");
       setHistatsCode(data.histatsCode || "");
+      setCustomHeadScripts(data.customHeadScripts || "");
       setSwapFeeBps(typeof data.swapFeeBps === "number" ? data.swapFeeBps : 100);
       setMaintenanceMode(Boolean(data.maintenanceMode));
       setMaintenanceMessage(data.maintenanceMessage || "");
@@ -351,6 +353,7 @@ export default function AdminPage() {
           ogImage,
           favicon,
           histatsCode,
+          customHeadScripts,
           swapFeeBps,
           maintenanceMode,
           maintenanceMessage,
@@ -1805,6 +1808,19 @@ export default function AdminPage() {
                         />
                         <p className="text-[10px] font-base text-foreground/50">
                           From histats.com counter code (the full &lt;script&gt;...&lt;/script&gt; block). Leave empty to disable.
+                        </p>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-base text-foreground/60 block">Custom Head Scripts</label>
+                        <Textarea
+                          value={customHeadScripts}
+                          onChange={(e) => setCustomHeadScripts(e.target.value)}
+                          placeholder={"<!-- Paste Google Analytics, Meta Pixel, or any script tags here -->\n<script>\n  // Your tracking code\n</script>"}
+                          className="text-sm font-mono"
+                          rows={8}
+                        />
+                        <p className="text-[10px] font-base text-foreground/50">
+          Paste any script tags (Google Analytics, Meta Pixel, etc.). Injected into the head of every page. Leave empty to disable.
                         </p>
                       </div>
                     </div>
